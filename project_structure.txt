@@ -1,0 +1,52 @@
+中国社交媒体情绪地图项目结构
+===========================
+
+/
+├── README.md                       # 项目说明文档
+├── requirements.txt                # 项目依赖
+├── main.py                         # 主程序入口
+├── app.py                          # Streamlit Web应用
+├── api.py                          # Flask API服务
+├── config/
+│   ├── config.json                 # 主配置文件 
+│   └── api_keys.json               # API密钥（不提交到版本控制）
+├── data/
+│   ├── sentiment_dict/             # 情感词典
+│   │   ├── general.json            # 通用情感词典
+│   │   ├── programming.json        # 编程领域情感词典
+│   │   └── education.json          # 教育领域情感词典
+│   ├── location_dict.json          # 地区词典
+│   └── cache/                      # 数据缓存目录
+├── db/
+│   └── sentiment_data.db           # SQLite数据库
+├── modules/
+│   ├── __init__.py
+│   ├── collector/                  # 数据采集模块
+│   │   ├── __init__.py
+│   │   ├── data_collector.py       # 数据采集器
+│   │   ├── zhihu_api.py            # 知乎API适配器
+│   │   └── weibo_api.py            # 微博API适配器
+│   ├── analyzer/                   # 数据分析模块
+│   │   ├── __init__.py
+│   │   ├── sentiment_analyzer.py   # 情感分析器
+│   │   └── location_processor.py   # 地区处理器
+│   ├── processor/                  # 数据处理模块
+│   │   ├── __init__.py
+│   │   ├── data_processor.py       # 数据处理管道
+│   │   └── data_aggregator.py      # 数据聚合器
+│   └── visualizer/                 # 可视化模块
+│       ├── __init__.py
+│       ├── map_visualizer.py       # 地图可视化
+│       └── chart_generator.py      # 图表生成器
+├── static/                         # 静态资源
+│   ├── css/                        # 样式文件
+│   ├── js/                         # JavaScript文件
+│   └── images/                     # 图片资源
+├── templates/                      # HTML模板
+├── tests/                          # 测试代码
+│   ├── test_collector.py
+│   ├── test_analyzer.py
+│   └── test_visualizer.py
+└── docs/                           # 文档
+    ├── user_guide.md               # 用户指南
+    └── api_doc.md                  # API文档

@@ -1,0 +1,11 @@
+{
+  "zhihu": {
+    "api_key": "your_zhihu_api_key_here",
+    "api_secret": "your_zhihu_api_secret_here"
+  },
+  "weibo": {
+    "app_key": "your_weibo_app_key_here",
+    "app_secret": "your_weibo_app_secret_here",
+    "access_token": "your_weibo_access_token_here"
+  }
+}
