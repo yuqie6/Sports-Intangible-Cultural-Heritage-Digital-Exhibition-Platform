@@ -3,15 +3,15 @@
     "cookies": [
       {
         "name": "z_c0",
-        "value": "2|1:0|10:1742390240|4:z_c0|80:MS4xTkZvaFZnQUFBQUFtQUFBQVlBSlZUZUFSeUdnNXNUMERqOTFScFJuMnY5LWoyeGp1Z0dYWEF3PT0=|cddc011611f9a2c28e6fef468e383574bbe2b42f4fd839fda508f86f25a3e10a	",
+        "value": "MS4xTkZvaFZnQUFBQUFtQUFBQVlBSlZUZUFSeUdnNXNUMERqOTFScFJuMnY5LWoyeGp1Z0dYWEF3PT0=",
         "domain": ".zhihu.com",
         "path": "/"
       }
     ]
   },
   "weibo": {
-    "app_key": "your_weibo_app_key_here",
-    "app_secret": "your_weibo_app_secret_here",
-    "access_token": "your_weibo_access_token_here"
+    "app_key": "",
+    "app_secret": "",
+    "access_token": ""
   }
 }
