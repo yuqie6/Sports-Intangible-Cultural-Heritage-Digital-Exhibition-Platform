@@ -20,12 +20,17 @@ from modules.processor.data_aggregator import DataAggregator
 from modules.visualizer.map_visualizer import MapVisualizer
 from modules.visualizer.chart_generator import ChartGenerator
 
+# 导入日志配置
+from config.logging_config import setup_logging
+
+# 设置日志
+setup_logging(debug=False)
+
 # 配置日志
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.ERROR,  # 将级别改为ERROR,只显示错误信息
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.StreamHandler(),
         logging.FileHandler('streamlit_app.log', encoding='utf-8')
     ]
 )
@@ -42,15 +47,13 @@ def load_config(config_path="config/config.json"):
         return {}
 
 # 初始化应用
-@st.cache_resource
 def init_app(config):
-    collector = DataCollector()
+    # 不再在缓存函数中创建DataCollector实例
     processor = DataProcessor(config)
     aggregator = DataAggregator(config)
     map_visualizer = MapVisualizer(config)
     chart_generator = ChartGenerator(config)
     return {
-        'collector': collector,
         'processor': processor,
         'aggregator': aggregator,
         'map_visualizer': map_visualizer,
@@ -101,11 +104,11 @@ def render_sidebar():
     # 关键词输入
     keyword = st.sidebar.text_input("关键词", value="编程竞赛", help="输入要分析的关键词")
     
-    # 平台选择
+    # 平台选择 - 添加小红书作为选项
     platforms = st.sidebar.multiselect(
         "数据来源平台",
-        options=["zhihu", "weibo"],
-        default=["zhihu"],
+        options=["zhihu", "weibo", "xiaohongshu"],
+        default=["zhihu", "xiaohongshu"],
         help="选择要分析的平台"
     )
     
@@ -128,6 +131,17 @@ def render_sidebar():
         help="选择特定领域的情感分析词典"
     )
     
+    # 显示设置
+    st.sidebar.header("显示设置")
+    
+    # 地图显示方式选择
+    map_display = st.sidebar.radio(
+        "地图显示方式",
+        options=["交互式HTML", "静态图片"],
+        index=0,
+        help="选择地图的显示方式。如果HTML版本无法正常显示，请尝试静态图片。"
+    )
+    
     # 操作按钮
     start_button = st.sidebar.button("开始分析")
     
@@ -145,6 +159,7 @@ def render_sidebar():
         "platforms": platforms,
         "data_limit": data_limit,
         "domain": domain,
+        "map_display": map_display,
         "start_button": start_button
     }
 
@@ -159,11 +174,12 @@ def process_and_display(components, params):
     status_placeholder = st.empty()
     
     try:
-        # 数据采集
+        # 数据采集 - 为每个请求创建新的收集器
         progress_placeholder.progress(0.1)
         status_placeholder.info("正在采集数据...")
         
-        collector = components['collector']
+        # 每次调用创建新的收集器实例
+        collector = DataCollector()
         start_time = time.time()
         
         raw_data = collector.collect(
@@ -241,7 +257,42 @@ def process_and_display(components, params):
                     province_data,
                     title=f"'{params['keyword']}' 情绪地图"
                 )
-                st_pyecharts(main_map, height="500px")
+                
+                # 根据选择的显示方式显示地图
+                if params["map_display"] == "交互式HTML":
+                    try:
+                        st_pyecharts(main_map, height="500px")
+                    except Exception as e:
+                        st.error(f"显示交互式地图时出错: {str(e)}")
+                        st.info("尝试使用静态图片代替...")
+                        
+                        # 生成静态图片
+                        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as tmp:
+                            temp_html = tmp.name
+                        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                            temp_png = tmp.name
+                            
+                        # 保存HTML和PNG
+                        map_visualizer.save_to_html(main_map, temp_html)
+                        map_visualizer.save_to_png(main_map, temp_png)
+                        
+                        # 显示静态图片
+                        if os.path.exists(temp_png):
+                            st.image(temp_png, caption=f"'{params['keyword']}' 情绪地图")
+                else:
+                    # 直接生成静态图片
+                    with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as tmp:
+                        temp_html = tmp.name
+                    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                        temp_png = tmp.name
+                        
+                    # 保存HTML和PNG
+                    map_visualizer.save_to_html(main_map, temp_html)
+                    map_visualizer.save_to_png(main_map, temp_png)
+                    
+                    # 显示静态图片
+                    if os.path.exists(temp_png):
+                        st.image(temp_png, caption=f"'{params['keyword']}' 情绪地图")
                 
                 # 如果有多个平台，显示平台对比
                 if len(platform_province_data) > 1:
@@ -250,7 +301,25 @@ def process_and_display(components, params):
                         platform_province_data,
                         list(platform_province_data.keys())
                     )
-                    st_pyecharts(platform_timeline, height="500px")
+                    
+                    # 根据显示方式显示平台对比
+                    if params["map_display"] == "交互式HTML":
+                        try:
+                            st_pyecharts(platform_timeline, height="500px")
+                        except:
+                            st.error("无法显示交互式平台对比地图")
+                    else:
+                        # 生成静态平台对比图片
+                        with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as tmp:
+                            temp_platform_html = tmp.name
+                        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                            temp_platform_png = tmp.name
+                            
+                        map_visualizer.save_to_html(platform_timeline, temp_platform_html)
+                        map_visualizer.save_to_png(platform_timeline, temp_platform_png)
+                        
+                        if os.path.exists(temp_platform_png):
+                            st.image(temp_platform_png, caption="平台情绪对比")
             else:
                 st.warning("没有足够的地区数据来生成地图。这可能是因为：\n\n"
                            "1. 社交媒体内容缺少地区信息\n"
@@ -330,6 +399,14 @@ def process_and_display(components, params):
             if platform_stats:
                 st.subheader("平台数据统计")
                 st.dataframe(pd.DataFrame(platform_stats))
+                
+                # 添加平台说明
+                st.markdown("""
+                **平台说明**:
+                - **知乎**: 问答社区，内容偏向专业和深度
+                - **微博**: 短内容社交平台，实时性强
+                - **小红书**: 生活方式分享社区，内容偏向个人体验
+                """)
         
         with tab4:
             st.header("原始处理数据")
@@ -371,6 +448,20 @@ def main():
         # 显示示例图片
         if os.path.exists("static/images/example_map.png"):
             st.image("static/images/example_map.png", caption="示例情绪地图", use_column_width=True)
+        else:
+            # 如果没有示例图片，显示提示信息
+            st.warning("没有找到示例图片，您可以运行 `python generate_example_map.py` 生成示例图片")
+            st.markdown("""
+            ## 支持的平台
+            
+            本工具现在支持以下平台的数据采集与分析：
+            
+            - **知乎**: 中国最大的问答社区之一
+            - **微博**: 中国流行的微博客平台
+            - **小红书**: 生活方式分享社区
+            
+            针对知乎的反爬机制，我们提供了模拟数据生成功能。如果您在分析时没有得到足够的真实数据，系统将自动补充模拟数据。
+            """)
 
 if __name__ == "__main__":
     main()

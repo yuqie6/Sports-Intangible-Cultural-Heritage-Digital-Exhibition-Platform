@@ -50,3 +50,72 @@
 └── docs/                           # 文档
     ├── user_guide.md               # 用户指南
     └── api_doc.md                  # API文档
+
+中国社交媒体情绪地图 - 项目结构
+
+./
+├── app.py                       # Streamlit Web应用
+├── api.py                       # RESTful API服务
+├── main.py                      # 命令行应用
+├── requirements.txt             # 项目依赖
+├── generate_example_map.py      # 生成示例地图
+├── generate_static_maps.py      # 生成静态地图工具
+├── debug_zhihu.py               # 知乎页面调试工具
+│
+├── config/                      # 配置文件
+│   ├── config.json              # 主配置文件
+│   ├── api_keys.json            # API密钥配置 (不提交到版本控制)
+│   └── api_keys_example.json    # API密钥配置示例
+│
+├── modules/                     # 核心模块
+│   ├── __init__.py              # 包初始化
+│   │
+│   ├── collector/               # 数据采集模块
+│   │   ├── __init__.py
+│   │   ├── data_collector.py    # 数据采集器
+│   │   ├── zhihu_api.py         # 知乎数据采集
+│   │   ├── weibo_api.py         # 微博数据采集
+│   │   ├── xiaohongshu_api.py   # 小红书数据采集
+│   │   └── mock_data.py         # 模拟数据生成器
+│   │
+│   ├── analyzer/                # 数据分析模块
+│   │   ├── __init__.py
+│   │   ├── sentiment_analyzer.py # 情感分析器
+│   │   └── location_processor.py # 地区处理器
+│   │
+│   ├── processor/               # 数据处理模块
+│   │   ├── __init__.py
+│   │   ├── data_processor.py    # 数据处理器
+│   │   └── data_aggregator.py   # 数据聚合器
+│   │
+│   └── visualizer/              # 可视化模块
+│       ├── __init__.py
+│       ├── map_visualizer.py    # 地图可视化器
+│       └── chart_generator.py   # 图表生成器
+│
+├── data/                        # 数据文件
+│   ├── sentiment_dict/          # 情感词典
+│   │   ├── general.json         # 通用情感词典
+│   │   ├── programming.json     # 编程领域情感词典
+│   │   └── education.json       # 教育领域情感词典
+│   │
+│   └── location_dict.json       # 地区词典
+│
+├── static/                      # 静态资源
+│   ├── css/                     # CSS样式
+│   │   └── style.css            # 样式表
+│   │
+│   └── images/                  # 图片资源
+│       └── example_map.png      # 示例地图图片
+│
+├── db/                          # 数据库文件
+│   └── sentiment_data.db        # SQLite数据库
+│
+├── output/                      # 输出文件夹
+│
+├── debug/                       # 调试输出
+│
+└── docs/                        # 文档
+    ├── user_guide.md            # 用户指南
+    ├── api_doc.md               # API文档
+    └── troubleshooting.md       # 故障排除指南

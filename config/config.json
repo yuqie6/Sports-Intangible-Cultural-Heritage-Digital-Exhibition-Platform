@@ -2,8 +2,9 @@
   "app": {
     "name": "中国社交媒体情绪地图",
     "version": "1.0.0",
-    "debug": true,
-    "cache_expire_days": 3
+    "debug": false,
+    "cache_expire_days": 3,
+    "use_mock_data": true
   },
   "data_collection": {
     "default_limit": 100,
@@ -15,9 +16,13 @@
       "zhihu": {
         "enabled": true,
         "search_url": "https://www.zhihu.com/search",
+        "api_search_url": "https://www.zhihu.com/api/v4/search_v3",
+        "api_search_enabled": true,
         "max_per_request": 20,
-        "use_selenium": false,
-        "priority": 1
+        "use_selenium": true,
+        "max_retries": 3,
+        "timeout": 20,
+        "priority": 3
       },
       "weibo": {
         "enabled": true,
@@ -25,6 +30,15 @@
         "search_endpoint": "/search/topics.json",
         "max_per_request": 50,
         "priority": 2
+      },
+      "xiaohongshu": {
+        "enabled": true,
+        "search_url": "https://www.xiaohongshu.com/search_result",
+        "max_per_request": 20,
+        "use_selenium": true,
+        "max_retries": 3,
+        "timeout": 30,
+        "priority": 1
       }
     }
   },

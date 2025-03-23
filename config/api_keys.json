@@ -13,5 +13,15 @@
     "app_key": "",
     "app_secret": "",
     "access_token": ""
+  },
+  "xiaohongshu": {
+    "cookies": [
+      {
+        "name": "web_session",
+        "value": "your_xiaohongshu_cookie_here",
+        "domain": ".xiaohongshu.com",
+        "path": "/"
+      }
+    ]
   }
 }

@@ -224,3 +224,35 @@ class MapVisualizer:
         except Exception as e:
             logger.error(f"保存图表时出错: {str(e)}")
             return False
+    
+    def save_to_png(self, chart, file_path: str) -> bool:
+        """保存图表为PNG图片
+        
+        Args:
+            chart: pyecharts图表对象
+            file_path: 输出文件路径
+            
+        Returns:
+            bool: 是否成功保存
+        """
+        try:
+            # 首先保存为临时HTML文件
+            temp_html = file_path.replace('.png', '_temp.html')
+            chart.render(temp_html)
+            
+            # 使用snapshot-selenium将HTML转换为PNG
+            from pyecharts.render import make_snapshot
+            from snapshot_selenium import snapshot
+            
+            make_snapshot(snapshot, temp_html, file_path)
+            
+            # 删除临时HTML文件
+            import os
+            if os.path.exists(temp_html):
+                os.remove(temp_html)
+            
+            logger.info(f"图表已保存为PNG图片: {file_path}")
+            return True
+        except Exception as e:
+            logger.error(f"保存PNG图片时出错: {str(e)}")
+            return False
