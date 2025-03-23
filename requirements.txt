@@ -10,6 +10,11 @@ pkuseg>=0.0.25
 snownlp>=0.12.3
 hanlp>=2.1.0
 
+# 网页解析
+beautifulsoup4>=4.9.3
+selenium>=4.0.0
+webdriver-manager>=3.5.0
+
 # 数据可视化
 pyecharts>=1.9.0
 matplotlib>=3.4.0
@@ -20,10 +25,6 @@ wordcloud>=1.8.0
 flask>=2.0.0
 streamlit>=1.0.0
 streamlit-echarts>=0.4.0
-
-# 浏览器自动化（用于动态加载内容）
-selenium>=4.0.0
-webdriver-manager>=3.5.0
 
 # 数据库
 sqlalchemy>=1.4.0

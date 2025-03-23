@@ -8,15 +8,15 @@
   "data_collection": {
     "default_limit": 100,
     "request_interval": {
-      "min": 1,
-      "max": 3
+      "min": 2,
+      "max": 5
     },
     "platforms": {
       "zhihu": {
         "enabled": true,
-        "api_base": "https://www.zhihu.com/api/v4",
-        "search_endpoint": "/search_v3",
+        "search_url": "https://www.zhihu.com/search",
         "max_per_request": 20,
+        "use_selenium": false,
         "priority": 1
       },
       "weibo": {
