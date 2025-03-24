@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑非遗项目 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('heritage.list') }}">非遗项目</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('heritage.detail', id=item.id) }}">{{ item.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">编辑</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">编辑非遗项目</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('heritage.edit', id=item.id) }}" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                            {% if form.name.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.name.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.category.label(class="form-label") }}
+                            {{ form.category(class="form-select") }}
+                            {% if form.category.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.category.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows=8) }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.cover_image.label(class="form-label") }}
+                            <div class="mb-2">
+                                {% if item.cover_image %}
+                                <img src="{{ url_for('static', filename=item.cover_image) }}" class="img-thumbnail" style="max-height: 150px;" alt="当前封面">
+                                <p class="text-muted mt-1">当前封面</p>
+                                {% else %}
+                                <p class="text-muted">当前无封面图片</p>
+                                {% endif %}
+                            </div>
+                            {{ form.cover_image(class="form-control", onchange="previewImage(this, 'cover-preview')") }}
+                            <p class="text-muted small mt-1">选择新图片以更换封面，留空则保持原图</p>
+                            {% if form.cover_image.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.cover_image.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="mt-2">
+                                <img id="cover-preview" class="img-fluid mt-2 d-none" style="max-height: 200px;" alt="新封面预览">
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('heritage.detail', id=item.id) }}" class="btn btn-outline-secondary">取消</a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function previewImage(input, previewId) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const preview = document.getElementById(previewId);
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}

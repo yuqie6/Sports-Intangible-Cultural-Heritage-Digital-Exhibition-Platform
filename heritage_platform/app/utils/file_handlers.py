@@ -35,6 +35,7 @@ def save_file(file, file_type):
         return None
     
     if not allowed_file(file.filename, allowed_extensions):
+        current_app.logger.warning(f"不允许的文件类型: {file.filename}")
         return None
     
     # 创建安全的文件名
@@ -47,11 +48,19 @@ def save_file(file, file_type):
         'static/uploads', 
         save_folder
     )
+    
+    # 调试信息
+    current_app.logger.info(f"上传路径: {upload_path}")
     os.makedirs(upload_path, exist_ok=True)
     
     # 保存文件
     file_path = os.path.join(upload_path, unique_filename)
-    file.save(file_path)
-    
-    # 返回相对路径（用于数据库存储）
-    return f"uploads/{save_folder}/{unique_filename}"
+    try:
+        file.save(file_path)
+        current_app.logger.info(f"文件已保存: {file_path}")
+        
+        # 返回相对路径（用于数据库存储）
+        return f"uploads/{save_folder}/{unique_filename}"
+    except Exception as e:
+        current_app.logger.error(f"保存文件时出错: {str(e)}")
+        return None

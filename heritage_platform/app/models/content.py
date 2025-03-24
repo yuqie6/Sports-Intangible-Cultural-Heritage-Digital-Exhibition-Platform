@@ -8,9 +8,10 @@ class Content(db.Model):
     title = db.Column(db.String(100), nullable=False)
     heritage_id = db.Column(db.Integer, db.ForeignKey('heritage_items.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    content_type = db.Column(db.String(20), nullable=False)  # article, video, image
+    content_type = db.Column(db.String(20), nullable=False)  # article, video, image, multimedia
     text_content = db.Column(db.Text)  # for article type
     file_path = db.Column(db.String(255))  # for video and image type
+    rich_content = db.Column(db.Text)  # 富文本内容字段，包含HTML，支持嵌入图片和视频
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -40,6 +41,8 @@ class Content(db.Model):
             'content_type': self.content_type,
             'text_content': self.text_content,
             'file_path': self.file_path,
+            # 确保即使数据库中没有这个字段，也不会出错
+            'rich_content': self.rich_content if hasattr(self, 'rich_content') else None,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
             'comment_count': self.comments.count(),

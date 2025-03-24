@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ content.title }} - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('content.list') }}">内容专区</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('content.list', heritage_id=content.heritage_id) }}">{{ content.heritage_item.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ content.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h1 class="h3 mb-0">{{ content.title }}</h1>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center">
+                    {% if content.author.avatar %}
+                    <img src="{{ url_for('static', filename=content.author.avatar) }}" class="avatar-sm me-2 rounded-circle" alt="{{ content.author.username }}">
+                    {% else %}
+                    <div class="avatar-sm me-2 d-flex align-items-center justify-content-center bg-primary text-white rounded-circle">
+                        {{ content.author.username[0] }}
+                    </div>
+                    {% endif %}
+                    <div>
+                        <div>{{ content.author.username }}</div>
+                        <small class="text-muted">{{ content.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </div>
+                </div>
+                <div>
+                    <span class="badge bg-primary">{{ content.content_type }}</span>
+                    <span class="badge bg-secondary">{{ content.heritage_item.name }}</span>
+                </div>
+            </div>
+            
+            <!-- 内容显示区域 -->
+            <div class="content-display mb-4">
+                {% if content.content_type == 'article' %}
+                    <div class="article-content">
+                        {{ content.text_content|safe }}
+                    </div>
+                {% elif content.content_type == 'image' and content.file_path %}
+                    <div class="text-center">
+                        <img src="{{ url_for('static', filename=content.file_path) }}" class="img-fluid" alt="{{ content.title }}">
+                    </div>
+                {% elif content.content_type == 'video' and content.file_path %}
+                    <div class="text-center">
+                        <video controls class="img-fluid">
+                            <source src="{{ url_for('static', filename=content.file_path) }}" type="video/mp4">
+                            您的浏览器不支持视频播放
+                        </video>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- 互动工具栏 -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <span class="me-3"><i class="far fa-eye"></i> 浏览 {{ content.comments.count() + content.likes.count() * 2 }}</span>
+                    <span class="me-3"><i class="far fa-comment"></i> 评论 {{ content.comments.count() }}</span>
+                    <span><i class="far fa-heart"></i> 点赞 {{ content.likes.count() }}</span>
+                </div>
+                <div>
+                    {% if current_user.is_authenticated %}
+                    <form method="POST" action="{{ url_for('content.like', id=content.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-sm {% if has_liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                            <i class="{% if has_liked %}fas{% else %}far{% endif %} fa-heart me-1"></i> 
+                            {% if has_liked %}已点赞{% else %}点赞{% endif %}
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('content.favorite', id=content.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-sm {% if has_favorited %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                            <i class="{% if has_favorited %}fas{% else %}far{% endif %} fa-star me-1"></i> 
+                            {% if has_favorited %}已收藏{% else %}收藏{% endif %}
+                        </button>
+                    </form>
+                    {% else %}
+                    <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-sm btn-outline-primary">登录后互动</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 评论区 -->
+    <div class="card mb-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">评论区</h4>
+            <span>共 {{ pagination.total if pagination else 0 }} 条评论</span>
+        </div>
+        <div class="card-body">
+            {% if current_user.is_authenticated %}
+            <div class="mb-4">
+                <form method="POST" action="{{ url_for('content.detail', id=content.id) }}">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.text.label(class="form-label") }}
+                        {{ form.text(class="form-control", rows=3) }}
+                        {% if form.text.errors %}
+                            <div class="text-danger">
+                                {% for error in form.text.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                请<a href="{{ url_for('auth.login', next=request.path) }}">登录</a>后发表评论
+            </div>
+            {% endif %}
+            
+            <!-- 评论列表 -->
+            {% if comments %}
+                <div class="list-group">
+                    {% for comment in comments %}
+                    <div class="list-group-item border-0 border-bottom">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0 me-3">
+                                {% if comment.author.avatar %}
+                                <img src="{{ url_for('static', filename=comment.author.avatar) }}" class="avatar-sm rounded-circle" alt="{{ comment.author.username }}">
+                                {% else %}
+                                <div class="avatar-sm d-flex align-items-center justify-content-center bg-secondary text-white rounded-circle">
+                                    {{ comment.author.username[0] }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ comment.author.username }}</strong>
+                                        <small class="text-muted ms-2">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    </div>
+                                    <div>
+                                        {% if current_user.is_authenticated and (current_user.id == comment.user_id or current_user.is_admin) %}
+                                        <button class="btn btn-sm btn-link text-danger">删除</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <p class="mb-0 mt-1">{{ comment.text }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- 评论分页 -->
+                {% if pagination and pagination.pages > 1 %}
+                <nav class="mt-4" aria-label="评论分页">
+                    <ul class="pagination justify-content-center">
+                        {% if pagination.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('content.detail', id=content.id, page=pagination.prev_num) }}">上一页</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一页</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                            {% if p %}
+                                {% if p == pagination.page %}
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="#">{{ p }}</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('content.detail', id=content.id, page=p) }}">{{ p }}</a>
+                                </li>
+                                {% endif %}
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">...</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('content.detail', id=content.id, page=pagination.next_num) }}">下一页</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">下一页</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-light text-center">
+                    暂无评论，发表第一条评论吧！
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 相关内容推荐 -->
+    <h4 class="mb-3">相关内容推荐</h4>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for i in range(4) %}
+        <div class="col">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='img/default-content.jpg') }}" class="card-img-top" alt="相关内容">
+                <div class="card-body">
+                    <h5 class="card-title">相关内容标题</h5>
+                    <p class="card-text"><small class="text-muted">用户名 · 2025-03-20</small></p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <a href="#" class="btn btn-sm btn-outline-primary">查看详情</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

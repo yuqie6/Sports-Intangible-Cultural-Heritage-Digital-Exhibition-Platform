@@ -1,47 +1,61 @@
 from app import create_app, db
 import pymysql
 from sqlalchemy.exc import OperationalError
+import traceback
 
 # 创建应用上下文
 app = create_app()
 app_context = app.app_context()
 app_context.push()
 
-# 正确导入所有模型
-from app.models import User, HeritageItem, Content, Comment, Like, Favorite
-
 def create_database_if_not_exists():
     """尝试创建数据库（如果不存在）"""
     try:
         # 从应用配置中提取数据库连接信息
         db_uri = app.config['SQLALCHEMY_DATABASE_URI']
-        db_name = db_uri.split('/')[-1]
+        db_parts = db_uri.split('/')
+        db_name = db_parts[-1]
+        
+        # 尝试提取用户名和密码
+        auth_parts = db_parts[2].split('@')[0].split(':')
+        user = auth_parts[0]
+        password = auth_parts[1] if len(auth_parts) > 1 else ''
+        
+        # 提取主机名
+        host_parts = db_parts[2].split('@')
+        host = host_parts[1] if len(host_parts) > 1 else host_parts[0]
+        
+        print(f"连接到 MySQL 服务器 {host} 使用用户 {user}")
         
         # 连接到MySQL服务器而非具体数据库
         connection = pymysql.connect(
-            host='localhost',
-            user='root',
-            password='qB645522153',  # 使用您的实际密码
+            host=host,
+            user=user,
+            password=password,
             charset='utf8mb4'
         )
         
         try:
             with connection.cursor() as cursor:
                 # 创建数据库（如果不存在）
-                cursor.execute(f"CREATE DATABASE IF NOT EXISTS `heritage_platform` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
-                print(f"数据库 heritage_platform 已创建或已存在")
+                cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+                print(f"数据库 {db_name} 已创建或已存在")
         finally:
             connection.close()
             
     except Exception as e:
         print(f"创建数据库时出错: {e}")
-        raise
+        print(traceback.format_exc())
 
 def init_db():
     """初始化数据库"""
     try:
         # 尝试创建数据库（如果不存在）
         create_database_if_not_exists()
+        
+        # 从模型导入，确保所有表都会被创建
+        from app.models import User, HeritageItem, Content, Comment, Like, Favorite
+        from app.models import ForumTopic, ForumPost
         
         # 创建所有表
         print("正在创建数据库表...")
@@ -89,6 +103,7 @@ def init_db():
         print("请确保MySQL服务已运行，且配置文件中的数据库连接信息正确。")
     except Exception as e:
         print(f"初始化数据库时发生错误: {e}")
+        print(traceback.format_exc())
 
 if __name__ == '__main__':
     init_db()

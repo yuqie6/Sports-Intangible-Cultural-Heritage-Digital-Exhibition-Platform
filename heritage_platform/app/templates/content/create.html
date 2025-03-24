@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}发布内容 - 体育非遗数字展示平台{% endblock %}
+
+{% block styles %}
+<!-- 添加CKEditor样式 -->
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/ckeditor/ckeditor.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('content.list') }}">内容专区</a></li>
+            <li class="breadcrumb-item active" aria-current="page">发布内容</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">发布内容</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('content.create') }}" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control") }}
+                            {% if form.title.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.title.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.heritage_id.label(class="form-label") }}
+                            {{ form.heritage_id(class="form-select") }}
+                            {% if form.heritage_id.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.heritage_id.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.content_type.label(class="form-label") }}
+                            {{ form.content_type(class="form-select", onchange="toggleContentFields()") }}
+                            {% if form.content_type.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.content_type.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div id="text-content-field" class="mb-3">
+                            {{ form.text_content.label(class="form-label") }}
+                            {{ form.text_content(class="form-control", rows=10) }}
+                            {% if form.text_content.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.text_content.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div id="file-field" class="mb-3 d-none">
+                            {{ form.file.label(class="form-label") }}
+                            <div class="input-group">
+                                {{ form.file(class="form-control", onchange="previewFile(this)") }}
+                            </div>
+                            {% if form.file.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.file.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div id="file-preview" class="mt-2 d-none">
+                                <img id="image-preview" class="img-fluid mb-2 d-none" alt="预览图">
+                                <video id="video-preview" class="img-fluid mb-2 d-none" controls></video>
+                            </div>
+                        </div>
+                        
+                        <div id="multimedia-content-field" class="mb-3 d-none">
+                            {{ form.rich_content.label(class="form-label") }}
+                            {{ form.rich_content(class="form-control", id="rich-editor") }}
+                            {% if form.rich_content.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.rich_content.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <!-- 媒体文件上传区域 -->
+                            <div class="mt-3">
+                                <label class="form-label">上传媒体文件</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="media-upload">
+                                    <button class="btn btn-outline-primary" type="button" id="insert-media">插入到文章</button>
+                                </div>
+                                <small class="text-muted">支持图片和视频，上传后点击"插入到文章"将媒体内容添加到编辑器中</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('content.list') }}" class="btn btn-outline-secondary">取消</a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- 引入CKEditor -->
+<script src="{{ url_for('static', filename='vendor/ckeditor/ckeditor.js') }}"></script>
+<script>
+    function toggleContentFields() {
+        const contentType = document.getElementById('content_type').value;
+        const textContentField = document.getElementById('text-content-field');
+        const fileField = document.getElementById('file-field');
+        const multimediaField = document.getElementById('multimedia-content-field');
+        
+        // 隐藏所有字段
+        textContentField.classList.add('d-none');
+        fileField.classList.add('d-none');
+        multimediaField.classList.add('d-none');
+        
+        // 根据内容类型显示相应字段
+        if (contentType === 'article') {
+            textContentField.classList.remove('d-none');
+        } else if (contentType === 'multimedia') {
+            multimediaField.classList.remove('d-none');
+        } else {
+            fileField.classList.remove('d-none');
+        }
+        
+        console.log("内容类型更改为: " + contentType);
+    }
+    
+    // 初始化富文本编辑器
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleContentFields();
+        
+        // 如果页面上有富文本编辑器，则初始化它
+        if (document.getElementById('rich-editor')) {
+            CKEDITOR.replace('rich-editor', {
+                height: 400,
+                filebrowserUploadUrl: '{{ url_for("content.upload_image") }}',
+                allowedContent: true
+            });
+        }
+        
+        // 处理媒体文件插入
+        const insertMediaBtn = document.getElementById('insert-media');
+        if (insertMediaBtn) {
+            insertMediaBtn.addEventListener('click', function() {
+                const fileInput = document.getElementById('media-upload');
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    // 这里需要先上传文件，然后获取URL，再插入编辑器
+                    // 实际项目中应通过AJAX上传文件
+                    alert('在实际项目中，这里会上传文件并获取URL插入编辑器');
+                }
+            });
+        }
+    });
+    
+    function previewFile(input) {
+        const contentType = document.getElementById('content_type').value;
+        const preview = document.getElementById('file-preview');
+        const imagePreview = document.getElementById('image-preview');
+        const videoPreview = document.getElementById('video-preview');
+        
+        console.log("预览文件, 类型: " + contentType);
+        
+        if (input.files && input.files[0]) {
+            console.log("文件名: " + input.files[0].name);
+            console.log("文件大小: " + input.files[0].size + " 字节");
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.classList.remove('d-none');
+                
+                if (contentType === 'image') {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('d-none');
+                    videoPreview.classList.add('d-none');
+                    console.log("图片预览已设置");
+                } else if (contentType === 'video') {
+                    videoPreview.src = e.target.result;
+                    videoPreview.classList.remove('d-none');
+                    imagePreview.classList.add('d-none');
+                    console.log("视频预览已设置");
+                }
+            };
+            
+            reader.onerror = function(e) {
+                console.error("文件读取错误: ", e);
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    // 初始化页面时调用一次
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleContentFields();
+        console.log("页面加载完成，初始化表单字段");
+    });
+</script>
+{% endblock %}

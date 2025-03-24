@@ -4,6 +4,7 @@ from flask_login import LoginManager
 from config import Config
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
+import os
 
 # 初始化扩展
 db = SQLAlchemy()
@@ -24,6 +25,24 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     csrf.init_app(app)
     migrate.init_app(app, db)
+    
+    # 确保上传目录存在
+    with app.app_context():
+        os.makedirs(os.path.join(app.static_folder, 'uploads/images'), exist_ok=True)
+        os.makedirs(os.path.join(app.static_folder, 'uploads/videos'), exist_ok=True)
+        app.logger.info("上传目录已创建")
+        
+        # 检查表是否存在，如存在再确保列存在
+        try:
+            from app.utils.db_helpers import ensure_column_exists
+            from sqlalchemy import inspect
+            
+            # 检查表是否存在
+            inspector = inspect(db.engine)
+            if 'contents' in inspector.get_table_names():
+                ensure_column_exists('contents', 'rich_content', 'TEXT')
+        except Exception as e:
+            app.logger.warning(f"检查数据库结构时出错: {str(e)}")
     
     # 注册API蓝图（前后端分离的API接口）
     from app.api import api_bp

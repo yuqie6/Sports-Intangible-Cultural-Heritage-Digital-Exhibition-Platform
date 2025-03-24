@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}非遗项目 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">非遗项目</h1>
+        {% if current_user.is_teacher or current_user.is_admin %}
+        <a href="{{ url_for('heritage.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> 创建非遗项目
+        </a>
+        {% endif %}
+    </div>
+    
+    <!-- 分类筛选器 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap">
+                <a href="{{ url_for('heritage.list') }}" class="btn {% if not current_category %}btn-primary{% else %}btn-outline-primary{% endif %} me-2 mb-2">全部</a>
+                {% for category in categories %}
+                <a href="{{ url_for('heritage.list', category=category) }}" class="btn {% if current_category == category %}btn-primary{% else %}btn-outline-primary{% endif %} me-2 mb-2">{{ category }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 项目列表 -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% if items %}
+            {% for item in items %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if item.cover_image %}
+                    <img src="{{ url_for('static', filename=item.cover_image) }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ item.name }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/default-heritage.jpg') }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ item.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.name }}</h5>
+                        <p class="card-text">
+                            <span class="badge bg-primary">{{ item.category }}</span>
+                            <small class="text-muted ms-2">
+                                <i class="fas fa-user me-1"></i>{{ item.creator.username }}
+                            </small>
+                        </p>
+                        <p class="card-text">{{ item.description|truncate(150) }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{{ url_for('heritage.detail', id=item.id) }}" class="btn btn-primary">查看详情</a>
+                        <a href="{{ url_for('content.list', heritage_id=item.id) }}" class="btn btn-outline-primary">相关内容</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center py-5">
+                    <p class="mb-3">暂无非遗项目</p>
+                    {% if current_user.is_teacher or current_user.is_admin %}
+                    <a href="{{ url_for('heritage.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-1"></i> 创建非遗项目
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- 分页 -->
+    {% if pagination.pages > 1 %}
+    <nav class="mt-4" aria-label="项目分页">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('heritage.list', page=pagination.prev_num, category=current_category) }}">上一页</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一页</a>
+            </li>
+            {% endif %}
+            
+            {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                {% if p %}
+                    {% if p == pagination.page %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="#">{{ p }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('heritage.list', page=p, category=current_category) }}">{{ p }}</a>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('heritage.list', page=pagination.next_num, category=current_category) }}">下一页</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">下一页</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

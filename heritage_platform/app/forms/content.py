@@ -10,9 +10,11 @@ class ContentForm(FlaskForm):
     content_type = SelectField('内容类型', validators=[DataRequired()], choices=[
         ('article', '文章'),
         ('image', '图片'),
-        ('video', '视频')
+        ('video', '视频'),
+        ('multimedia', '多媒体文章')  # 新增多媒体文章类型
     ])
-    text_content = TextAreaField('文本内容', validators=[Optional()])
+    text_content = TextAreaField('纯文本内容', validators=[Optional()])
+    rich_content = TextAreaField('富文本内容', validators=[Optional()])  # 用于CKEditor或其他富文本编辑器
     file = FileField('文件', validators=[
         FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'avi'], '只允许上传图片或视频!')
     ])

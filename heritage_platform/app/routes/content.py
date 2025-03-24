@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import current_user, login_required
 from app import db
 from app.models import Content, HeritageItem, Comment, Like, Favorite
@@ -15,21 +15,63 @@ def list():
     content_type = request.args.get('type')
     heritage_id = request.args.get('heritage_id', type=int)
     
-    query = Content.query
-    
-    if content_type:
-        query = query.filter_by(content_type=content_type)
+    try:
+        # 临时方案：使用 db.session.execute 来明确选择字段，避免查询不存在的字段
+        stmt = db.select(Content.id, Content.title, Content.heritage_id, 
+                        Content.user_id, Content.content_type, 
+                        Content.text_content, Content.file_path,
+                        Content.created_at, Content.updated_at)
         
-    if heritage_id:
-        query = query.filter_by(heritage_id=heritage_id)
+        if content_type:
+            stmt = stmt.filter(Content.content_type == content_type)
+            
+        if heritage_id:
+            stmt = stmt.filter(Content.heritage_id == heritage_id)
+            
+        stmt = stmt.order_by(Content.created_at.desc())
         
-    pagination = query.order_by(Content.created_at.desc()).paginate(
-        page=page, per_page=12, error_out=False)
-    
-    items = pagination.items
+        result = db.session.execute(stmt)
+        items = result.all()
+        
+        # 手动创建分页对象
+        total = db.session.query(db.func.count(Content.id)).scalar()
+        per_page = 12
+        total_pages = (total + per_page - 1) // per_page
+        
+        # 简单的分页实现
+        class SimplePagination:
+            def __init__(self, items, page, per_page, total):
+                self.items = items
+                self.page = page
+                self.per_page = per_page
+                self.total = total
+                self.pages = (total + per_page - 1) // per_page
+                self.has_prev = page > 1
+                self.has_next = page < self.pages
+                self.prev_num = page - 1 if self.has_prev else None
+                self.next_num = page + 1 if self.has_next else None
+                
+            def iter_pages(self, left_edge=2, left_current=2, right_current=3, right_edge=2):
+                # 简化版的页码生成
+                for i in range(1, self.pages + 1):
+                    if i <= left_edge or \
+                       (i > self.page - left_current - 1 and i < self.page + right_current) or \
+                       i > self.pages - right_edge:
+                        yield i
+        
+        pagination = SimplePagination(items, page, per_page, total)
+    except Exception as e:
+        current_app.logger.error(f"内容列表查询错误: {str(e)}")
+        # 降级处理：返回空列表
+        items = []
+        pagination = SimplePagination([], page, 12, 0)
     
     # 获取所有非遗项目供筛选用
-    heritage_items = HeritageItem.query.all()
+    try:
+        heritage_items = HeritageItem.query.all()
+    except Exception as e:
+        current_app.logger.error(f"获取非遗项目列表错误: {str(e)}")
+        heritage_items = []
     
     return render_template('content/list.html', 
                            items=items, 
@@ -116,17 +158,25 @@ def create():
             # 根据内容类型处理不同字段
             if form.content_type.data == 'article':
                 content.text_content = form.text_content.data
+            elif form.content_type.data == 'multimedia':
+                content.rich_content = form.rich_content.data
             elif form.content_type.data in ['image', 'video']:
                 if form.file.data:
+                    current_app.logger.info(f"处理文件上传: {form.file.data.filename}, 类型: {form.content_type.data}")
                     file_path = save_file(form.file.data, form.content_type.data)
                     if file_path:
+                        current_app.logger.info(f"文件上传成功，路径: {file_path}")
                         content.file_path = file_path
                     else:
+                        current_app.logger.error("文件上传失败")
                         flash('文件上传失败', 'danger')
                         return render_template('content/create.html', form=form)
+                else:
+                    current_app.logger.warning(f"未检测到文件上传")
             
             db.session.add(content)
             db.session.commit()
+            current_app.logger.info(f"内容创建成功：ID={content.id}, 标题={content.title}")
             
             flash('内容创建成功', 'success')
             return redirect(url_for('content.detail', id=content.id))
@@ -134,9 +184,39 @@ def create():
         except Exception as e:
             db.session.rollback()
             current_app.logger.error(f"创建内容失败: {str(e)}")
+            current_app.logger.error(traceback.format_exc())
             flash('创建内容失败，请稍后重试', 'danger')
     
     return render_template('content/create.html', form=form)
+
+# 添加图片上传API端点
+@content_bp.route('/upload_image', methods=['POST'])
+@login_required
+def upload_image():
+    """富文本编辑器的图片上传处理"""
+    if 'upload' not in request.files:
+        return jsonify({'error': '没有文件上传'})
+    
+    file = request.files['upload']
+    if file.filename == '':
+        return jsonify({'error': '未选择文件'})
+    
+    if file and allowed_file(file.filename, ALLOWED_IMAGE_EXTENSIONS):
+        try:
+            file_path = save_file(file, 'image')
+            url = url_for('static', filename=file_path)
+            
+            # 返回CKEditor需要的格式
+            return jsonify({
+                'uploaded': 1,
+                'fileName': file.filename,
+                'url': url
+            })
+        except Exception as e:
+            current_app.logger.error(f"上传图片失败: {str(e)}")
+            return jsonify({'error': '上传失败'})
+    
+    return jsonify({'error': '不支持的文件类型'})
 
 @content_bp.route('/like/<int:id>', methods=['POST'])
 @login_required
