@@ -21,3 +21,35 @@ class Content(db.Model):
     
     def __repr__(self):
         return f'<Content {self.title}>'
+        
+    def to_dict(self, include_comments=False):
+        """转换为字典用于API响应"""
+        from app.models import User, HeritageItem
+        
+        author = User.query.get(self.user_id)
+        heritage = HeritageItem.query.get(self.heritage_id)
+        
+        result = {
+            'id': self.id,
+            'title': self.title,
+            'heritage_id': self.heritage_id,
+            'heritage_name': heritage.name if heritage else None,
+            'user_id': self.user_id,
+            'author_name': author.username if author else None,
+            'author_avatar': author.avatar if author else None,
+            'content_type': self.content_type,
+            'text_content': self.text_content,
+            'file_path': self.file_path,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'comment_count': self.comments.count(),
+            'like_count': self.likes.count(),
+            'favorite_count': self.favorites.count()
+        }
+        
+        if include_comments:
+            from app.models import Comment
+            comments = Comment.query.filter_by(content_id=self.id).order_by(Comment.created_at.desc()).limit(10).all()
+            result['recent_comments'] = [comment.to_dict() for comment in comments]
+            
+        return result

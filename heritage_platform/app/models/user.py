@@ -20,6 +20,9 @@ class User(UserMixin, db.Model):
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     likes = db.relationship('Like', backref='user', lazy='dynamic')
     favorites = db.relationship('Favorite', backref='user', lazy='dynamic')
+    # 添加论坛关系
+    forum_topics = db.relationship('ForumTopic', backref='creator', lazy='dynamic', foreign_keys='ForumTopic.user_id')
+    forum_posts = db.relationship('ForumPost', backref='author', lazy='dynamic', foreign_keys='ForumPost.user_id')
     
     @property
     def password(self):

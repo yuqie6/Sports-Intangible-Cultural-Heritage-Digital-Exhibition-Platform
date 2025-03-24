@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ topic.title }} - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">论坛</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index', category=topic.category) }}">{{ topic.category }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ topic.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">{{ topic.title }}</h1>
+        <div>
+            {% if current_user.is_admin %}
+            <form method="POST" action="{{ url_for('forum.pin_topic', id=topic.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    {% if topic.is_pinned %}取消置顶{% else %}置顶{% endif %}
+                </button>
+            </form>
+            <form method="POST" action="{{ url_for('forum.close_topic', id=topic.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                    {% if topic.is_closed %}打开主题{% else %}关闭主题{% endif %}
+                </button>
+            </form>
+            {% endif %}
+            <a href="{{ url_for('forum.index') }}" class="btn btn-outline-primary btn-sm">
+                返回列表
+            </a>
+        </div>
+    </div>
+    
+    <div class="mb-3 text-muted small">
+        <span class="badge bg-secondary">{{ topic.category }}</span>
+        <span class="mx-2">|</span>
+        <i class="fas fa-user me-1"></i> {{ topic.creator }}
+        <span class="mx-2">|</span>
+        <i class="fas fa-calendar me-1"></i> {{ topic.created_at.strftime('%Y-%m-%d %H:%M') }}
+        <span class="mx-2">|</span>
+        <i class="fas fa-eye me-1"></i> {{ topic.views }} 次查看
+        <span class="mx-2">|</span>
+        <i class="fas fa-comment me-1"></i> {{ topic.post_count }} 条回复
+    </div>
+    
+    <!-- 主题帖子 -->
+    <div class="card mb-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <span>帖子列表</span>
+            <span>共 {{ pagination.total }} 条</span>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for post in posts %}
+            <div class="list-group-item">
+                <div class="d-flex">
+                    <!-- 用户信息 -->
+                    <div class="flex-shrink-0 me-3 text-center" style="width: 100px;">
+                        {% if post.author_avatar %}
+                        <img src="{{ url_for('static', filename=post.author_avatar) }}" class="avatar-md mb-2" alt="{{ post.author }}">
+                        {% else %}
+                        <div class="avatar-md mb-2 d-flex align-items-center justify-content-center bg-secondary text-white rounded-circle">
+                            {{ post.author[0] }}
+                        </div>
+                        {% endif %}
+                        <div>{{ post.author }}</div>
+                        <div class="small text-muted">#{{ loop.index }}</div>
+                    </div>
+                    
+                    <!-- 帖子内容 -->
+                    <div class="flex-grow-1">
+                        <div class="mb-2 text-muted small">
+                            <i class="fas fa-clock me-1"></i> {{ post.created_at }}
+                            {% if post.created_at != post.updated_at %}
+                            <span class="mx-1">|</span>
+                            <i class="fas fa-edit me-1"></i> 已编辑
+                            {% endif %}
+                        </div>
+                        <div class="post-content">
+                            {{ post.content|safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- 分页 -->
+    {% if pagination.pages > 1 %}
+    <nav class="mb-4" aria-label="回复分页">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('forum.topic', id=topic.id, page=pagination.prev_num) }}">上一页</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一页</a>
+            </li>
+            {% endif %}
+            
+            {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                {% if p %}
+                    {% if p == pagination.page %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="#">{{ p }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('forum.topic', id=topic.id, page=p) }}">{{ p }}</a>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('forum.topic', id=topic.id, page=pagination.next_num) }}">下一页</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">下一页</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    <!-- 回复表单 -->
+    {% if topic.is_closed and not current_user.is_admin %}
+    <div class="alert alert-warning">此主题已关闭，无法回复</div>
+    {% elif current_user.is_authenticated %}
+    <div class="card">
+        <div class="card-header bg-light">回复</div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('forum.topic', id=topic.id) }}">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    {{ form.content.label(class="form-label") }}
+                    {{ form.content(class="form-control", rows=5) }}
+                    {% if form.content.errors %}
+                        <div class="text-danger">
+                            {% for error in form.content.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-grid">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-4">
+        <p>登录后才能回复内容</p>
+        <a href="{{ url_for('auth.login', next=request.url) }}" class="btn btn-primary">登录</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

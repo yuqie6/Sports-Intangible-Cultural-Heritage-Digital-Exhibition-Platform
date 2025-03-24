@@ -28,10 +28,13 @@
                         <a class="nav-link" href="{{ url_for('main.index') }}">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">非遗项目</a>
+                        <a class="nav-link" href="{{ url_for('heritage.list') }}">非遗项目</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">内容专区</a>
+                        <a class="nav-link" href="{{ url_for('content.list') }}">内容专区</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('forum.index') }}">交流论坛</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.about') }}">关于我们</a>
@@ -44,13 +47,16 @@
                                 {{ current_user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">个人中心</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('user.profile') }}">个人中心</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('user.my_contents') }}">我的内容</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('user.my_favorites') }}">我的收藏</a></li>
                                 {% if current_user.is_admin %}
-                                <li><a class="dropdown-item" href="#">管理后台</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('user.dashboard') }}">管理后台</a></li>
                                 {% endif %}
                                 {% if current_user.is_teacher or current_user.is_admin %}
-                                <li><a class="dropdown-item" href="#">发布内容</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('heritage.create') }}">创建非遗项目</a></li>
                                 {% endif %}
+                                <li><a class="dropdown-item" href="{{ url_for('content.create') }}">发布内容</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">退出登录</a></li>
                             </ul>

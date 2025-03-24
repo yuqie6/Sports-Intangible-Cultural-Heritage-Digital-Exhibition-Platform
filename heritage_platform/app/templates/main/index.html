@@ -8,15 +8,68 @@
     <div class="container-fluid py-5">
         <h1 class="display-5 fw-bold">体育非遗数字展示平台</h1>
         <p class="col-md-8 fs-4">连接课堂学习与数字化分享，促进体育非遗文化的传播与保护。</p>
-        <a href="#" class="btn btn-primary btn-lg">了解更多</a>
+        <div class="mt-4">
+            <a href="{{ url_for('heritage.list') }}" class="btn btn-primary btn-lg me-2">
+                <i class="fas fa-compass me-2"></i>探索非遗项目
+            </a>
+            <a href="{{ url_for('forum.index') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-comments me-2"></i>参与交流讨论
+            </a>
+        </div>
     </div>
 </div>
+
+<!-- 功能导航区 -->
+<section class="mb-5">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-4">
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-project-diagram fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title">非遗项目</h4>
+                    <p class="card-text">探索丰富多彩的体育非遗项目，了解其历史与传承。</p>
+                    <a href="{{ url_for('heritage.list') }}" class="btn btn-outline-primary">查看项目</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-book-open fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title">学习资源</h4>
+                    <p class="card-text">获取丰富的文章、视频和图片等学习资源。</p>
+                    <a href="{{ url_for('content.list') }}" class="btn btn-outline-primary">浏览内容</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-comments fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title">交流讨论</h4>
+                    <p class="card-text">在论坛中与其他学习者分享经验和心得。</p>
+                    <a href="{{ url_for('forum.index') }}" class="btn btn-outline-primary">进入论坛</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-upload fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title">分享内容</h4>
+                    <p class="card-text">分享您的学习成果和心得体会。</p>
+                    <a href="{{ url_for('content.create') }}" class="btn btn-outline-primary">发布内容</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- 精选非遗项目 -->
 <section class="mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>精选非遗项目</h2>
-        <a href="#" class="btn btn-outline-primary">查看全部</a>
+        <a href="{{ url_for('heritage.list') }}" class="btn btn-outline-primary">查看全部</a>
     </div>
     
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -34,7 +87,7 @@
                         <p class="card-text">{{ item.description|truncate(100) }}</p>
                     </div>
                     <div class="card-footer bg-transparent border-top-0">
-                        <a href="#" class="btn btn-sm btn-primary">查看详情</a>
+                        <a href="{{ url_for('heritage.detail', id=item.id) }}" class="btn btn-sm btn-primary">查看详情</a>
                         <span class="badge bg-secondary float-end">{{ item.category }}</span>
                     </div>
                 </div>
@@ -51,10 +104,10 @@
 </section>
 
 <!-- 最新内容 -->
-<section>
+<section class="mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>最新内容</h2>
-        <a href="#" class="btn btn-outline-primary">查看全部</a>
+        <a href="{{ url_for('content.list') }}" class="btn btn-outline-primary">查看全部</a>
     </div>
     
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
@@ -85,7 +138,7 @@
                         </p>
                     </div>
                     <div class="card-footer bg-transparent border-top-0">
-                        <a href="#" class="btn btn-sm btn-outline-primary">阅读更多</a>
+                        <a href="{{ url_for('content.detail', id=content.id) }}" class="btn btn-sm btn-outline-primary">阅读更多</a>
                         <div class="float-end">
                             <span class="me-2"><i class="far fa-comment"></i> {{ content.comments.count() }}</span>
                             <span><i class="far fa-heart"></i> {{ content.likes.count() }}</span>
@@ -101,6 +154,45 @@
                 </div>
             </div>
         {% endif %}
+    </div>
+</section>
+
+<!-- 论坛活动 -->
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>论坛动态</h2>
+        <a href="{{ url_for('forum.index') }}" class="btn btn-outline-primary">进入论坛</a>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-light">
+            <div class="row align-items-center">
+                <div class="col-7">主题</div>
+                <div class="col-3 text-center d-none d-md-block">作者</div>
+                <div class="col-2 text-center">回复</div>
+            </div>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for i in range(5) %}
+            <a href="#" class="list-group-item list-group-item-action">
+                <div class="row align-items-center">
+                    <div class="col-7">
+                        <h6 class="mb-0">如何更好地学习传统武术</h6>
+                        <small class="text-muted">教学</small>
+                    </div>
+                    <div class="col-3 text-center d-none d-md-block">
+                        <small>张老师</small>
+                    </div>
+                    <div class="col-2 text-center">
+                        <span class="badge bg-secondary">12</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="card-footer text-end">
+            <a href="{{ url_for('forum.create_topic') }}" class="btn btn-primary btn-sm">发布主题</a>
+        </div>
     </div>
 </section>
 {% endblock %}

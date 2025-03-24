@@ -1,0 +1,24 @@
+from flask_wtf import FlaskForm
+from wtforms import StringField, TextAreaField, SelectField, SubmitField
+from wtforms.validators import DataRequired, Length, Optional
+from flask_wtf.file import FileField, FileAllowed
+
+class ContentForm(FlaskForm):
+    """内容表单"""
+    title = StringField('标题', validators=[DataRequired(), Length(1, 100)])
+    heritage_id = SelectField('所属非遗项目', validators=[DataRequired()], coerce=int)
+    content_type = SelectField('内容类型', validators=[DataRequired()], choices=[
+        ('article', '文章'),
+        ('image', '图片'),
+        ('video', '视频')
+    ])
+    text_content = TextAreaField('文本内容', validators=[Optional()])
+    file = FileField('文件', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'avi'], '只允许上传图片或视频!')
+    ])
+    submit = SubmitField('发布')
+
+class CommentForm(FlaskForm):
+    """评论表单"""
+    text = TextAreaField('评论内容', validators=[DataRequired(), Length(1, 1000)])
+    submit = SubmitField('发表评论')

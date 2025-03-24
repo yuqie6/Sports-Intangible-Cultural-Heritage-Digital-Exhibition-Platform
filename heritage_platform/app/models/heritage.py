@@ -17,3 +17,27 @@ class HeritageItem(db.Model):
     
     def __repr__(self):
         return f'<HeritageItem {self.name}>'
+        
+    def to_dict(self, include_contents=False):
+        """转换为字典用于API响应"""
+        from app.models import User
+        creator = User.query.get(self.created_by)
+        
+        result = {
+            'id': self.id,
+            'name': self.name,
+            'category': self.category,
+            'description': self.description,
+            'cover_image': self.cover_image,
+            'created_by': self.created_by,
+            'creator_name': creator.username if creator else None,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'content_count': self.contents.count()
+        }
+        
+        if include_contents:
+            from app.models import Content
+            contents = Content.query.filter_by(heritage_id=self.id).order_by(Content.created_at.desc()).limit(10).all()
+            result['recent_contents'] = [content.to_dict() for content in contents]
+            
+        return result
