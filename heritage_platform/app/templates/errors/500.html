@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}服务器错误 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-1">500</h1>
+    <p class="lead">抱歉，服务器出现了错误</p>
+    <p class="mb-4">我们已记录此问题，并将尽快修复</p>
+    <a href="{{ url_for('main.index') }}" class="btn btn-primary">返回首页</a>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}首页 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<!-- 头部横幅 -->
+<div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">体育非遗数字展示平台</h1>
+        <p class="col-md-8 fs-4">连接课堂学习与数字化分享，促进体育非遗文化的传播与保护。</p>
+        <a href="#" class="btn btn-primary btn-lg">了解更多</a>
+    </div>
+</div>
+
+<!-- 精选非遗项目 -->
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>精选非遗项目</h2>
+        <a href="#" class="btn btn-outline-primary">查看全部</a>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% if featured_items %}
+            {% for item in featured_items %}
+            <div class="col">
+                <div class="card h-100 feature-card">
+                    {% if item.cover_image %}
+                    <img src="{{ url_for('static', filename=item.cover_image) }}" class="card-img-top" alt="{{ item.name }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/default-heritage.jpg') }}" class="card-img-top" alt="{{ item.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.name }}</h5>
+                        <p class="card-text">{{ item.description|truncate(100) }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="#" class="btn btn-sm btn-primary">查看详情</a>
+                        <span class="badge bg-secondary float-end">{{ item.category }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    暂无精选非遗项目，敬请期待！
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- 最新内容 -->
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>最新内容</h2>
+        <a href="#" class="btn btn-outline-primary">查看全部</a>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% if latest_contents %}
+            {% for content in latest_contents %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if content.content_type == 'image' and content.file_path %}
+                    <img src="{{ url_for('static', filename=content.file_path) }}" class="card-img-top" alt="{{ content.title }}">
+                    {% elif content.content_type == 'video' and content.file_path %}
+                    <div class="position-relative">
+                        <img src="{{ url_for('static', filename='img/video-placeholder.jpg') }}" class="card-img-top" alt="{{ content.title }}">
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <i class="fas fa-play-circle fa-3x text-white"></i>
+                        </div>
+                    </div>
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/default-content.jpg') }}" class="card-img-top" alt="{{ content.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ content.title }}</h5>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>{{ content.author.username }}
+                                <span class="mx-2">|</span>
+                                <i class="fas fa-calendar me-1"></i>{{ content.created_at.strftime('%Y-%m-%d') }}
+                            </small>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="#" class="btn btn-sm btn-outline-primary">阅读更多</a>
+                        <div class="float-end">
+                            <span class="me-2"><i class="far fa-comment"></i> {{ content.comments.count() }}</span>
+                            <span><i class="far fa-heart"></i> {{ content.likes.count() }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    暂无内容，快来发布第一篇吧！
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
