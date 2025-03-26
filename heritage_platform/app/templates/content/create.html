@@ -163,7 +163,9 @@
             CKEDITOR.replace('rich-editor', {
                 height: 400,
                 filebrowserUploadUrl: '{{ url_for("content.upload_image") }}',
-                allowedContent: true
+                allowedContent: true,
+                // 引用自定义配置文件
+                customConfig: '{{ url_for("static", filename="vendor/ckeditor/config.js") }}'
             });
         }
         
