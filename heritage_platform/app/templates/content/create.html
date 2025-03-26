@@ -19,105 +19,167 @@
     
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">发布内容</h4>
+            <!-- 小提示卡片 -->
+            <div class="card border-0 shadow-sm mb-4 bg-light">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>内容发布指南
+                    </h5>
+                    <div class="mb-3">
+                        <p class="card-text">请选择适合的内容类型：</p>
+                        <ul class="mb-0">
+                            <li><strong>图文文章</strong> - 适合发布带有图片的长文内容</li>
+                            <li><strong>图片</strong> - 适合分享高清图片作品</li>
+                            <li><strong>视频</strong> - 适合上传和分享精彩视频</li>
+                            <li><strong>多媒体</strong> - 支持富媒体混合排版，更自由的内容创作</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('content.create') }}" enctype="multipart/form-data">
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-edit me-2"></i>
+                        <span>发布内容</span>
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('content.create') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
                         {{ form.hidden_tag() }}
                         
-                        <div class="mb-3">
-                            {{ form.title.label(class="form-label") }}
-                            {{ form.title(class="form-control") }}
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.title(class="form-control", placeholder="标题", id="title") }}
+                                {{ form.title.label(for="title", class="required") }}
+                            </div>
                             {% if form.title.errors %}
-                                <div class="text-danger">
+                                <div class="text-danger mt-1">
                                     {% for error in form.title.errors %}
-                                        <small>{{ error }}</small>
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
                                     {% endfor %}
                                 </div>
                             {% endif %}
                         </div>
                         
-                        <div class="mb-3">
-                            {{ form.heritage_id.label(class="form-label") }}
-                            {{ form.heritage_id(class="form-select") }}
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.heritage_id(class="form-select", id="heritage_id") }}
+                                {{ form.heritage_id.label(for="heritage_id", class="required") }}
+                            </div>
                             {% if form.heritage_id.errors %}
-                                <div class="text-danger">
+                                <div class="text-danger mt-1">
                                     {% for error in form.heritage_id.errors %}
-                                        <small>{{ error }}</small>
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
                                     {% endfor %}
                                 </div>
                             {% endif %}
                         </div>
                         
-                        <div class="mb-3">
-                            {{ form.content_type.label(class="form-label") }}
-                            {{ form.content_type(class="form-select", onchange="toggleContentFields()") }}
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.content_type(class="form-select", id="content_type", onchange="toggleContentFields()") }}
+                                {{ form.content_type.label(for="content_type", class="required") }}
+                            </div>
                             {% if form.content_type.errors %}
-                                <div class="text-danger">
+                                <div class="text-danger mt-1">
                                     {% for error in form.content_type.errors %}
-                                        <small>{{ error }}</small>
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
                                     {% endfor %}
                                 </div>
                             {% endif %}
                         </div>
                         
-                        <div id="text-content-field" class="mb-3">
-                            {{ form.text_content.label(class="form-label") }}
-                            {{ form.text_content(class="form-control", rows=10) }}
+                        <div id="text-content-field" class="mb-4 content-field">
+                            <div class="mb-2 d-flex align-items-center">
+                                <i class="fas fa-paragraph text-primary me-2"></i>
+                                {{ form.text_content.label(class="form-label fw-bold mb-0") }}
+                            </div>
+                            {{ form.text_content(class="form-control", rows=12, style="resize: vertical;") }}
                             {% if form.text_content.errors %}
-                                <div class="text-danger">
+                                <div class="text-danger mt-1">
                                     {% for error in form.text_content.errors %}
-                                        <small>{{ error }}</small>
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
                                     {% endfor %}
                                 </div>
                             {% endif %}
+                            <small class="form-text text-muted mt-1">
+                                <i class="fas fa-info-circle me-1"></i>支持Markdown格式，可添加段落、标题、列表等
+                            </small>
                         </div>
                         
-                        <div id="file-field" class="mb-3 d-none">
-                            {{ form.file.label(class="form-label") }}
+                        <div id="file-field" class="mb-4 content-field d-none">
+                            <div class="mb-2 d-flex align-items-center">
+                                <i class="fas fa-file-upload text-primary me-2"></i>
+                                {{ form.file.label(class="form-label fw-bold mb-0") }}
+                            </div>
                             <div class="input-group">
                                 {{ form.file(class="form-control", onchange="previewFile(this)") }}
                             </div>
                             {% if form.file.errors %}
-                                <div class="text-danger">
+                                <div class="text-danger mt-1">
                                     {% for error in form.file.errors %}
-                                        <small>{{ error }}</small>
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
                                     {% endfor %}
                                 </div>
                             {% endif %}
-                            <div id="file-preview" class="mt-2 d-none">
-                                <img id="image-preview" class="img-fluid mb-2 d-none" alt="预览图">
-                                <video id="video-preview" class="img-fluid mb-2 d-none" controls></video>
+                            <small class="form-text text-muted mt-1">
+                                <span id="image-help" class="d-none">
+                                    <i class="fas fa-info-circle me-1"></i>支持JPG、JPEG、PNG和GIF格式，最大文件大小20MB
+                                </span>
+                                <span id="video-help" class="d-none">
+                                    <i class="fas fa-info-circle me-1"></i>支持MP4、WEBM和MOV格式，最大文件大小100MB
+                                </span>
+                            </small>
+                            <div id="file-preview" class="mt-3 p-3 border rounded d-none">
+                                <h6 class="mb-3"><i class="fas fa-eye me-1"></i>预览</h6>
+                                <img id="image-preview" class="img-fluid rounded mb-2 d-none" alt="预览图">
+                                <video id="video-preview" class="img-fluid rounded mb-2 d-none" controls></video>
                             </div>
                         </div>
                         
-                        <div id="multimedia-content-field" class="mb-3 d-none">
-                            {{ form.rich_content.label(class="form-label") }}
+                        <div id="multimedia-content-field" class="mb-4 content-field d-none">
+                            <div class="mb-2 d-flex align-items-center">
+                                <i class="fas fa-pen-fancy text-primary me-2"></i>
+                                {{ form.rich_content.label(class="form-label fw-bold mb-0") }}
+                            </div>
                             {{ form.rich_content(class="form-control", id="rich-editor") }}
                             {% if form.rich_content.errors %}
-                                <div class="text-danger">
+                                <div class="text-danger mt-1">
                                     {% for error in form.rich_content.errors %}
-                                        <small>{{ error }}</small>
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
                                     {% endfor %}
                                 </div>
                             {% endif %}
                             
                             <!-- 媒体文件上传区域 -->
-                            <div class="mt-3">
-                                <label class="form-label">上传媒体文件</label>
-                                <div class="input-group">
-                                    <input type="file" class="form-control" id="media-upload">
-                                    <button class="btn btn-outline-primary" type="button" id="insert-media">插入到文章</button>
+                            <div class="mt-4 card border-light">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-images me-1"></i>媒体文件管理</h6>
                                 </div>
-                                <small class="text-muted">支持图片和视频，上传后点击"插入到文章"将媒体内容添加到编辑器中</small>
+                                <div class="card-body">
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="media-upload">
+                                        <button class="btn btn-outline-primary" type="button" id="insert-media">
+                                            <i class="fas fa-plus-circle me-1"></i>插入到文章
+                                        </button>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">
+                                        <i class="fas fa-info-circle me-1"></i>支持图片和视频，上传后点击"插入到文章"将媒体内容添加到编辑器中
+                                    </small>
+                                </div>
                             </div>
                         </div>
                         
+                        <hr class="my-4">
+                        
                         <div class="d-flex justify-content-between">
-                            <a href="{{ url_for('content.list') }}" class="btn btn-outline-secondary">取消</a>
-                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('content.list') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>取消
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>{{ form.submit.label.text }}
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -133,14 +195,15 @@
 <script>
     function toggleContentFields() {
         const contentType = document.getElementById('content_type').value;
+        const contentFields = document.querySelectorAll('.content-field');
         const textContentField = document.getElementById('text-content-field');
         const fileField = document.getElementById('file-field');
         const multimediaField = document.getElementById('multimedia-content-field');
+        const imageHelp = document.getElementById('image-help');
+        const videoHelp = document.getElementById('video-help');
         
         // 隐藏所有字段
-        textContentField.classList.add('d-none');
-        fileField.classList.add('d-none');
-        multimediaField.classList.add('d-none');
+        contentFields.forEach(field => field.classList.add('d-none'));
         
         // 根据内容类型显示相应字段
         if (contentType === 'article') {
@@ -149,6 +212,15 @@
             multimediaField.classList.remove('d-none');
         } else {
             fileField.classList.remove('d-none');
+            
+            // 显示相应的帮助文本
+            if (contentType === 'image') {
+                imageHelp.classList.remove('d-none');
+                videoHelp.classList.add('d-none');
+            } else if (contentType === 'video') {
+                videoHelp.classList.remove('d-none');
+                imageHelp.classList.add('d-none');
+            }
         }
         
         console.log("内容类型更改为: " + contentType);
@@ -219,13 +291,27 @@
             };
             
             reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.classList.add('d-none');
         }
     }
     
-    // 初始化页面时调用一次
-    document.addEventListener('DOMContentLoaded', function() {
-        toggleContentFields();
-        console.log("页面加载完成，初始化表单字段");
-    });
+    // 表单验证
+    (function() {
+        'use strict'
+        
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
 </script>
 {% endblock %}

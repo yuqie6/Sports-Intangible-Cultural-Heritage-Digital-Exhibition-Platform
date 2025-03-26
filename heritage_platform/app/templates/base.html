@@ -8,16 +8,19 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Animate.css 动画库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- 自定义CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block styles %}{% endblock %}
 </head>
 <body>
     <!-- 导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-dragon me-2"></i>体育非遗数字平台
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') }}">
+                <i class="fas fa-dragon me-2"></i>
+                <span>体育非遗数字平台</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -25,45 +28,99 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">首页</a>
+                        <a class="nav-link {% if request.path == url_for('main.index') %}active{% endif %}" href="{{ url_for('main.index') }}">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('heritage.list') }}">非遗项目</a>
+                        <a class="nav-link {% if request.path.startswith('/heritage') %}active{% endif %}" href="{{ url_for('heritage.list') }}">
+                            <i class="fas fa-landmark me-1"></i>非遗项目
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('content.list') }}">内容专区</a>
+                        <a class="nav-link {% if request.path.startswith('/content') %}active{% endif %}" href="{{ url_for('content.list') }}">
+                            <i class="fas fa-book-open me-1"></i>内容专区
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('forum.index') }}">交流论坛</a>
+                        <a class="nav-link {% if request.path.startswith('/forum') %}active{% endif %}" href="{{ url_for('forum.index') }}">
+                            <i class="fas fa-comments me-1"></i>交流论坛
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.about') }}">关于我们</a>
+                        <a class="nav-link {% if request.path == url_for('main.about') %}active{% endif %}" href="{{ url_for('main.about') }}">
+                            <i class="fas fa-info-circle me-1"></i>关于我们
+                        </a>
                     </li>
                 </ul>
+                
+                <!-- 搜索框 -->
+                <form class="search-form d-none d-md-flex me-3" action="{{ url_for('content.list') }}" method="GET">
+                    <input class="form-control" type="search" name="q" placeholder="搜索内容..." aria-label="Search">
+                    <button class="btn btn-sm btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                
                 <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
                         <div class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                {{ current_user.username }}
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                {% if current_user.avatar %}
+                                <img src="{{ current_user.avatar }}" alt="{{ current_user.username }}" class="avatar-sm me-2">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='img/default-avatar.jpg') }}" alt="{{ current_user.username }}" class="avatar-sm me-2">
+                                {% endif %}
+                                <span>{{ current_user.username }}</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ url_for('user.profile') }}">个人中心</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('user.my_contents') }}">我的内容</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('user.my_favorites') }}">我的收藏</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.profile') }}">
+                                        <i class="fas fa-user me-2 text-primary"></i>个人中心
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.my_contents') }}">
+                                        <i class="fas fa-file-alt me-2 text-primary"></i>我的内容
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.my_favorites') }}">
+                                        <i class="fas fa-heart me-2 text-primary"></i>我的收藏
+                                    </a>
+                                </li>
                                 {% if current_user.is_admin %}
-                                <li><a class="dropdown-item" href="{{ url_for('user.dashboard') }}">管理后台</a></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-2 text-danger"></i>管理后台
+                                    </a>
+                                </li>
                                 {% endif %}
                                 {% if current_user.is_teacher or current_user.is_admin %}
-                                <li><a class="dropdown-item" href="{{ url_for('heritage.create') }}">创建非遗项目</a></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('heritage.create') }}">
+                                        <i class="fas fa-plus-circle me-2 text-success"></i>创建非遗项目
+                                    </a>
+                                </li>
                                 {% endif %}
-                                <li><a class="dropdown-item" href="{{ url_for('content.create') }}">发布内容</a></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('content.create') }}">
+                                        <i class="fas fa-edit me-2 text-info"></i>发布内容
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">退出登录</a></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center text-danger" href="{{ url_for('auth.logout') }}">
+                                        <i class="fas fa-sign-out-alt me-2"></i>退出登录
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     {% else %}
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">登录</a>
-                        <a class="nav-link" href="{{ url_for('auth.register') }}">注册</a>
+                        <a class="nav-link btn btn-outline-primary me-2" href="{{ url_for('auth.login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i>登录
+                        </a>
+                        <a class="nav-link btn btn-primary" href="{{ url_for('auth.register') }}">
+                            <i class="fas fa-user-plus me-1"></i>注册
+                        </a>
                     {% endif %}
                 </div>
             </div>
@@ -73,7 +130,16 @@
     <!-- 消息提示 -->
     <div class="container mt-3">
         {% for category, message in get_flashed_messages(with_categories=true) %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show">
+        <div class="alert alert-{{ category }} alert-dismissible fade show animate__animated animate__fadeIn">
+            {% if category == 'success' %}
+                <i class="fas fa-check-circle me-2"></i>
+            {% elif category == 'danger' or category == 'error' %}
+                <i class="fas fa-exclamation-triangle me-2"></i>
+            {% elif category == 'warning' %}
+                <i class="fas fa-exclamation-circle me-2"></i>
+            {% elif category == 'info' %}
+                <i class="fas fa-info-circle me-2"></i>
+            {% endif %}
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -81,46 +147,136 @@
     </div>
 
     <!-- 主内容区 -->
-    <main class="container my-4">
+    <main class="container my-4 fade-in">
         {% block content %}{% endblock %}
     </main>
 
     <!-- 页脚 -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>体育非遗数字展示平台</h5>
-                    <p>连接课堂学习与数字化分享，促进体育非遗文化的传播与保护。</p>
+    <footer>
+        <div class="container py-4">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5><i class="fas fa-dragon me-2"></i>体育非遗数字展示平台</h5>
+                    <p class="mt-3">连接课堂学习与数字化分享，促进体育非遗文化的传播与保护。我们致力于让每一个珍贵的非物质文化遗产得以永续传承。</p>
+                    <div class="d-flex mt-3">
+                        <a href="#" class="me-3"><i class="fab fa-weixin fa-2x"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-weibo fa-2x"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-qq fa-2x"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-bilibili fa-2x"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-3">
+                
+                <div class="col-lg-3 col-md-6">
                     <h5>快速链接</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ url_for('main.index') }}" class="text-white">首页</a></li>
-                        <li><a href="#" class="text-white">非遗项目</a></li>
-                        <li><a href="#" class="text-white">内容专区</a></li>
-                        <li><a href="{{ url_for('main.about') }}" class="text-white">关于我们</a></li>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2">
+                            <a href="{{ url_for('main.index') }}"><i class="fas fa-angle-right me-2"></i>首页</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('heritage.list') }}"><i class="fas fa-angle-right me-2"></i>非遗项目</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('content.list') }}"><i class="fas fa-angle-right me-2"></i>内容专区</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('forum.index') }}"><i class="fas fa-angle-right me-2"></i>交流论坛</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('main.about') }}"><i class="fas fa-angle-right me-2"></i>关于我们</a>
+                        </li>
                     </ul>
                 </div>
-                <div class="col-md-3">
+                
+                <div class="col-lg-2 col-md-6">
+                    <h5>用户中心</h5>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2">
+                            <a href="{{ url_for('auth.login') }}"><i class="fas fa-angle-right me-2"></i>登录</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('auth.register') }}"><i class="fas fa-angle-right me-2"></i>注册</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                        <li class="mb-2">
+                            <a href="{{ url_for('user.profile') }}"><i class="fas fa-angle-right me-2"></i>个人中心</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{{ url_for('user.my_contents') }}"><i class="fas fa-angle-right me-2"></i>我的内容</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
                     <h5>联系我们</h5>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-envelope me-2"></i>contact@example.com</li>
-                        <li><i class="fas fa-phone me-2"></i>123-456-7890</li>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-map-marker-alt fa-fw me-2 mt-1"></i>
+                            <span>中国北京市海淀区xx路xx号</span>
+                        </li>
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-envelope fa-fw me-2 mt-1"></i>
+                            <span>contact@example.com</span>
+                        </li>
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-phone fa-fw me-2 mt-1"></i>
+                            <span>123-456-7890</span>
+                        </li>
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-clock fa-fw me-2 mt-1"></i>
+                            <span>周一至周五: 9:00 - 17:00</span>
+                        </li>
                     </ul>
                 </div>
             </div>
-            <hr>
-            <div class="text-center">
-                <p>&copy; 2025 体育非遗数字展示平台 | 由 <a href="#" class="text-white">yuqie6</a> 开发</p>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0">&copy; 2025 体育非遗数字展示平台 | 由 <a href="#">yuqie6</a> 开发</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-0"><a href="#">隐私政策</a> | <a href="#">使用条款</a> | <a href="#">网站地图</a></p>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="back-to-top" class="btn btn-primary rounded-circle position-fixed" style="bottom: 30px; right: 30px; width: 50px; height: 50px; display: none;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- 自定义JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <script>
+        // 返回顶部按钮
+        const backToTopButton = document.getElementById('back-to-top');
+        
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                backToTopButton.style.display = "flex";
+                backToTopButton.style.justifyContent = "center";
+                backToTopButton.style.alignItems = "center";
+            } else {
+                backToTopButton.style.display = "none";
+            }
+        };
+        
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+    
     {% block scripts %}{% endblock %}
 </body>
 </html>
