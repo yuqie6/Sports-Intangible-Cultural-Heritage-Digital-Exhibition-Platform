@@ -1,9 +1,13 @@
 @echo off
+chcp 65001
 echo 正在初始化数据库...
-call conda activate heritage_env
+
+:: 设置环境变量
+set DB_PASSWORD=qB645522153
+set PYTHONIOENCODING=utf-8
 
 echo 正在运行初始化脚本...
-python init_db.py
+python -X utf8 init_db.py
 
 if %errorlevel% neq 0 (
     echo 初始化过程中发生错误！

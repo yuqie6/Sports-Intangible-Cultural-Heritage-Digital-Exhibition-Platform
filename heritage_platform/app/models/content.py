@@ -1,3 +1,4 @@
+from tokenize import Comment
 from app import db
 from datetime import datetime
 
@@ -15,7 +16,9 @@ class Content(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # 关系 - 使用字符串引用而不是直接引用类，避免循环导入
+    # 关系定义 - 直接使用ForeignKey而不定义额外的关系
+    # 不再定义指向HeritageItem的关系，在HeritageItem中已经定义了contents关系
+    author = db.relationship('User', backref='contents', lazy=True, foreign_keys=[user_id])
     comments = db.relationship('Comment', backref='content', lazy='dynamic')
     likes = db.relationship('Like', backref='content', lazy='dynamic')
     favorites = db.relationship('Favorite', backref='content', lazy='dynamic')
@@ -25,23 +28,23 @@ class Content(db.Model):
         
     def to_dict(self, include_comments=False):
         """转换为字典用于API响应"""
-        from app.models import User, HeritageItem
+        # 导入HeritageItem以便获取关联的非遗项目
+        from app.models import HeritageItem
         
-        author = User.query.get(self.user_id)
-        heritage = HeritageItem.query.get(self.heritage_id)
+        # 获取关联的非遗项目
+        heritage_item = HeritageItem.query.get(self.heritage_id) if self.heritage_id else None
         
         result = {
             'id': self.id,
             'title': self.title,
             'heritage_id': self.heritage_id,
-            'heritage_name': heritage.name if heritage else None,
+            'heritage_name': heritage_item.name if heritage_item else None,
             'user_id': self.user_id,
-            'author_name': author.username if author else None,
-            'author_avatar': author.avatar if author else None,
+            'author_name': self.author.username if self.author else None,
+            'author_avatar': self.author.avatar if self.author else None,
             'content_type': self.content_type,
             'text_content': self.text_content,
             'file_path': self.file_path,
-            # 确保即使数据库中没有这个字段，也不会出错
             'rich_content': self.rich_content if hasattr(self, 'rich_content') else None,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
@@ -51,8 +54,7 @@ class Content(db.Model):
         }
         
         if include_comments:
-            from app.models import Comment
-            comments = Comment.query.filter_by(content_id=self.id).order_by(Comment.created_at.desc()).limit(10).all()
+            comments = self.comments.order_by(Comment.created_at.desc()).limit(10).all()
             result['recent_comments'] = [comment.to_dict() for comment in comments]
             
         return result

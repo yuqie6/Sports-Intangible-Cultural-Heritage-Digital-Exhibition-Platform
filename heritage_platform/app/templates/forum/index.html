@@ -65,7 +65,13 @@
                             <span class="badge bg-light text-dark">{{ topic.post_count }}</span>
                         </div>
                         <div class="col-3 col-md-2 text-center d-none d-md-block">
-                            <small class="text-muted">{{ topic.last_activity.strftime('%Y-%m-%d') }}</small>
+                            <small class="text-muted">
+                                {% if topic.last_activity %}
+                                    {{ topic.last_activity.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </small>
                         </div>
                     </div>
                 </a>

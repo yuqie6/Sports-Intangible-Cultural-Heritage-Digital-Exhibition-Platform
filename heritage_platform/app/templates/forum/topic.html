@@ -74,7 +74,7 @@
                     <!-- 帖子内容 -->
                     <div class="flex-grow-1">
                         <div class="mb-2 text-muted small">
-                            <i class="fas fa-clock me-1"></i> {{ post.created_at }}
+                            <i class="fas fa-clock me-1"></i> {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
                             {% if post.created_at != post.updated_at %}
                             <span class="mx-1">|</span>
                             <i class="fas fa-edit me-1"></i> 已编辑

@@ -1,9 +1,10 @@
+import traceback
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import current_user, login_required
 from app import db
 from app.models import Content, HeritageItem, Comment, Like, Favorite
 from app.forms.content import ContentForm, CommentForm
-from app.utils.file_handlers import save_file
+from app.utils.file_handlers import ALLOWED_IMAGE_EXTENSIONS, allowed_file, save_file
 from sqlalchemy.exc import SQLAlchemyError
 
 content_bp = Blueprint('content', __name__)
@@ -14,57 +15,29 @@ def list():
     page = request.args.get('page', 1, type=int)
     content_type = request.args.get('type')
     heritage_id = request.args.get('heritage_id', type=int)
+    per_page = 12
     
     try:
-        # 临时方案：使用 db.session.execute 来明确选择字段，避免查询不存在的字段
-        stmt = db.select(Content.id, Content.title, Content.heritage_id, 
-                        Content.user_id, Content.content_type, 
-                        Content.text_content, Content.file_path,
-                        Content.created_at, Content.updated_at)
+        # 使用查询构建器并加载关联的用户信息
+        query = Content.query.join(Content.author)
         
         if content_type:
-            stmt = stmt.filter(Content.content_type == content_type)
+            query = query.filter(Content.content_type == content_type)
             
         if heritage_id:
-            stmt = stmt.filter(Content.heritage_id == heritage_id)
+            query = query.filter(Content.heritage_id == heritage_id)
             
-        stmt = stmt.order_by(Content.created_at.desc())
+        # 应用排序并进行分页
+        pagination = query.order_by(Content.created_at.desc()).paginate(
+            page=page, per_page=per_page, error_out=False)
         
-        result = db.session.execute(stmt)
-        items = result.all()
+        items = pagination.items
         
-        # 手动创建分页对象
-        total = db.session.query(db.func.count(Content.id)).scalar()
-        per_page = 12
-        total_pages = (total + per_page - 1) // per_page
-        
-        # 简单的分页实现
-        class SimplePagination:
-            def __init__(self, items, page, per_page, total):
-                self.items = items
-                self.page = page
-                self.per_page = per_page
-                self.total = total
-                self.pages = (total + per_page - 1) // per_page
-                self.has_prev = page > 1
-                self.has_next = page < self.pages
-                self.prev_num = page - 1 if self.has_prev else None
-                self.next_num = page + 1 if self.has_next else None
-                
-            def iter_pages(self, left_edge=2, left_current=2, right_current=3, right_edge=2):
-                # 简化版的页码生成
-                for i in range(1, self.pages + 1):
-                    if i <= left_edge or \
-                       (i > self.page - left_current - 1 and i < self.page + right_current) or \
-                       i > self.pages - right_edge:
-                        yield i
-        
-        pagination = SimplePagination(items, page, per_page, total)
     except Exception as e:
         current_app.logger.error(f"内容列表查询错误: {str(e)}")
         # 降级处理：返回空列表
         items = []
-        pagination = SimplePagination([], page, 12, 0)
+        pagination = None
     
     # 获取所有非遗项目供筛选用
     try:

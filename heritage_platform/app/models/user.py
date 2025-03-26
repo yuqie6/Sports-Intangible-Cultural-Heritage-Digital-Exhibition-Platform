@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     
     # 关系
     heritage_items = db.relationship('HeritageItem', backref='creator', lazy='dynamic')
-    contents = db.relationship('Content', backref='author', lazy='dynamic')
+    # 删除conflicting的contents关系定义
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     likes = db.relationship('Like', backref='user', lazy='dynamic')
     favorites = db.relationship('Favorite', backref='user', lazy='dynamic')

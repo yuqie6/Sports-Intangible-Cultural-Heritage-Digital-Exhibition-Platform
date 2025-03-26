@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from config import Config
+from config import config
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 import os
@@ -16,9 +16,15 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message = '请先登录再访问此页面'
 login_manager.login_message_category = 'info'
 
-def create_app(config_class=Config):
+def create_app(config_name='default'):
+    """创建Flask应用实例
+    
+    Args:
+        config_name: 配置名称，对应config.py中的配置类
+    """
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
     
     # 初始化扩展
     db.init_app(app)
@@ -26,23 +32,8 @@ def create_app(config_class=Config):
     csrf.init_app(app)
     migrate.init_app(app, db)
     
-    # 确保上传目录存在
-    with app.app_context():
-        os.makedirs(os.path.join(app.static_folder, 'uploads/images'), exist_ok=True)
-        os.makedirs(os.path.join(app.static_folder, 'uploads/videos'), exist_ok=True)
-        app.logger.info("上传目录已创建")
-        
-        # 检查表是否存在，如存在再确保列存在
-        try:
-            from app.utils.db_helpers import ensure_column_exists
-            from sqlalchemy import inspect
-            
-            # 检查表是否存在
-            inspector = inspect(db.engine)
-            if 'contents' in inspector.get_table_names():
-                ensure_column_exists('contents', 'rich_content', 'TEXT')
-        except Exception as e:
-            app.logger.warning(f"检查数据库结构时出错: {str(e)}")
+    # 确保日志目录存在
+    os.makedirs('logs', exist_ok=True)
     
     # 注册API蓝图（前后端分离的API接口）
     from app.api import api_bp
@@ -62,9 +53,6 @@ def create_app(config_class=Config):
     app.register_blueprint(content_bp, url_prefix='/content')
     app.register_blueprint(forum_bp, url_prefix='/forum')
     app.register_blueprint(user_bp, url_prefix='/user')
-    
-    # 创建文件上传目录
-    Config.init_app(app)
     
     # 注册全局错误处理
     from app.routes import errors

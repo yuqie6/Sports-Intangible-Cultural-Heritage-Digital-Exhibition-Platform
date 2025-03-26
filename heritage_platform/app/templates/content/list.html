@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}内容专区 - 体育非遗数字展示平台{% endblock %}
+{% block title %}内容列表 - 体育非遗数字展示平台{% endblock %}
 
 {% block content %}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">内容专区</h1>
+        <h1>内容列表</h1>
         {% if current_user.is_authenticated %}
         <a href="{{ url_for('content.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus-circle me-1"></i> 发布新内容
+            <i class="fas fa-plus-circle me-1"></i>发布内容
         </a>
         {% endif %}
     </div>
@@ -16,29 +16,34 @@
     <!-- 筛选器 -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ url_for('content.list') }}" class="row g-3">
-                <div class="col-md-4">
+            <form method="get" class="row g-3">
+                <!-- 内容类型筛选 -->
+                <div class="col-md-6">
                     <label class="form-label">内容类型</label>
-                    <div class="d-flex">
-                        <a href="{{ url_for('content.list', heritage_id=current_heritage_id) }}" class="btn {% if not current_type %}btn-primary{% else %}btn-outline-primary{% endif %} me-2">全部</a>
-                        <a href="{{ url_for('content.list', type='article', heritage_id=current_heritage_id) }}" class="btn {% if current_type == 'article' %}btn-primary{% else %}btn-outline-primary{% endif %} me-2">文章</a>
-                        <a href="{{ url_for('content.list', type='image', heritage_id=current_heritage_id) }}" class="btn {% if current_type == 'image' %}btn-primary{% else %}btn-outline-primary{% endif %} me-2">图片</a>
-                        <a href="{{ url_for('content.list', type='video', heritage_id=current_heritage_id) }}" class="btn {% if current_type == 'video' %}btn-primary{% else %}btn-outline-primary{% endif %}">视频</a>
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('content.list', heritage_id=current_heritage_id) }}" 
+                           class="btn {% if not current_type %}btn-primary{% else %}btn-outline-primary{% endif %}">全部</a>
+                        <a href="{{ url_for('content.list', type='article', heritage_id=current_heritage_id) }}" 
+                           class="btn {% if current_type == 'article' %}btn-primary{% else %}btn-outline-primary{% endif %}">文章</a>
+                        <a href="{{ url_for('content.list', type='image', heritage_id=current_heritage_id) }}" 
+                           class="btn {% if current_type == 'image' %}btn-primary{% else %}btn-outline-primary{% endif %}">图片</a>
+                        <a href="{{ url_for('content.list', type='video', heritage_id=current_heritage_id) }}" 
+                           class="btn {% if current_type == 'video' %}btn-primary{% else %}btn-outline-primary{% endif %}">视频</a>
+                        <a href="{{ url_for('content.list', type='multimedia', heritage_id=current_heritage_id) }}" 
+                           class="btn {% if current_type == 'multimedia' %}btn-primary{% else %}btn-outline-primary{% endif %}">多媒体</a>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <label for="heritage_filter" class="form-label">非遗项目</label>
-                    <select id="heritage_filter" class="form-select" onchange="location.href=this.value;">
-                        <option value="{{ url_for('content.list', type=current_type) }}">所有项目</option>
+                
+                <!-- 非遗项目筛选 -->
+                <div class="col-md-6">
+                    <label class="form-label">非遗项目</label>
+                    <div class="btn-group overflow-auto" role="group" style="max-width: 100%;">
+                        <a href="{{ url_for('content.list', type=current_type) }}" 
+                           class="btn {% if not current_heritage_id %}btn-primary{% else %}btn-outline-primary{% endif %}">全部</a>
                         {% for item in heritage_items %}
-                        <option value="{{ url_for('content.list', type=current_type, heritage_id=item.id) }}" {% if current_heritage_id == item.id %}selected{% endif %}>{{ item.name }}</option>
+                        <a href="{{ url_for('content.list', type=current_type, heritage_id=item.id) }}" 
+                           class="btn {% if current_heritage_id == item.id %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ item.name }}</a>
                         {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="搜索内容..." name="q" value="{{ request.args.get('q', '') }}">
-                        <button class="btn btn-outline-primary" type="submit">搜索</button>
                     </div>
                 </div>
             </form>
@@ -46,99 +51,85 @@
     </div>
     
     <!-- 内容列表 -->
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {% if items %}
-            {% for content in items %}
-            <div class="col">
-                <div class="card h-100">
-                    {% if content.content_type == 'image' and content.file_path %}
-                    <img src="{{ url_for('static', filename=content.file_path) }}" class="card-img-top" alt="{{ content.title }}">
-                    {% elif content.content_type == 'video' and content.file_path %}
-                    <div class="position-relative">
-                        <img src="{{ url_for('static', filename='img/video-placeholder.jpg') }}" class="card-img-top" alt="{{ content.title }}">
-                        <div class="position-absolute top-50 start-50 translate-middle">
-                            <i class="fas fa-play-circle fa-3x text-white"></i>
-                        </div>
-                    </div>
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/default-content.jpg') }}" class="card-img-top" alt="{{ content.title }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ content.title }}</h5>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                <i class="fas fa-user me-1"></i>{{ content.author.username }}
-                                <span class="mx-2">|</span>
-                                <i class="fas fa-calendar me-1"></i>{{ content.created_at.strftime('%Y-%m-%d') }}
-                            </small>
-                        </p>
-                        {% if content.content_type == 'article' and content.text_content %}
-                        <p class="card-text">{{ content.text_content|truncate(100) }}</p>
-                        {% endif %}
-                    </div>
-                    <div class="card-footer bg-transparent border-top-0">
-                        <a href="{{ url_for('content.detail', id=content.id) }}" class="btn btn-sm btn-primary">查看详情</a>
-                        <div class="float-end">
-                            <span class="me-2"><i class="far fa-comment"></i> {{ content.comments.count() }}</span>
-                            <span><i class="far fa-heart"></i> {{ content.likes.count() }}</span>
-                        </div>
-                    </div>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for content in items %}
+        <div class="col">
+            <div class="card h-100">
+                {% if content.file_path %}
+                <img src="{{ url_for('static', filename=content.file_path) }}" class="card-img-top" alt="{{ content.title }}">
+                {% else %}
+                <img src="{{ url_for('static', filename='img/default-content.jpg') }}" class="card-img-top" alt="默认图片">
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ content.title }}</h5>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-tag me-1"></i>{{ content.content_type }}
+                            {% if content.heritage_id %}
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-book me-1"></i>{{ content.heritage_item.name if content.heritage_item else '未分类' }}
+                            {% endif %}
+                        </small>
+                    </p>
                 </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="col-12">
-                <div class="alert alert-info text-center py-5">
-                    <p class="mb-3">暂无内容</p>
-                    {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('content.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus-circle me-1"></i> 发布新内容
+                
+                <div class="card-footer">
+                    <small class="text-muted">
+                        <i class="fas fa-user me-1"></i>{{ content.author.username if content.author else '未知用户' }}
+                        <span class="mx-2">|</span>
+                        <i class="fas fa-clock me-1"></i>{{ content.created_at.strftime('%Y-%m-%d') }}
+                    </small>
+                    <a href="{{ url_for('content.detail', id=content.id) }}" class="btn btn-sm btn-outline-primary float-end">
+                        查看详情
                     </a>
-                    {% endif %}
                 </div>
             </div>
-        {% endif %}
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted mb-0">暂无内容</p>
+        </div>
+        {% endfor %}
     </div>
     
     <!-- 分页 -->
-    {% if pagination.pages > 1 %}
-    <nav class="mt-4" aria-label="内容分页">
+    {% if pagination and pagination.pages > 1 %}
+    <nav class="mt-4">
         <ul class="pagination justify-content-center">
             {% if pagination.has_prev %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('content.list', page=pagination.prev_num, type=current_type, heritage_id=current_heritage_id) }}">上一页</a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一页</a>
+                <a class="page-link" href="{{ url_for('content.list', page=pagination.prev_num, type=current_type, heritage_id=current_heritage_id) }}">
+                    上一页
+                </a>
             </li>
             {% endif %}
             
-            {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
-                {% if p %}
-                    {% if p == pagination.page %}
-                    <li class="page-item active" aria-current="page">
-                        <a class="page-link" href="#">{{ p }}</a>
+            {% for page in pagination.iter_pages() %}
+                {% if page %}
+                    {% if page != pagination.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('content.list', page=page, type=current_type, heritage_id=current_heritage_id) }}">
+                            {{ page }}
+                        </a>
                     </li>
                     {% else %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('content.list', page=p, type=current_type, heritage_id=current_heritage_id) }}">{{ p }}</a>
+                    <li class="page-item active">
+                        <span class="page-link">{{ page }}</span>
                     </li>
                     {% endif %}
                 {% else %}
                 <li class="page-item disabled">
-                    <a class="page-link" href="#">...</a>
+                    <span class="page-link">...</span>
                 </li>
                 {% endif %}
             {% endfor %}
             
             {% if pagination.has_next %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('content.list', page=pagination.next_num, type=current_type, heritage_id=current_heritage_id) }}">下一页</a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">下一页</a>
+                <a class="page-link" href="{{ url_for('content.list', page=pagination.next_num, type=current_type, heritage_id=current_heritage_id) }}">
+                    下一页
+                </a>
             </li>
             {% endif %}
         </ul>
