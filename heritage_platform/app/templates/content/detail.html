@@ -8,7 +8,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
             <li class="breadcrumb-item"><a href="{{ url_for('content.list') }}">内容专区</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('content.list', heritage_id=content.heritage_id) }}">{{ content.heritage_item.name }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('content.list', heritage_id=content.heritage_id) }}">{{ content.heritage.name }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ content.title }}</li>
         </ol>
     </nav>
@@ -48,7 +48,7 @@
                         {% elif content.content_type == 'multimedia' %}多媒体
                         {% endif %}
                     </span>
-                    <span class="badge bg-secondary">{{ content.heritage_item.name }}</span>
+                    <span class="badge bg-secondary">{{ content.heritage.name }}</span>
                 </div>
             </div>
             

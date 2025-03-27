@@ -40,13 +40,18 @@ def detail(id):
     """非遗项目详情页"""
     item = HeritageItem.query.get_or_404(id)
     
-    # 获取相关内容
-    contents = Content.query.filter_by(heritage_id=id).order_by(Content.created_at.desc()).all()
-    
-    # 按类型分组内容
-    articles = [c for c in contents if c.content_type == 'article']
-    videos = [c for c in contents if c.content_type == 'video']
-    images = [c for c in contents if c.content_type == 'image']
+    try:
+        # 使用关系获取内容并按类型分组
+        contents = item.contents
+        articles = [c for c in contents if c.content_type == 'article']
+        videos = [c for c in contents if c.content_type == 'video']
+        images = [c for c in contents if c.content_type == 'image']
+        
+        current_app.logger.info(f"Found contents for heritage {id}: {len(articles)} articles, {len(videos)} videos, {len(images)} images")
+        
+    except Exception as e:
+        current_app.logger.error(f"Error fetching contents for heritage {id}: {str(e)}")
+        articles, videos, images = [], [], []
     
     return render_template('heritage/detail.html', 
                            item=item,

@@ -17,8 +17,8 @@ class Content(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # 关系定义 - 直接使用ForeignKey而不定义额外的关系
-    # 不再定义指向HeritageItem的关系，在HeritageItem中已经定义了contents关系
+    # 关系定义
+    heritage = db.relationship('HeritageItem', back_populates='contents')
     author = db.relationship('User', backref='contents', lazy=True, foreign_keys=[user_id])
     comments = db.relationship('Comment', backref='content', lazy='dynamic')
     likes = db.relationship('Like', backref='content', lazy='dynamic')

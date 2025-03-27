@@ -13,7 +13,7 @@ class HeritageItem(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # 关系
-    contents = db.relationship('Content', backref='heritage_item', lazy='dynamic')
+    contents = db.relationship('Content', back_populates='heritage', lazy=True)
     
     def __repr__(self):
         return f'<HeritageItem {self.name}>'
