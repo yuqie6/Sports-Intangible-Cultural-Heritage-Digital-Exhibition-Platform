@@ -6,6 +6,21 @@ from flask_login import current_user, login_required
 from app.utils.response import api_success, api_error
 import traceback
 
+@api_bp.route('/forum/latest_topics', methods=['GET'])
+def get_latest_topics():
+    """获取最新论坛主题API"""
+    try:
+        limit = request.args.get('limit', 5, type=int)
+        topics = ForumTopic.query.order_by(
+            ForumTopic.last_activity.desc()).limit(limit).all()
+        
+        return api_success({
+            'topics': [topic.to_dict() for topic in topics]
+        })
+    except Exception as e:
+        current_app.logger.error(f"获取最新主题出错：{str(e)}")
+        return api_error("获取最新主题失败")
+
 @api_bp.route('/forum/topics', methods=['GET'])
 def get_topics():
     """获取论坛主题列表API"""

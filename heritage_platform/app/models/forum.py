@@ -41,8 +41,8 @@ class ForumTopic(db.Model):
             'post_count': self.post_count,
             'is_pinned': self.is_pinned,
             'is_closed': self.is_closed,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'last_activity': self.last_activity.strftime('%Y-%m-%d %H:%M:%S')
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
+            'last_activity': self.last_activity.strftime('%Y-%m-%d %H:%M:%S') if self.last_activity else None
         }
 
 class ForumPost(db.Model):

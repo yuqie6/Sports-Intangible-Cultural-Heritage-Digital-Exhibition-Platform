@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import current_user, login_required
 from app import db
 from app.models import ForumTopic, ForumPost, User
@@ -8,6 +8,34 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import func
 
 forum_bp = Blueprint('forum', __name__)
+
+@forum_bp.route('/api/latest_topics')
+def latest_topics():
+    """获取最新论坛主题API"""
+    limit = request.args.get('limit', 5, type=int)
+    
+    # 查询最新主题
+    topics = db.session.query(
+        ForumTopic,
+        User.username.label('creator_name')
+    ).outerjoin(User, ForumTopic.user_id == User.id
+    ).order_by(
+        ForumTopic.last_activity.desc()
+    ).limit(limit).all()
+    
+    # 格式化数据
+    result = []
+    for topic, creator_name in topics:
+        result.append({
+            'id': topic.id,
+            'title': topic.title,
+            'category': topic.category,
+            'creator': creator_name or "未知用户",
+            'post_count': topic.post_count,
+            'last_activity': topic.last_activity.strftime('%Y-%m-%d %H:%M')
+        })
+    
+    return jsonify(result)
 
 @forum_bp.route('/')
 def index():

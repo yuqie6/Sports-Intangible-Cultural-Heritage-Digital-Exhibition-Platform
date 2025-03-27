@@ -173,26 +173,81 @@
             </div>
         </div>
         <div class="list-group list-group-flush">
-            {% for i in range(5) %}
-            <a href="#" class="list-group-item list-group-item-action">
-                <div class="row align-items-center">
-                    <div class="col-7">
-                        <h6 class="mb-0">如何更好地学习传统武术</h6>
-                        <small class="text-muted">教学</small>
-                    </div>
-                    <div class="col-3 text-center d-none d-md-block">
-                        <small>张老师</small>
-                    </div>
-                    <div class="col-2 text-center">
-                        <span class="badge bg-secondary">12</span>
+            <div id="latest-topics-container">
+                <!-- 动态加载最新主题 -->
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">加载中...</span>
                     </div>
                 </div>
-            </a>
-            {% endfor %}
+            </div>
         </div>
         <div class="card-footer text-end">
             <a href="{{ url_for('forum.create_topic') }}" class="btn btn-primary btn-sm">发布主题</a>
         </div>
     </div>
 </section>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取最新论坛主题
+    function fetchLatestTopics() {
+    fetch('/api/forum/latest_topics?limit=5')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('latest-topics-container');
+                container.innerHTML = '';
+                
+                if (!data.data || !data.data.topics || data.data.topics.length === 0) {
+                    container.innerHTML = `
+                        <div class="alert alert-info m-3">
+                            暂无论坛主题
+                        </div>
+                    `;
+                    return;
+                }
+                
+                data.data.topics.forEach(topic => {
+                    const topicElement = document.createElement('a');
+                    topicElement.className = 'list-group-item list-group-item-action';
+                    topicElement.href = `/forum/topic/${topic.id}`;
+                    
+                    topicElement.innerHTML = `
+                        <div class="row align-items-center">
+                            <div class="col-7">
+                                <h6 class="mb-0">${topic.title}</h6>
+                                <small class="text-muted">${topic.category}</small>
+                            </div>
+                            <div class="col-3 text-center d-none d-md-block">
+                                <small>${topic.creator}</small>
+                            </div>
+                            <div class="col-2 text-center">
+                                <span class="badge bg-secondary">${topic.post_count}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(topicElement);
+                });
+            })
+            .catch(error => {
+                console.error('获取最新主题失败:', error);
+                const container = document.getElementById('latest-topics-container');
+                container.innerHTML = `
+                    <div class="alert alert-danger m-3">
+                        加载论坛动态失败，请刷新页面重试
+                    </div>
+                `;
+            });
+    }
+    
+    // 初始加载
+    fetchLatestTopics();
+    
+    // 每30秒刷新一次
+    setInterval(fetchLatestTopics, 30000);
+});
+</script>
+{% endblock %}
 {% endblock %}
