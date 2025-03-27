@@ -223,11 +223,11 @@ def upload_image():
             file.save(file_path)
             current_app.logger.info(f"文件保存到: {file_path}")
             
-            # 构建URL (确保生成的URL以/static/开头)
-            relative_path = f"uploads/images/{unique_filename}"
-            url = url_for('static', filename=relative_path)
+            # 构建绝对URL路径（确保以/static/开头）
+            url = url_for('static', filename=f"uploads/images/{unique_filename}")
             
-            current_app.logger.info(f"生成的URL: {url}")
+            # 记录生成的URL
+            current_app.logger.info(f"生成的图片URL: {url}")
             
             # 确认文件已成功保存
             if os.path.exists(file_path):
@@ -236,7 +236,7 @@ def upload_image():
                 return jsonify({
                     'uploaded': 1,
                     'fileName': filename,
-                    'url': url
+                    'url': url  # 绝对URL路径，以/static/开头
                 })
             else:
                 current_app.logger.error(f"文件保存后不存在: {file_path}")

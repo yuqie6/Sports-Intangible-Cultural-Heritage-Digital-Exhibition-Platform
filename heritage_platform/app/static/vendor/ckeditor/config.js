@@ -26,6 +26,14 @@ CKEDITOR.editorConfig = function( config ) {
     config.extraAllowedContent = 'img[alt,src,width,height,data-*]{*}(*);';
     config.imageResize = { maxWidth: 1000, maxHeight: 800 };
     
+    // 确保使用绝对路径URL
+    config.baseHref = '/';
+    
+    // 添加自定义处理插件，修复图片URL问题
+    config.forceEnterMode = true;
+    config.htmlEncodeOutput = false;
+    config.entities = false;
+    
     // 定义工具栏组
     config.toolbarGroups = [
         { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },

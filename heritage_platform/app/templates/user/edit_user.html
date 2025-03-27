@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑用户 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.dashboard') }}">管理后台</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.manage_users') }}">用户管理</a></li>
+            <li class="breadcrumb-item active">编辑用户</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i>编辑用户</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4 text-center">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar }}" alt="{{ user.username }}" class="rounded-circle avatar-lg">
+                        {% else %}
+                            <div class="avatar-placeholder rounded-circle">
+                                <i class="fas fa-user fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
+                        <h5 class="mt-3">{{ user.username }}</h5>
+                        <p class="text-muted">用户 ID: {{ user.id }}</p>
+                    </div>
+                
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else "")) }}
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), type="email") }}
+                            {% for error in form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), type="password") }}
+                            <div class="form-text">如果不需要修改密码，请留空</div>
+                            {% for error in form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.role.label(class="form-label") }}
+                            {{ form.role(class="form-select" + (" is-invalid" if form.role.errors else "")) }}
+                            {% for error in form.role.errors %}
+                                <div class="invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.avatar.label(class="form-label") }}
+                            {{ form.avatar(class="form-control" + (" is-invalid" if form.avatar.errors else ""), accept="image/*") }}
+                            <div class="form-text">可选。支持JPG、PNG、GIF格式，建议尺寸为200x200像素。</div>
+                            {% for error in form.avatar.errors %}
+                                <div class="invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('user.manage_users') }}" class="btn btn-outline-secondary">返回</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .avatar-lg {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+    .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e9ecef;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}

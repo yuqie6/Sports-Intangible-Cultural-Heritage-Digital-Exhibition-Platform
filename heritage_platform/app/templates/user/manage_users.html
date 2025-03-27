@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}用户管理 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.dashboard') }}">管理后台</a></li>
+            <li class="breadcrumb-item active">用户管理</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">用户管理</h1>
+        <a href="{{ url_for('user.create_user') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle me-1"></i> 创建新用户
+        </a>
+    </div>
+    
+    <!-- 搜索和筛选区域 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('user.manage_users') }}">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="搜索用户名或邮箱..." name="search" value="{{ search or '' }}">
+                            <button class="btn btn-outline-secondary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="role" class="form-select" onchange="this.form.submit()">
+                            <option value="">所有角色</option>
+                            <option value="student" {% if current_role == 'student' %}selected{% endif %}>学生</option>
+                            <option value="teacher" {% if current_role == 'teacher' %}selected{% endif %}>教师</option>
+                            <option value="admin" {% if current_role == 'admin' %}selected{% endif %}>管理员</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-outline-secondary w-100" onclick="window.location.href='{{ url_for('user.manage_users') }}'">
+                            重置筛选
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 用户列表 -->
+    <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">用户列表</h5>
+            <span>共 {{ pagination.total }} 个用户</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>邮箱</th>
+                            <th>角色</th>
+                            <th>注册时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar }}" alt="{{ user.username }}" class="avatar-xs me-2 rounded-circle">
+                                {% else %}
+                                    <i class="fas fa-user-circle me-2"></i>
+                                {% endif %}
+                                {{ user.username }}
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="badge {% if user.is_admin %}bg-danger{% elif user.is_teacher %}bg-info{% else %}bg-secondary{% endif %}">
+                                    {% if user.is_admin %}管理员{% elif user.is_teacher %}教师{% else %}学生{% endif %}
+                                </span>
+                            </td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('user.edit_user', id=user.id) }}" class="btn btn-outline-primary" title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if user.id != current_user.id %}
+                                    <button type="button" class="btn btn-outline-danger delete-user-btn" 
+                                            data-bs-toggle="modal" data-bs-target="#deleteUserModal"
+                                            data-id="{{ user.id }}" data-name="{{ user.username }}" title="删除">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% else %}
+                                    <button type="button" class="btn btn-outline-danger" disabled title="不能删除当前登录用户">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 分页 -->
+        {% if pagination.pages > 1 %}
+        <div class="card-footer">
+            <nav aria-label="用户分页">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('user.manage_users', page=pagination.prev_num, role=current_role, search=search) }}">上一页</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一页</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                        {% if p %}
+                            {% if p == pagination.page %}
+                            <li class="page-item active" aria-current="page">
+                                <a class="page-link" href="#">{{ p }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('user.manage_users', page=p, role=current_role, search=search) }}">{{ p }}</a>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('user.manage_users', page=pagination.next_num, role=current_role, search=search) }}">下一页</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">下一页</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 删除用户确认模态框 -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteUserModalLabel">确认删除用户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除用户 <strong id="deleteUserName"></strong> 吗？此操作不可撤销！</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form id="deleteUserForm" method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .avatar-xs {
+        width: 24px;
+        height: 24px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 设置删除用户模态框的信息
+        const deleteUserButtons = document.querySelectorAll('.delete-user-btn');
+        deleteUserButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.getAttribute('data-id');
+                const userName = this.getAttribute('data-name');
+                document.getElementById('deleteUserName').textContent = userName;
+                document.getElementById('deleteUserForm').setAttribute('action', 
+                    '{{ url_for("user.delete_user", id=0) }}'.replace('0', userId));
+            });
+        });
+    });
+</script>
+{% endblock %}
