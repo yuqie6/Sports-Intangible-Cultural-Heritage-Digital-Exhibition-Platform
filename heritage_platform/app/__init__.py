@@ -5,6 +5,7 @@ from config import config
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 import os
+import markdown
 
 # 初始化扩展
 db = SQLAlchemy()
@@ -63,5 +64,18 @@ def create_app(config_name='default'):
     # 注册上下文处理器，提供通用数据
     from app.utils.context_processors import common_data
     app.context_processor(common_data)
+    
+    # 添加模板过滤器
+    @app.template_filter('markdown')
+    def render_markdown(content):
+        """将Markdown格式转换为HTML"""
+        if content:
+            return markdown.markdown(content, extensions=[
+                'markdown.extensions.fenced_code',  # 支持代码块
+                'markdown.extensions.tables',       # 支持表格
+                'markdown.extensions.nl2br',        # 换行转为<br>
+                'markdown.extensions.extra'         # 额外功能集合
+            ])
+        return ''
     
     return app
