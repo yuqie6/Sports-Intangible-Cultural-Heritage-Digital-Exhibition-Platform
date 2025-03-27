@@ -173,7 +173,7 @@ def save_file(file, file_type: str, watermark: Optional[str] = None) -> Optional
             file.save(file_path)
         
         current_app.logger.info(f"文件已保存: {file_path}")
-        return f"uploads/{save_folder}/{unique_filename}"
+        return f"static/uploads/{save_folder}/{unique_filename}"
         
     except Exception as e:
         current_app.logger.error(f"保存文件时出错: {str(e)}")

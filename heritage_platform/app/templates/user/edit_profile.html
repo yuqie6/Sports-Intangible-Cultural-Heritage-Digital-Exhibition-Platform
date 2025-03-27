@@ -18,7 +18,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center p-4">
                     <div class="position-relative mx-auto mb-4" style="width: 150px; height: 150px;">
-                        <img src="{{ current_user.avatar or url_for('static', filename='img/default-avatar.jpg') }}" 
+                    <img src="{{ current_user.avatar }}" 
                              alt="{{ current_user.username }}" class="avatar-lg rounded-circle mx-auto" 
                              style="width: 150px; height: 150px; object-fit: cover;">
                     </div>
@@ -104,7 +104,7 @@
                                     <p class="mb-2"><strong>预览</strong></p>
                                     <div class="d-flex align-items-center">
                                         <div class="position-relative me-4" style="width: 100px; height: 100px;">
-                                            <img src="{{ current_user.avatar or url_for('static', filename='img/default-avatar.jpg') }}" 
+                                            <img src="{{ current_user.avatar }}" 
                                                  alt="头像预览" id="avatar-preview" class="img-thumbnail rounded-circle" 
                                                  style="width: 100px; height: 100px; object-fit: cover;">
                                         </div>

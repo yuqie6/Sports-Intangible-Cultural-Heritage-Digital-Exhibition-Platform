@@ -12,7 +12,7 @@
             <div class="card">
                 <div class="card-body text-center">
                     {% if current_user.avatar %}
-                    <img src="{{ url_for('static', filename=current_user.avatar) }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;" alt="{{ current_user.username }}">
+                    <img src="{{ current_user.avatar }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;" alt="{{ current_user.username }}">
                     {% else %}
                     <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center bg-primary text-white mb-3" style="width: 150px; height: 150px; font-size: 60px;">
                         {{ current_user.username[0] }}
