@@ -115,7 +115,9 @@
             {% for content in latest_contents %}
             <div class="col">
                 <div class="card h-100">
-                    {% if content.content_type == 'image' and content.file_path %}
+                    {% if content.cover_image %}
+                    <img src="{{ url_for('static', filename=content.cover_image) }}" class="card-img-top" alt="{{ content.title }}">
+                    {% elif content.content_type == 'image' and content.file_path %}
                     <img src="{{ url_for('static', filename=content.file_path) }}" class="card-img-top" alt="{{ content.title }}">
                     {% elif content.content_type == 'video' and content.file_path %}
                     <div class="position-relative">
@@ -217,8 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="row align-items-center">
                             <div class="col-7">
                                 <h6 class="mb-0">${topic.title}</h6>
-                                <small class="text-muted">${topic.category}</small>
-                            </div>
+                                <small class="text-muted
+                                </div>
                             <div class="col-3 text-center d-none d-md-block">
                                 <small>${topic.creator}</small>
                             </div>
