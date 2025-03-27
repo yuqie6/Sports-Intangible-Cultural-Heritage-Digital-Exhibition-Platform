@@ -212,26 +212,21 @@ def upload_cover():
         # 重置文件指针位置
         file.seek(0)
         
-        # 保存文件
-        upload_path = os.path.join(
-            current_app.root_path, 
-            'static', 'uploads', 'images'
-        )
-        os.makedirs(upload_path, exist_ok=True)
-        
-        filename = secure_filename(file.filename)
-        unique_filename = f"{uuid.uuid4().hex}_{filename}"
-        file_path = os.path.join(upload_path, unique_filename)
-        
-        file.save(file_path)
+        # 使用统一的文件处理函数保存
+        file_path = save_file(file, 'image')
+        if not file_path:
+            return jsonify({
+                'success': False,
+                'error': '文件保存失败'
+            })
         
         # 构建URL
-        url = url_for('static', filename=f"uploads/images/{unique_filename}")
+        url = url_for('static', filename=file_path)
         
         return jsonify({
             'success': True,
             'url': url,
-            'fileName': filename
+            'fileName': file.filename
         })
         
     except Exception as e:
@@ -372,7 +367,6 @@ def like(id):
 
 @content_bp.route('/delete/<int:id>', methods=['POST'])
 @login_required
-
 def delete(id):
     """删除内容"""
     content = Content.query.get_or_404(id)
@@ -386,10 +380,11 @@ def delete(id):
         # 删除关联文件
         if content.cover_image:
             try:
+                # 修复路径处理，避免重复的static前缀
                 cover_path = os.path.join(
                     current_app.root_path, 
                     'static', 
-                    content.cover_image.lstrip('/static/')
+                    content.cover_image.replace('/static/', '')
                 )
                 if os.path.exists(cover_path):
                     os.remove(cover_path)
@@ -398,10 +393,11 @@ def delete(id):
         
         if content.file_path:
             try:
+                # 修复路径处理，避免重复的static前缀
                 file_path = os.path.join(
                     current_app.root_path,
                     'static',
-                    content.file_path.lstrip('/static/')
+                    content.file_path.replace('/static/', '')
                 )
                 if os.path.exists(file_path):
                     os.remove(file_path)

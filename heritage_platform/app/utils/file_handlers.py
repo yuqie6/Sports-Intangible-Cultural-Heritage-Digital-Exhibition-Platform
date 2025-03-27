@@ -140,8 +140,26 @@ def save_file(file, file_type: str, watermark: Optional[str] = None) -> Optional
         current_app.logger.warning(f"无效的图片文件: {file.filename}")
         return None
     
-    # 创建安全的文件名
+    # 创建安全的文件名并保留扩展名
     filename = secure_filename(file.filename)
+    if not filename:  # 如果secure_filename返回空字符串(如中文文件名)
+        # 从原始文件名提取扩展名
+        if '.' in file.filename:
+            ext = file.filename.rsplit('.', 1)[1].lower()
+            if ext in ALLOWED_IMAGE_EXTENSIONS or ext in ALLOWED_VIDEO_EXTENSIONS:
+                filename = f"file_{uuid.uuid4().hex[:8]}.{ext}"
+            else:
+                filename = f"file_{uuid.uuid4().hex[:8]}"
+        else:
+            filename = f"file_{uuid.uuid4().hex[:8]}"
+    else:
+        # 确保文件名有扩展名
+        if '.' not in filename:
+            if '.' in file.filename:
+                ext = file.filename.rsplit('.', 1)[1].lower()
+                if ext in ALLOWED_IMAGE_EXTENSIONS or ext in ALLOWED_VIDEO_EXTENSIONS:
+                    filename = f"{filename}.{ext}"
+    
     unique_filename = f"{uuid.uuid4().hex}_{filename}"
     
     # 确保上传目录存在
@@ -173,7 +191,7 @@ def save_file(file, file_type: str, watermark: Optional[str] = None) -> Optional
             file.save(file_path)
         
         current_app.logger.info(f"文件已保存: {file_path}")
-        return f"static/uploads/{save_folder}/{unique_filename}"
+        return f"uploads/{save_folder}/{unique_filename}"
         
     except Exception as e:
         current_app.logger.error(f"保存文件时出错: {str(e)}")
