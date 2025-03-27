@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request
 from flask_login import login_required, current_user
-from app.models import Notification
+from app.models import Notification, User
+from app.forms.notification import AnnouncementForm
+from app.utils.decorators import admin_required, teacher_required, role_required
 from app import db
 
 bp = Blueprint('notification', __name__)
@@ -13,6 +15,61 @@ def list_notifications():
         user_id=current_user.id
     ).order_by(Notification.created_at.desc()).all()
     return render_template('notification/list.html', notifications=notifications)
+
+@bp.route('/announcement', methods=['GET', 'POST'])
+@login_required
+@role_required(['admin', 'teacher'])  # 只允许管理员和教师访问
+def create_announcement():
+    """创建公告页面 - 管理员和教师功能"""
+    form = AnnouncementForm()
+    
+    if form.validate_on_submit():
+        try:
+            title = form.title.data
+            content = form.content.data
+            announcement_content = f"{title}：{content}"
+            
+            # 获取所有用户
+            users = User.query.all()
+            sent_count = 0
+            
+            for user in users:
+                # 跳过当前用户（不给自己发通知）
+                if user.id == current_user.id:
+                    continue
+                
+                # 发送公告通知
+                success = send_notification(
+                    user_id=user.id,
+                    content=announcement_content,
+                    notification_type='announcement',
+                    sender_id=current_user.id
+                )
+                
+                if success:
+                    sent_count += 1
+            
+            flash(f'公告已成功发送给 {sent_count} 位用户', 'success')
+            return redirect(url_for('notification.create_announcement'))
+            
+        except Exception as e:
+            current_app.logger.error(f"发布公告失败: {str(e)}")
+            flash('发布公告失败，请稍后重试', 'danger')
+    
+    return render_template('notification/announcement.html', form=form)
+
+@bp.route('/announcements')
+@login_required
+@role_required(['admin', 'teacher'])  # 只允许管理员和教师访问
+def list_announcements():
+    """查看已发布的公告列表 - 管理员和教师功能"""
+    # 获取当前用户发布的公告
+    announcements = Notification.query.filter_by(
+        sender_id=current_user.id,
+        type='announcement'
+    ).order_by(Notification.created_at.desc()).all()
+    
+    return render_template('notification/announcements.html', announcements=announcements)
 
 def send_notification(user_id, content, notification_type, link=None, sender_id=None):
     """
@@ -38,5 +95,5 @@ def send_notification(user_id, content, notification_type, link=None, sender_id=
         return True
     except Exception as e:
         db.session.rollback()
-        print(f"发送通知失败: {str(e)}")
+        current_app.logger.error(f"发送通知失败: {str(e)}")
         return False

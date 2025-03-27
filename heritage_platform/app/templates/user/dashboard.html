@@ -83,6 +83,30 @@
                 </div>
             </div>
         </div>
+        <!-- 公告管理卡片 -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                公告管理</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <a href="{{ url_for('notification.create_announcement') }}" class="btn btn-sm btn-warning mb-2 w-100">
+                                    <i class="fas fa-bullhorn me-1"></i> 发布公告
+                                </a>
+                                <a href="{{ url_for('notification.list_announcements') }}" class="btn btn-sm btn-outline-secondary w-100">
+                                    <i class="fas fa-list me-1"></i> 已发布公告
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 最近活动 -->
