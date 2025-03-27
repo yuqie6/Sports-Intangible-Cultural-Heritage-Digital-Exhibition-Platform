@@ -83,11 +83,14 @@ def detail(id):
             current_app.logger.error(f"发布评论失败: {str(e)}")
             flash('发布评论失败，请稍后重试', 'danger')
     
-    # 获取评论列表
+    # 获取顶级评论列表（不包括回复）
     page = request.args.get('page', 1, type=int)
-    comments_pagination = Comment.query.filter_by(content_id=id).order_by(
-        Comment.created_at.desc()).paginate(
-        page=page, per_page=10, error_out=False)
+    comments_pagination = Comment.query.filter_by(
+        content_id=id,
+        parent_id=None
+    ).order_by(Comment.created_at.desc()).paginate(
+        page=page, per_page=10, error_out=False
+    )
     
     # 检查当前用户是否已点赞
     has_liked = False
@@ -421,6 +424,35 @@ def delete(id):
         flash('删除内容失败，请稍后重试', 'danger')
     
     return redirect(url_for('content.list'))
+
+@content_bp.route('/reply_comment/<int:content_id>/<int:comment_id>', methods=['POST'])
+@login_required
+def reply_comment(content_id, comment_id):
+    """回复评论"""
+    content = Content.query.get_or_404(content_id)
+    parent_comment = Comment.query.get_or_404(comment_id)
+    form = CommentForm()
+    
+    if form.validate_on_submit():
+        try:
+            reply = Comment(
+                user_id=current_user.id,
+                content_id=content_id,
+                text=form.text.data,
+                parent_id=comment_id,
+                reply_to_user_id=parent_comment.user_id
+            )
+            
+            db.session.add(reply)
+            db.session.commit()
+            
+            flash('回复发布成功', 'success')
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"发布回复失败: {str(e)}")
+            flash('发布回复失败，请稍后重试', 'danger')
+    
+    return redirect(url_for('content.detail', id=content_id))
 
 @content_bp.route('/favorite/<int:id>', methods=['POST'])
 @login_required

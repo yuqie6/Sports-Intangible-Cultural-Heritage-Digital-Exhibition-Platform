@@ -17,7 +17,8 @@ class User(UserMixin, db.Model):
     # 关系
     heritage_items = db.relationship('HeritageItem', backref='creator', lazy='dynamic')
     # 删除conflicting的contents关系定义
-    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic', foreign_keys='Comment.user_id')
+    comment_replies = db.relationship('Comment', lazy='dynamic', foreign_keys='Comment.reply_to_user_id')
     likes = db.relationship('Like', backref='user', lazy='dynamic')
     favorites = db.relationship('Favorite', backref='user', lazy='dynamic')
     # 添加论坛关系

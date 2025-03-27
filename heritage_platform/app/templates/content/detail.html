@@ -172,6 +172,52 @@
                                     </div>
                                 </div>
                                 <p class="mb-0 mt-1">{{ comment.text }}</p>
+
+                                <!-- 回复按钮 -->
+                                {% if current_user.is_authenticated %}
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-secondary reply-btn" data-comment-id="{{ comment.id }}">
+                                        <i class="fas fa-reply"></i> 回复
+                                    </button>
+                                </div>
+                                {% endif %}
+
+                                <!-- 嵌套回复表单 -->
+                                {% if current_user.is_authenticated %}
+                                <div class="reply-form mt-3" id="reply-form-{{ comment.id }}" style="display: none;">
+                                    <form method="POST" action="{{ url_for('content.reply_comment', content_id=content.id, comment_id=comment.id) }}">
+                                        {{ form.hidden_tag() }}
+                                        <div class="mb-3">
+                                            {{ form.text.label(class="form-label") }}
+                                            {{ form.text(class="form-control", rows=3) }}
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm">提交回复</button>
+                                        <button type="button" class="btn btn-secondary btn-sm cancel-reply-btn" data-comment-id="{{ comment.id }}">取消</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+
+                                <!-- 嵌套回复列表 -->
+                                {% if comment.replies.count() > 0 %}
+                                <div class="replies mt-3 ms-4 border-start ps-3">
+                                    {% for reply in comment.replies %}
+                                    <div class="reply mb-3">
+                                        <div class="d-flex align-items-center small text-muted mb-1">
+                                            <i class="fas fa-user me-1"></i> {{ reply.author.username }}
+                                            {% if reply.reply_to_user %}
+                                            <i class="fas fa-reply mx-1"></i>
+                                            {{ reply.reply_to_user.username }}
+                                            {% endif %}
+                                            <span class="mx-2">|</span>
+                                            <i class="fas fa-clock me-1"></i> {{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </div>
+                                        <div class="reply-content">
+                                            {{ reply.text }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -249,6 +295,31 @@
         {% endfor %}
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 回复按钮点击事件
+    const replyButtons = document.querySelectorAll('.reply-btn');
+    replyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.dataset.commentId;
+            const replyForm = document.getElementById(`reply-form-${commentId}`);
+            replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+        });
+    });
+
+    // 取消回复按钮点击事件
+    const cancelButtons = document.querySelectorAll('.cancel-reply-btn');
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.dataset.commentId;
+            document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+        });
+    });
+});
+</script>
 {% endblock %}
 
 {% block styles %}

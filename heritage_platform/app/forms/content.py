@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectField, SubmitField
+from wtforms import StringField, TextAreaField, SelectField, SubmitField, HiddenField
 from wtforms.validators import DataRequired, Length, Optional
 from flask_wtf.file import FileField, FileAllowed
 
@@ -27,4 +27,6 @@ class ContentForm(FlaskForm):
 class CommentForm(FlaskForm):
     """评论表单"""
     text = TextAreaField('评论内容', validators=[DataRequired(), Length(1, 1000)])
+    parent_id = HiddenField('父评论ID')
+    reply_to_user_id = HiddenField('回复用户ID')
     submit = SubmitField('发表评论')
