@@ -129,6 +129,18 @@ def topic(id):
             # 更新主题最后活动时间，不直接修改post_count属性
             topic.last_activity = post.created_at
             
+            # 发送通知给主题创建者（如果回复者不是创建者本人）
+            if current_user.id != topic.user_id:
+                from app.routes.notification import send_notification
+                content = f"{current_user.username} 在主题 \"{topic.title}\" 中发表了回复"
+                send_notification(
+                    user_id=topic.user_id,
+                    content=content,
+                    notification_type='reply',
+                    link=url_for('forum.topic', id=id),
+                    sender_id=current_user.id
+                )
+            
             db.session.commit()
             flash('回复成功', 'success')
             return redirect(url_for('forum.topic', id=id))
@@ -357,8 +369,34 @@ def reply_post(topic_id, post_id):
             
             db.session.add(post)
             topic.last_activity = post.created_at
-            db.session.commit()
             
+            # 发送通知
+            from app.routes.notification import send_notification
+            
+            # 如果是回复其他用户的评论
+            if form.reply_to_user_id.data and form.reply_to_user_id.data.isdigit():
+                reply_to_user_id = int(form.reply_to_user_id.data)
+                if reply_to_user_id != current_user.id:  # 不给自己发通知
+                    content = f"{current_user.username} 回复了你在主题 \"{topic.title}\" 中的评论"
+                    send_notification(
+                        user_id=reply_to_user_id,
+                        content=content,
+                        notification_type='reply',
+                        link=url_for('forum.topic', id=topic_id),
+                        sender_id=current_user.id
+                    )
+            # 如果是回复主贴（且不是回复自己的主贴）
+            elif parent_post.user_id != current_user.id:
+                content = f"{current_user.username} 回复了你在主题 \"{topic.title}\" 中的评论"
+                send_notification(
+                    user_id=parent_post.user_id,
+                    content=content,
+                    notification_type='reply',
+                    link=url_for('forum.topic', id=topic_id),
+                    sender_id=current_user.id
+                )
+            
+            db.session.commit()
             flash('回复成功', 'success')
         except Exception as e:
             db.session.rollback()

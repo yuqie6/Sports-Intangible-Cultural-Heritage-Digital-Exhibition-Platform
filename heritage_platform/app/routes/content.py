@@ -85,8 +85,20 @@ def detail(id):
             )
             
             db.session.add(comment)
-            db.session.commit()
             
+            # 如果评论者不是内容作者本人，发送通知
+            if current_user.id != content.user_id:
+                from app.routes.notification import send_notification
+                content_msg = f"{current_user.username} 评论了你的内容 \"{content.title}\""
+                send_notification(
+                    user_id=content.user_id,
+                    content=content_msg,
+                    notification_type='reply',
+                    link=url_for('content.detail', id=id),
+                    sender_id=current_user.id
+                )
+            
+            db.session.commit()
             flash('评论发布成功', 'success')
             return redirect(url_for('content.detail', id=id))
             
@@ -395,6 +407,18 @@ def like(id):
             db.session.add(like)
             message = '点赞成功'
             
+            # 如果点赞者不是内容作者本人，发送通知
+            if current_user.id != content.user_id:
+                from app.routes.notification import send_notification
+                content_msg = f"{current_user.username} 点赞了你的内容\"{content.title}\""
+                send_notification(
+                    user_id=content.user_id,
+                    content=content_msg,
+                    notification_type='like',
+                    link=url_for('content.detail', id=id),
+                    sender_id=current_user.id
+                )
+            
         db.session.commit()
         flash(message, 'success')
         
@@ -481,8 +505,20 @@ def reply_comment(content_id, comment_id):
             )
             
             db.session.add(reply)
-            db.session.commit()
             
+            # 发送通知给被回复的用户（如果回复者不是被回复者本人）
+            if current_user.id != parent_comment.user_id:
+                from app.routes.notification import send_notification
+                content_msg = f"{current_user.username} 回复了你在内容 \"{content.title}\" 中的评论"
+                send_notification(
+                    user_id=parent_comment.user_id,
+                    content=content_msg,
+                    notification_type='reply',
+                    link=url_for('content.detail', id=content_id),
+                    sender_id=current_user.id
+                )
+            
+            db.session.commit()
             flash('回复发布成功', 'success')
         except Exception as e:
             db.session.rollback()

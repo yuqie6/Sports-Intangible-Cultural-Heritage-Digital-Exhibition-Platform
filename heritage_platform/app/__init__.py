@@ -38,6 +38,7 @@ def create_app(config_name='default'):
     
     # 注册API蓝图（前后端分离的API接口）
     from app.api import api_bp
+    csrf.exempt(api_bp)  # 豁免API路由的CSRF保护
     app.register_blueprint(api_bp, url_prefix='/api')
     
     # 注册视图蓝图
@@ -47,6 +48,7 @@ def create_app(config_name='default'):
     from app.routes.content import content_bp
     from app.routes.forum import forum_bp
     from app.routes.user import user_bp
+    from app.routes.notification import bp as notification_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -54,6 +56,7 @@ def create_app(config_name='default'):
     app.register_blueprint(content_bp, url_prefix='/content')
     app.register_blueprint(forum_bp, url_prefix='/forum')
     app.register_blueprint(user_bp, url_prefix='/user')
+    app.register_blueprint(notification_bp, url_prefix='/notification')
     
     # 注册全局错误处理
     from app.routes import errors

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>我的通知</h2>
+                {% if notifications %}
+                <button type="button" class="btn btn-secondary" onclick="markAllAsRead(event)">全部标为已读</button>
+                {% endif %}
+            </div>
+            
+            {% if notifications %}
+            <div class="list-group">
+                {% for notification in notifications %}
+                <div class="list-group-item {% if not notification.is_read %}list-group-item-primary{% endif %}"
+                     id="notification-{{ notification.id }}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <div>
+                            {% if notification.type == 'reply' %}
+                                <i class="fas fa-comment text-primary"></i>
+                            {% elif notification.type == 'like' %}
+                                <i class="fas fa-heart text-danger"></i>
+                            {% elif notification.type == 'announcement' %}
+                                <i class="fas fa-bullhorn text-warning"></i>
+                            {% endif %}
+                            
+                            {{ notification.content }}
+                            
+                            {% if notification.link %}
+                            <a href="{{ notification.link }}" class="ml-2">查看详情</a>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">
+                            {{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            {% if not notification.is_read %}
+                            <button type="button" class="btn btn-sm btn-outline-primary ml-2" 
+                                    onclick="markAsRead({{ notification.id }}, event)">
+                                标为已读
+                            </button>
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% if notification.sender %}
+                    <small class="text-muted">来自: {{ notification.sender }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                暂无通知
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 直接调试Content-Type问题
+function logHeaders(url, options) {
+    console.log('Fetch request to:', url);
+    console.log('Request options:', options);
+    // 返回原始options以继续fetch
+    return options;
+}
+
+function markAsRead(notificationId, event) {
+    if (event) {
+        event.preventDefault();  // 阻止默认的表单提交行为
+    }
+    
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            notification_id: notificationId
+        })
+    };
+    
+    // 调试请求头信息
+    logHeaders('/api/notifications/mark-read', options);
+    
+    fetch('/api/notifications/mark-read', options)
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.message) {
+            // 更新UI
+            const notification = document.getElementById(`notification-${notificationId}`);
+            notification.classList.remove('list-group-item-primary');
+            // 隐藏"标为已读"按钮
+            const button = notification.querySelector('button');
+            if (button) button.remove();
+            // 更新未读计数
+            updateUnreadCount();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function markAllAsRead(event) {
+    if (event) {
+        event.preventDefault();  // 阻止默认的表单提交行为
+    }
+    
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    };
+    
+    // 调试请求头信息
+    logHeaders('/api/notifications/mark-all-read', options);
+    
+    fetch('/api/notifications/mark-all-read', options)
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.message) {
+            // 更新所有通知的UI
+            document.querySelectorAll('.list-group-item').forEach(item => {
+                item.classList.remove('list-group-item-primary');
+                const button = item.querySelector('button');
+                if (button) button.remove();
+            });
+            // 更新未读计数
+            updateUnreadCount();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// 更新顶部导航栏的未读计数
+function updateUnreadCount() {
+    fetch('/api/notifications/unread-count')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('notification-badge');
+            if (badge) {
+                if (data.count > 0) {
+                    badge.textContent = data.count;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}
