@@ -374,6 +374,58 @@ footer .footer-bottom {
     border-radius: 50px;
 }
 
+/* 论坛表格样式 */
+.forum-table .row {
+    min-height: 50px;
+    align-items: center;
+}
+
+.forum-table .row > div {
+    padding: 1rem 1.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+}
+
+.forum-table .small {
+    display: block;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.forum-table h6 {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.forum-table .badge {
+    padding: 0.5rem 0.75rem;
+    font-weight: normal;
+}
+
+.forum-table .row > div:first-child {
+    padding-left: 1.5rem;
+}
+
+.forum-table .row > div:last-child {
+    padding-right: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .forum-table .row > div.d-none.d-md-block {
+        display: none !important;
+    }
+    .forum-table .row > div:not(.d-none) {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding: 0.75rem 1rem;
+    }
+    .forum-table .row {
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+}
+
 /* 嵌套回复样式 */
 .nested-replies {
     margin-left: 15px;

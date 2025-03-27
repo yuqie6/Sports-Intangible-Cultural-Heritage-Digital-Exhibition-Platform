@@ -168,13 +168,13 @@
     
     <div class="card">
         <div class="card-header bg-light">
-            <div class="row align-items-center">
+            <div class="row forum-table">
                 <div class="col-7">主题</div>
                 <div class="col-3 text-center d-none d-md-block">作者</div>
                 <div class="col-2 text-center">回复</div>
             </div>
         </div>
-        <div class="list-group list-group-flush">
+        <div class="list-group list-group-flush forum-table">
             <div id="latest-topics-container">
                 <!-- 动态加载最新主题 -->
                 <div class="text-center py-4">
@@ -216,16 +216,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     topicElement.href = `/forum/topic/${topic.id}`;
                     
                     topicElement.innerHTML = `
-                        <div class="row align-items-center">
+                        <div class="row forum-table">
                             <div class="col-7">
                                 <h6 class="mb-0">${topic.title}</h6>
-                                <small class="text-muted
-                                </div>
+                                <small class="text-muted">${topic.created_at}</small>
+                            </div>
                             <div class="col-3 text-center d-none d-md-block">
-                                <small>${topic.creator}</small>
+                                <small class="d-flex align-items-center justify-content-center h-100">${topic.creator}</small>
                             </div>
                             <div class="col-2 text-center">
-                                <span class="badge bg-secondary">${topic.post_count}</span>
+                                <span class="badge bg-secondary d-flex align-items-center justify-content-center h-100">${topic.post_count}</span>
                             </div>
                         </div>
                     `;
