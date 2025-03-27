@@ -67,7 +67,7 @@
                     <!-- 用户信息 -->
                     <div class="flex-shrink-0 me-3 text-center" style="width: 100px;">
                         {% if post.author_avatar %}
-                        <img src="{{ url_for('static', filename=post.author_avatar) }}" class="avatar-md mb-2" alt="{{ post.author }}">
+                        <img src="{{ url_for('static', filename=post.author_avatar.replace('static/', '')) }}" class="avatar-md mb-2" alt="{{ post.author }}">
                         {% else %}
                         <div class="avatar-md mb-2 d-flex align-items-center justify-content-center bg-secondary text-white rounded-circle">
                             {{ post.author[0] }}
