@@ -6,6 +6,7 @@ from app.forms.forum import TopicForm, PostForm
 from app.utils.decorators import admin_required
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import func
+from sqlalchemy.orm import aliased
 
 forum_bp = Blueprint('forum', __name__)
 
@@ -88,7 +89,7 @@ def index():
 
 @forum_bp.route('/topic/<int:id>', methods=['GET', 'POST'])
 def topic(id):
-    """主题详情页 - 优化数据库查询"""
+    """主题详情页 - 支持嵌套回复功能"""
     topic = ForumTopic.query.get_or_404(id)
     
     # 增加浏览次数 - 避免每次访问都重新查询
@@ -108,6 +109,21 @@ def topic(id):
                 user_id=current_user.id,
                 content=form.content.data
             )
+            
+            # 处理回复关系
+            if form.parent_id.data and form.parent_id.data.isdigit():
+                parent_id = int(form.parent_id.data)
+                parent_post = ForumPost.query.get(parent_id)
+                if parent_post and parent_post.topic_id == id:
+                    post.parent_id = parent_id
+                    
+                    # 如果提供了回复目标用户ID
+                    if form.reply_to_user_id.data and form.reply_to_user_id.data.isdigit():
+                        reply_to_user_id = int(form.reply_to_user_id.data)
+                        user = User.query.get(reply_to_user_id)
+                        if user:
+                            post.reply_to_user_id = reply_to_user_id
+            
             db.session.add(post)
             
             # 更新主题最后活动时间，不直接修改post_count属性
@@ -122,14 +138,17 @@ def topic(id):
             current_app.logger.error(f"发表回复失败: {str(e)}")
             flash('发表回复失败，请稍后重试', 'danger')
     
-    # 获取帖子列表 - 优化为一次性JOIN查询
+    # 获取帖子列表 - 添加对回复的层级关系查询
     page = request.args.get('page', 1, type=int)
+    
+    # 仅获取顶级帖子和作者信息
     posts_query = db.session.query(
         ForumPost,
         User.username.label('author_name'),
         User.avatar.label('author_avatar')
-    ).outerjoin(User, ForumPost.user_id == User.id).filter(ForumPost.topic_id == id).order_by(
-        ForumPost.created_at.asc())
+    ).outerjoin(User, ForumPost.user_id == User.id
+    ).filter(ForumPost.topic_id == id, ForumPost.parent_id == None
+    ).order_by(ForumPost.created_at.asc())
     
     posts_pagination = posts_query.paginate(page=page, per_page=20, error_out=False)
     
@@ -151,13 +170,48 @@ def topic(id):
     # 简化帖子数据处理
     posts_with_authors = []
     for post, author_name, author_avatar in posts_pagination.items:
+        # 获取回复数据
+        replies_data = []
+        
+        # 使用别名解决多表连接问题
+        ReplyUser = aliased(User)
+        ReplyToUser = aliased(User)
+        
+        replies = db.session.query(
+            ForumPost,
+            ReplyUser.username.label('author_name'),
+            ReplyUser.avatar.label('author_avatar'),
+            ReplyToUser.username.label('reply_to_username')
+        ).outerjoin(ReplyUser, ForumPost.user_id == ReplyUser.id
+        ).outerjoin(ReplyToUser, ForumPost.reply_to_user_id == ReplyToUser.id
+        ).filter(ForumPost.parent_id == post.id
+        ).order_by(ForumPost.created_at.asc()).all()
+        
+        for reply, reply_author, reply_avatar, reply_to_username in replies:
+            # 获取回复目标用户名
+            reply_to_name = reply_to_username if reply_to_username else author_name
+                
+            replies_data.append({
+                'id': reply.id,
+                'content': reply.content,
+                'created_at': reply.created_at,
+                'updated_at': reply.updated_at,
+                'author': reply_author or "未知用户",
+                'author_avatar': reply_avatar,
+                'author_id': reply.user_id,
+                'reply_to_name': reply_to_name,
+                'reply_to_user_id': reply.reply_to_user_id
+            })
+            
         posts_with_authors.append({
             'id': post.id,
             'content': post.content,
             'created_at': post.created_at,
             'updated_at': post.updated_at,
             'author': author_name or "未知用户",
-            'author_avatar': author_avatar
+            'author_id': post.user_id,
+            'author_avatar': author_avatar,
+            'replies': replies_data
         })
     
     # 提交数据库更改
@@ -267,6 +321,51 @@ def delete_topic(id):
         current_app.logger.error(f"删除主题失败: {str(e)}")
         flash('删除主题失败，请稍后重试', 'danger')
         return redirect(url_for('forum.topic', id=id))
+
+@forum_bp.route('/topic/<int:topic_id>/reply/<int:post_id>', methods=['POST'])
+@login_required
+def reply_post(topic_id, post_id):
+    """处理嵌套回复"""
+    topic = ForumTopic.query.get_or_404(topic_id)
+    parent_post = ForumPost.query.get_or_404(post_id)
+    
+    # 验证父帖子属于当前主题
+    if parent_post.topic_id != topic_id:
+        flash('无效的回复请求', 'danger')
+        return redirect(url_for('forum.topic', id=topic_id))
+    
+    form = PostForm()
+    if form.validate_on_submit():
+        try:
+            if topic.is_closed and not current_user.is_admin:
+                flash('该主题已关闭，无法回复', 'warning')
+                return redirect(url_for('forum.topic', id=topic_id))
+                
+            post = ForumPost(
+                topic_id=topic_id,
+                user_id=current_user.id,
+                content=form.content.data,
+                parent_id=post_id
+            )
+            
+            # 如果提供了回复目标用户ID
+            if form.reply_to_user_id.data and form.reply_to_user_id.data.isdigit():
+                reply_to_user_id = int(form.reply_to_user_id.data)
+                user = User.query.get(reply_to_user_id)
+                if user:
+                    post.reply_to_user_id = reply_to_user_id
+            
+            db.session.add(post)
+            topic.last_activity = post.created_at
+            db.session.commit()
+            
+            flash('回复成功', 'success')
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"发表回复失败: {str(e)}")
+            flash('发表回复失败，请稍后重试', 'danger')
+    
+    return redirect(url_for('forum.topic', id=topic_id))
 
 @forum_bp.route('/delete_post/<int:id>', methods=['POST'])
 @login_required

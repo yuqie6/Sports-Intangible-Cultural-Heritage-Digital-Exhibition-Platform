@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms import StringField, TextAreaField, SelectField, SubmitField, HiddenField
+from wtforms.validators import DataRequired, Length, Optional
 
 class TopicForm(FlaskForm):
     """论坛主题表单"""
@@ -18,4 +18,6 @@ class TopicForm(FlaskForm):
 class PostForm(FlaskForm):
     """论坛回复表单"""
     content = TextAreaField('回复内容', validators=[DataRequired(), Length(1, 5000)])
+    parent_id = HiddenField('父评论ID')
+    reply_to_user_id = HiddenField('回复用户ID')
     submit = SubmitField('发表回复')

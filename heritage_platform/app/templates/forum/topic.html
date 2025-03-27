@@ -62,7 +62,7 @@
         </div>
         <div class="list-group list-group-flush">
             {% for post in posts %}
-            <div class="list-group-item">
+            <div class="list-group-item" id="post-{{ post.id }}">
                 <div class="d-flex">
                     <!-- 用户信息 -->
                     <div class="flex-shrink-0 me-3 text-center" style="width: 100px;">
@@ -102,6 +102,48 @@
                         <div class="post-content">
                             {{ post.content|safe }}
                         </div>
+
+                        <!-- 回复按钮 -->
+                        {% if current_user.is_authenticated and not topic.is_closed %}
+                        <div class="mt-2">
+                            <button class="btn btn-sm btn-outline-secondary reply-btn" data-post-id="{{ post.id }}">
+                                <i class="fas fa-reply"></i> 回复
+                            </button>
+                        </div>
+                        {% endif %}
+
+                        <!-- 嵌套回复表单 -->
+                        {% if current_user.is_authenticated and not topic.is_closed %}
+                        <div class="reply-form mt-3" id="reply-form-{{ post.id }}" style="display: none;">
+                            <form method="POST" action="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}">
+                                {{ form.hidden_tag() }}
+                                <div class="mb-3">
+                                    {{ form.content.label(class="form-label") }}
+                                    {{ form.content(class="form-control", rows=3) }}
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm">提交回复</button>
+                                <button type="button" class="btn btn-secondary btn-sm cancel-reply-btn" data-post-id="{{ post.id }}">取消</button>
+                            </form>
+                        </div>
+                        {% endif %}
+
+                        <!-- 嵌套回复列表 -->
+                        {% if post.replies %}
+                        <div class="replies mt-3 ms-4 border-start ps-3">
+                            {% for reply in post.replies %}
+                            <div class="reply mb-3">
+                                <div class="d-flex align-items-center small text-muted mb-1">
+                                    <i class="fas fa-user me-1"></i> {{ reply.author }}
+                                    <span class="mx-2">|</span>
+                                    <i class="fas fa-clock me-1"></i> {{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                </div>
+                                <div class="reply-content">
+                                    {{ reply.content|safe }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -224,6 +266,25 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!confirm('确定要删除这条回复吗？此操作不可恢复')) {
                 e.preventDefault();
             }
+        });
+    });
+
+    // 回复按钮点击事件
+    const replyButtons = document.querySelectorAll('.reply-btn');
+    replyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            const replyForm = document.getElementById(`reply-form-${postId}`);
+            replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+        });
+    });
+
+    // 取消回复按钮点击事件
+    const cancelButtons = document.querySelectorAll('.cancel-reply-btn');
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            document.getElementById(`reply-form-${postId}`).style.display = 'none';
         });
     });
 });

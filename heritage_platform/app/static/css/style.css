@@ -373,3 +373,41 @@ footer .footer-bottom {
     top: 5px;
     border-radius: 50px;
 }
+
+/* 嵌套回复样式 */
+.nested-replies {
+    margin-left: 15px;
+    border-left: 3px solid #f0f0f0;
+    padding-left: 15px;
+}
+
+.nested-replies .card {
+    box-shadow: none;
+}
+
+.nested-replies .list-group-item {
+    border-left: 0;
+    border-right: 0;
+    background-color: #f8f9fa;
+}
+
+.nested-replies .avatar-sm {
+    width: 32px;
+    height: 32px;
+}
+
+/* 回复按钮样式 */
+.reply-btn {
+    font-size: 0.85rem;
+    padding: 0.2rem 0.5rem;
+}
+
+/* 高亮当前回复 */
+.highlight-reply {
+    animation: highlight-fade 2s;
+}
+
+@keyframes highlight-fade {
+    0% { background-color: rgba(255, 243, 205, 1); }
+    100% { background-color: transparent; }
+}
