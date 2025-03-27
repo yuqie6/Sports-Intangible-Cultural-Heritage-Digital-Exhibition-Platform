@@ -21,8 +21,8 @@ def list():
     per_page = 12
     
     try:
-        # 使用查询构建器并加载关联的用户信息
-        query = Content.query.join(Content.author)
+        # 使用查询构建器并加载关联的用户信息和heritage项目
+        query = Content.query.options(db.joinedload(Content.heritage)).join(Content.author)
         
         if content_type:
             query = query.filter(Content.content_type == content_type)
@@ -59,7 +59,7 @@ def list():
 @content_bp.route('/detail/<int:id>', methods=['GET', 'POST'])
 def detail(id):
     """内容详情页"""
-    content = Content.query.get_or_404(id)
+    content = Content.query.options(db.joinedload(Content.heritage)).get_or_404(id)
     
     # 评论表单
     form = CommentForm()
@@ -108,13 +108,38 @@ def detail(id):
             content_id=id
         ).first() is not None
     
+    # 获取相关内容推荐 - 相同非遗项目且相同类型的内容，排除当前内容
+    related_contents = Content.query.filter(
+        Content.heritage_id == content.heritage_id,
+        Content.content_type == content.content_type,
+        Content.id != content.id
+    ).order_by(db.func.random()).limit(4).all()
+
+    # 如果不足4个，补充相同非遗项目的内容
+    if len(related_contents) < 4:
+        additional = Content.query.filter(
+            Content.heritage_id == content.heritage_id,
+            Content.id != content.id,
+            Content.id.notin_([c.id for c in related_contents])
+        ).order_by(db.func.random()).limit(4 - len(related_contents)).all()
+        related_contents.extend(additional)
+
+    # 如果仍不足4个，补充随机内容
+    if len(related_contents) < 4:
+        additional = Content.query.filter(
+            Content.id != content.id,
+            Content.id.notin_([c.id for c in related_contents])
+        ).order_by(db.func.random()).limit(4 - len(related_contents)).all()
+        related_contents.extend(additional)
+
     return render_template('content/detail.html', 
                            content=content,
                            form=form,
                            comments=comments_pagination.items,
                            pagination=comments_pagination,
                            has_liked=has_liked,
-                           has_favorited=has_favorited)
+                           has_favorited=has_favorited,
+                           related_contents=related_contents)
 
 @content_bp.route('/create', methods=['GET', 'POST'])
 @login_required

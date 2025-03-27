@@ -277,23 +277,31 @@
     </div>
     
     <!-- 相关内容推荐 -->
+    {% if related_contents %}
     <h4 class="mb-3">相关内容推荐</h4>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        {% for i in range(4) %}
+        {% for related in related_contents %}
         <div class="col">
             <div class="card h-100">
-                <img src="{{ url_for('static', filename='img/default-content.jpg') }}" class="card-img-top" alt="相关内容">
+                <img src="{% if related.cover_image %}{{ url_for('static', filename=related.cover_image) }}{% else %}{{ url_for('static', filename='img/default-content.jpg') }}{% endif %}" 
+                     class="card-img-top" 
+                     style="height: 150px; object-fit: cover;"
+                     alt="{{ related.title }}">
                 <div class="card-body">
-                    <h5 class="card-title">相关内容标题</h5>
-                    <p class="card-text"><small class="text-muted">用户名 · 2025-03-20</small></p>
+                    <h5 class="card-title">{{ related.title }}</h5>
+                    <p class="card-text"><small class="text-muted">{{ related.author.username }} · {{ related.created_at.strftime('%Y-%m-%d') }}</small></p>
+                    {% if related.heritage %}
+                    <span class="badge bg-secondary">{{ related.heritage.name }}</span>
+                    {% endif %}
                 </div>
                 <div class="card-footer bg-transparent border-top-0">
-                    <a href="#" class="btn btn-sm btn-outline-primary">查看详情</a>
+                    <a href="{{ url_for('content.detail', id=related.id) }}" class="btn btn-sm btn-outline-primary">查看详情</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    {% endif %}
 </div>
 {% endblock %}
 
