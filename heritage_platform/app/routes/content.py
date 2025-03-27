@@ -9,6 +9,7 @@ from app.models import Content, HeritageItem, Comment, Like, Favorite
 from app.forms.content import ContentForm, CommentForm
 from app.utils.file_handlers import ALLOWED_IMAGE_EXTENSIONS, allowed_file, save_file
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import or_
 
 content_bp = Blueprint('content', __name__)
 
@@ -18,11 +19,21 @@ def list():
     page = request.args.get('page', 1, type=int)
     content_type = request.args.get('type')
     heritage_id = request.args.get('heritage_id', type=int)
+    search_query = request.args.get('q', '')  # 获取搜索关键词
     per_page = 12
     
     try:
         # 使用查询构建器并加载关联的用户信息和heritage项目
         query = Content.query.options(db.joinedload(Content.heritage)).join(Content.author)
+        
+        # 应用搜索过滤
+        if search_query:
+            query = query.filter(or_(
+                Content.title.ilike(f'%{search_query}%'),
+                Content.text_content.ilike(f'%{search_query}%'),
+                Content.rich_content.ilike(f'%{search_query}%')
+            ))
+            current_app.logger.info(f"处理搜索请求: '{search_query}'")
         
         if content_type:
             query = query.filter(Content.content_type == content_type)
@@ -54,7 +65,8 @@ def list():
                            pagination=pagination,
                            heritage_items=heritage_items,
                            current_type=content_type,
-                           current_heritage_id=heritage_id)
+                           current_heritage_id=heritage_id,
+                           search_query=search_query)  # 传递搜索关键词到模板
 
 @content_bp.route('/detail/<int:id>', methods=['GET', 'POST'])
 def detail(id):
