@@ -232,25 +232,182 @@
         
         // 如果页面上有富文本编辑器，则初始化它
         if (document.getElementById('rich-editor')) {
-            CKEDITOR.replace('rich-editor', {
-                height: 400,
-                filebrowserUploadUrl: '{{ url_for("content.upload_image") }}',
-                allowedContent: true,
-                // 引用自定义配置文件
-                customConfig: '{{ url_for("static", filename="vendor/ckeditor/config.js") }}'
-            });
+            // 创建一个调试日志工具
+            const logger = {
+                info: function(msg) {
+                    console.log('[INFO] ' + msg);
+                },
+                error: function(msg) {
+                    console.error('[ERROR] ' + msg);
+                }
+            };
+            
+            logger.info('初始化CKEditor...');
+            
+            try {
+                // 初始化编辑器
+                CKEDITOR.replace('rich-editor', {
+                    height: 400,
+                    filebrowserUploadUrl: '{{ url_for("content.upload_image") }}',
+                    filebrowserImageUploadUrl: '{{ url_for("content.upload_image") }}',
+                    uploadUrl: '{{ url_for("content.upload_image") }}',
+                    imageUploadUrl: '{{ url_for("content.upload_image") }}',
+                    allowedContent: true, // 允许所有内容
+                    // 指定自定义配置文件
+                    customConfig: '{{ url_for("static", filename="vendor/ckeditor/config.js") }}'
+                });
+                
+                logger.info('CKEditor初始化成功');
+                
+                // 监听图片上传事件以显示更友好的反馈
+                CKEDITOR.on('dialogDefinition', function(ev) {
+                    logger.info('对话框定义事件: ' + ev.data.name);
+                    var dialogName = ev.data.name;
+                    var dialogDefinition = ev.data.definition;
+                    
+                    if (dialogName === 'image') {
+                        // 获取上传标签页
+                        var uploadTab = dialogDefinition.getContents('Upload');
+                        
+                        if (uploadTab) {
+                            // 添加更详细的上传说明
+                            uploadTab.elements[0].children[0].label = '选择要上传的图片文件 (支持JPG, JPEG, PNG, GIF)';
+                        }
+                    }
+                });
+                
+                // 添加图片粘贴处理
+                CKEDITOR.instances['rich-editor'].on('paste', function(e) {
+                    logger.info('检测到粘贴事件');
+                    var data = e.data;
+                    
+                    // 检查是否有图片数据
+                    if (data && data.dataTransfer && data.dataTransfer.getFilesCount() > 0) {
+                        var file = data.dataTransfer.getFile(0);
+                        logger.info('粘贴包含文件: ' + file.name + ', 类型: ' + file.type);
+                        
+                        // 检查是否是图片
+                        if (file.type.indexOf('image') === 0) {
+                            logger.info('开始处理粘贴的图片...');
+                            
+                            // 准备FormData
+                            var formData = new FormData();
+                            formData.append('upload', file);
+                            
+                            // 使用原生AJAX上传
+                            var xhr = new XMLHttpRequest();
+                            xhr.open('POST', '{{ url_for("content.upload_image") }}', true);
+                            xhr.onload = function() {
+                                logger.info('XHR状态: ' + xhr.status);
+                                logger.info('XHR响应: ' + xhr.responseText);
+                                
+                                if (xhr.status === 200) {
+                                    try {
+                                        var response = JSON.parse(xhr.responseText);
+                                        if (response.uploaded && response.url) {
+                                            // 插入图片
+                                            var imgHtml = '<p><img src="' + response.url + '" alt="' + response.fileName + '" style="max-width: 100%; height: auto;"></p>';
+                                            CKEDITOR.instances['rich-editor'].insertHtml(imgHtml);
+                                            logger.info('粘贴上传图片成功: ' + response.url);
+                                        } else {
+                                            logger.error('上传成功但返回错误: ' + (response.error ? response.error.message : '未知错误'));
+                                        }
+                                    } catch (error) {
+                                        logger.error('解析响应失败:' + error + ', 响应文本: ' + xhr.responseText);
+                                    }
+                                } else {
+                                    logger.error('上传请求失败, HTTP状态: ' + xhr.status);
+                                }
+                            };
+                            xhr.onerror = function(error) {
+                                logger.error('XHR请求错误: ' + error);
+                            };
+                            xhr.send(formData);
+                        }
+                    }
+                });
+            } catch (error) {
+                logger.error('初始化CKEditor时出错: ' + error);
+            }
         }
         
         // 处理媒体文件插入
         const insertMediaBtn = document.getElementById('insert-media');
         if (insertMediaBtn) {
             insertMediaBtn.addEventListener('click', function() {
+                console.log('点击了媒体文件插入按钮');
                 const fileInput = document.getElementById('media-upload');
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
-                    // 这里需要先上传文件，然后获取URL，再插入编辑器
-                    // 实际项目中应通过AJAX上传文件
-                    alert('在实际项目中，这里会上传文件并获取URL插入编辑器');
+                    console.log('选择了文件:', file.name, file.type, file.size + ' 字节');
+                    
+                    // 创建FormData对象上传文件
+                    const formData = new FormData();
+                    formData.append('upload', file);
+                    
+                    // 显示上传进度提示
+                    insertMediaBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>上传中...';
+                    insertMediaBtn.disabled = true;
+                    
+                    console.log('开始上传文件...');
+                    
+                    // 发送AJAX请求上传文件
+                    fetch('{{ url_for("content.upload_image") }}', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        console.log('上传响应状态:', response.status);
+                        if (!response.ok) {
+                            throw new Error('HTTP错误状态: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('上传响应数据:', data);
+                        
+                        if (data.uploaded && data.url) {
+                            // 获取编辑器实例
+                            const editor = CKEDITOR.instances['rich-editor'];
+                            
+                            // 判断文件类型
+                            const isImage = /\.(jpe?g|png|gif)$/i.test(file.name);
+                            const isVideo = /\.(mp4|webm|mov)$/i.test(file.name);
+                            
+                            if (isImage) {
+                                // 插入图片
+                                const imgHtml = `<p><img src="${data.url}" alt="${data.fileName}" style="max-width: 100%; height: auto;"></p>`;
+                                editor.insertHtml(imgHtml);
+                                console.log('成功插入图片:', data.url);
+                            } else if (isVideo) {
+                                // 插入视频
+                                const videoHtml = `<p><video controls width="100%" src="${data.url}"></video></p>`;
+                                editor.insertHtml(videoHtml);
+                                console.log('成功插入视频:', data.url);
+                            }
+                            
+                            // 重置文件输入
+                            fileInput.value = '';
+                            
+                            // 显示成功消息
+                            alert('媒体文件已成功插入到编辑器中');
+                        } else {
+                            console.error('上传失败:', data.error || '未知错误');
+                            alert('上传失败: ' + (data.error ? data.error.message : '未知错误'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('上传错误:', error);
+                        alert('上传失败，请稍后重试');
+                    })
+                    .finally(() => {
+                        // 恢复按钮状态
+                        insertMediaBtn.innerHTML = '<i class="fas fa-plus-circle me-1"></i>插入到文章';
+                        insertMediaBtn.disabled = false;
+                    });
+                } else {
+                    alert('请先选择要上传的文件');
                 }
             });
         }

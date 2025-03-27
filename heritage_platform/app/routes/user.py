@@ -6,6 +6,7 @@ from app.forms.user import ProfileForm, PasswordForm
 from app.utils.file_handlers import save_file
 from app.utils.decorators import admin_required
 from sqlalchemy.exc import SQLAlchemyError
+import os
 
 user_bp = Blueprint('user', __name__)
 
@@ -57,7 +58,9 @@ def edit_profile():
             if form.avatar.data:
                 avatar_path = save_file(form.avatar.data, 'image')
                 if avatar_path:
-                    current_user.avatar = avatar_path
+                    # 修复：确保头像路径以/static/开头，这样浏览器可以正确访问
+                    current_user.avatar = url_for('static', filename=avatar_path)
+                    current_app.logger.info(f"设置用户头像URL为: {current_user.avatar}")
             
             db.session.commit()
             flash('个人资料更新成功', 'success')

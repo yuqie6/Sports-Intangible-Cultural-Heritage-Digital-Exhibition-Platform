@@ -21,7 +21,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="d-flex align-items-center">
                     {% if content.author.avatar %}
-                    <img src="{{ url_for('static', filename=content.author.avatar) }}" class="avatar-sm me-2 rounded-circle" alt="{{ content.author.username }}">
+                    <img src="{{ content.author.avatar }}" class="avatar-sm me-2 rounded-circle" alt="{{ content.author.username }}">
                     {% else %}
                     <div class="avatar-sm me-2 d-flex align-items-center justify-content-center bg-primary text-white rounded-circle">
                         {{ content.author.username[0] }}
@@ -33,7 +33,13 @@
                     </div>
                 </div>
                 <div>
-                    <span class="badge bg-primary">{{ content.content_type }}</span>
+                    <span class="badge bg-primary">
+                        {% if content.content_type == 'article' %}文章
+                        {% elif content.content_type == 'image' %}图片
+                        {% elif content.content_type == 'video' %}视频
+                        {% elif content.content_type == 'multimedia' %}多媒体
+                        {% endif %}
+                    </span>
                     <span class="badge bg-secondary">{{ content.heritage_item.name }}</span>
                 </div>
             </div>
@@ -54,6 +60,14 @@
                             <source src="{{ url_for('static', filename=content.file_path) }}" type="video/mp4">
                             您的浏览器不支持视频播放
                         </video>
+                    </div>
+                {% elif content.content_type == 'multimedia' and content.rich_content %}
+                    <div class="multimedia-content">
+                        {{ content.rich_content|safe }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        没有可显示的内容
                     </div>
                 {% endif %}
             </div>
@@ -130,7 +144,7 @@
                         <div class="d-flex">
                             <div class="flex-shrink-0 me-3">
                                 {% if comment.author.avatar %}
-                                <img src="{{ url_for('static', filename=comment.author.avatar) }}" class="avatar-sm rounded-circle" alt="{{ comment.author.username }}">
+                                <img src="{{ comment.author.avatar }}" class="avatar-sm rounded-circle" alt="{{ comment.author.username }}">
                                 {% else %}
                                 <div class="avatar-sm d-flex align-items-center justify-content-center bg-secondary text-white rounded-circle">
                                     {{ comment.author.username[0] }}

@@ -1,7 +1,10 @@
+import os
+import uuid
 import traceback
+from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import current_user, login_required
-from app import db
+from app import db, csrf
 from app.models import Content, HeritageItem, Comment, Like, Favorite
 from app.forms.content import ContentForm, CommentForm
 from app.utils.file_handlers import ALLOWED_IMAGE_EXTENSIONS, allowed_file, save_file
@@ -162,34 +165,101 @@ def create():
     
     return render_template('content/create.html', form=form)
 
-# 添加图片上传API端点
+# 添加图片上传API端点，并豁免CSRF保护
 @content_bp.route('/upload_image', methods=['POST'])
 @login_required
+@csrf.exempt   # 添加CSRF豁免
 def upload_image():
     """富文本编辑器的图片上传处理"""
-    if 'upload' not in request.files:
-        return jsonify({'error': '没有文件上传'})
-    
-    file = request.files['upload']
-    if file.filename == '':
-        return jsonify({'error': '未选择文件'})
-    
-    if file and allowed_file(file.filename, ALLOWED_IMAGE_EXTENSIONS):
-        try:
-            file_path = save_file(file, 'image')
-            url = url_for('static', filename=file_path)
-            
-            # 返回CKEditor需要的格式
+    try:
+        current_app.logger.info("收到文件上传请求")
+        
+        # 检查请求中是否包含文件
+        if 'upload' not in request.files:
+            current_app.logger.warning("请求中没有'upload'文件")
             return jsonify({
-                'uploaded': 1,
-                'fileName': file.filename,
-                'url': url
+                'uploaded': 0,
+                'error': {'message': '没有文件上传'}
             })
+        
+        file = request.files['upload']
+        if file.filename == '':
+            current_app.logger.warning("上传了空文件名")
+            return jsonify({
+                'uploaded': 0,
+                'error': {'message': '未选择文件'}
+            })
+        
+        # 记录请求信息用于调试
+        current_app.logger.info(f"文件名: {file.filename}")
+        current_app.logger.info(f"Content-Type: {file.content_type}")
+        
+        # 检查文件类型
+        if not allowed_file(file.filename, ALLOWED_IMAGE_EXTENSIONS):
+            current_app.logger.warning(f"不支持的文件类型: {file.filename}")
+            return jsonify({
+                'uploaded': 0,
+                'error': {'message': '不支持的文件类型，请上传jpg, jpeg, png或gif格式'}
+            })
+        
+        # 重置文件指针位置，确保能正确读取文件内容
+        file.seek(0)
+        
+        try:
+            # 创建上传目录
+            upload_path = os.path.join(
+                current_app.root_path, 
+                'static', 'uploads', 'images'
+            )
+            current_app.logger.info(f"上传路径: {upload_path}")
+            os.makedirs(upload_path, exist_ok=True)
+            
+            # 创建安全的文件名
+            filename = secure_filename(file.filename)
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"
+            file_path = os.path.join(upload_path, unique_filename)
+            
+            # 直接保存文件
+            file.save(file_path)
+            current_app.logger.info(f"文件保存到: {file_path}")
+            
+            # 构建URL (确保生成的URL以/static/开头)
+            relative_path = f"uploads/images/{unique_filename}"
+            url = url_for('static', filename=relative_path)
+            
+            current_app.logger.info(f"生成的URL: {url}")
+            
+            # 确认文件已成功保存
+            if os.path.exists(file_path):
+                current_app.logger.info(f"文件确认存在: {file_path}")
+                # 返回CKEditor需要的格式
+                return jsonify({
+                    'uploaded': 1,
+                    'fileName': filename,
+                    'url': url
+                })
+            else:
+                current_app.logger.error(f"文件保存后不存在: {file_path}")
+                return jsonify({
+                    'uploaded': 0, 
+                    'error': {'message': '文件保存失败，请稍后重试'}
+                })
+                
         except Exception as e:
-            current_app.logger.error(f"上传图片失败: {str(e)}")
-            return jsonify({'error': '上传失败'})
+            current_app.logger.error(f"处理上传图片时出错: {str(e)}")
+            current_app.logger.error(traceback.format_exc())
+            return jsonify({
+                'uploaded': 0,
+                'error': {'message': f'上传处理失败: {str(e)}'}
+            })
     
-    return jsonify({'error': '不支持的文件类型'})
+    except Exception as e:
+        current_app.logger.error(f"图片上传过程中发生未处理的错误: {str(e)}")
+        current_app.logger.error(traceback.format_exc())
+        return jsonify({
+            'uploaded': 0,
+            'error': {'message': f'服务器错误: {str(e)}'}
+        })
 
 @content_bp.route('/like/<int:id>', methods=['POST'])
 @login_required

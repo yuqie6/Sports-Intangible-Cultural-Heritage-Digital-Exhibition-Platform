@@ -10,9 +10,21 @@ CKEDITOR.editorConfig = function( config ) {
     // 禁用 PDF 导出功能，消除 exportpdf-no-token-url 警告
     config.removePlugins = 'exportpdf';
     
-    // 启用图像处理功能，消除 clipboard-image-handling-disabled 警告
-    config.extraPlugins = 'uploadimage';
-    config.uploadUrl = '/upload';
+    // 不依赖缺失的 image2 和 uploadimage 插件
+    // config.extraPlugins = 'uploadimage,image2';
+    
+    // 图片上传相关配置
+    config.filebrowserUploadUrl = '/content/upload_image';
+    config.uploadUrl = '/content/upload_image';
+    config.filebrowserImageUploadUrl = '/content/upload_image';
+    config.imageUploadUrl = '/content/upload_image';
+    
+    // 设置允许上传的图片格式
+    config.imageAllowedContent = 'img[alt,src,width,height,data-*]{*}(*);';
+    
+    // 启用拖放上传图片功能
+    config.extraAllowedContent = 'img[alt,src,width,height,data-*]{*}(*);';
+    config.imageResize = { maxWidth: 1000, maxHeight: 800 };
     
     // 定义工具栏组
     config.toolbarGroups = [
@@ -33,6 +45,22 @@ CKEDITOR.editorConfig = function( config ) {
         { name: 'about', groups: [ 'about' ] }
     ];
     
+    // 添加图片上传按钮
+    config.toolbar = [
+        { name: 'document', items: [ 'Source', '-', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+        { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+        { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+        '/',
+        { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+        { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+        { name: 'links', items: [ 'Link', 'Unlink' ] },
+        { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+        '/',
+        { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+        { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+        { name: 'tools', items: [ 'Maximize'] }
+    ];
+    
     // 移除一些按钮
-    config.removeButtons = 'Save,NewPage,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,Flash,Table,HorizontalRule,Smiley,SpecialChar,PageBreak,Iframe,ShowBlocks,About';
+    config.removeButtons = 'Save,Preview,Print,Templates,PasteFromWord,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,Flash,Iframe,ShowBlocks,About';
 };
