@@ -164,7 +164,39 @@
         </div>
         {% endif %}
         
-        {% if not articles and not images and not videos %}
+        <!-- 富文本 -->
+        {% if multimedia %}
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">相关富文本</h4>
+                    <a href="{{ url_for('content.list', heritage_id=item.id, type='multimedia') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for content in multimedia[:5] %}
+                    <a href="{{ url_for('content.detail', id=content.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">{{ content.title }}</h5>
+                                <small>
+                                    <i class="fas fa-user me-1"></i> {{ content.author.username }}
+                                    <span class="mx-2">|</span>
+                                    <i class="fas fa-calendar me-1"></i> {{ content.created_at.strftime('%Y-%m-%d') }}
+                                </small>
+                            </div>
+                            <div>
+                                <span class="me-2"><i class="far fa-comment"></i> {{ content.comments.count() }}</span>
+                                <span><i class="far fa-heart"></i> {{ content.likes.count() }}</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if not articles and not images and not videos and not multimedia %}
         <div class="col-12">
             <div class="alert alert-info text-center py-5">
                 <p class="mb-3">该项目暂无相关内容</p>
@@ -189,13 +221,14 @@
             </div>
             <div class="modal-body">
                 <p>您确定要删除非遗项目 <strong>{{ item.name }}</strong> 吗？</p>
-                {% if articles or images or videos %}
+                {% if articles or images or videos or multimedia %}
                 <div class="alert alert-warning">
                     <p class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> 警告：此项目下有关联内容！</p>
                     <ul class="mb-0 mt-2">
                         {% if articles %}<li>{{ articles|length }} 篇文章</li>{% endif %}
                         {% if images %}<li>{{ images|length }} 张图片</li>{% endif %}
                         {% if videos %}<li>{{ videos|length }} 个视频</li>{% endif %}
+                        {% if multimedia %}<li>{{ multimedia|length }} 篇富文本</li>{% endif %}
                     </ul>
                     {% if not current_user.is_admin %}
                     <p class="mt-2 mb-0">请先删除所有关联内容或联系管理员</p>
@@ -211,7 +244,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                 <form method="POST" action="{{ url_for('heritage.delete', id=item.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-danger" {% if articles or images or videos and not current_user.is_admin %}disabled{% endif %}>
+                    <button type="submit" class="btn btn-danger" {% if (articles or images or videos or multimedia) and not current_user.is_admin %}disabled{% endif %}>
                         确认删除
                     </button>
                 </form>

@@ -46,18 +46,20 @@ def detail(id):
         articles = [c for c in contents if c.content_type == 'article']
         videos = [c for c in contents if c.content_type == 'video']
         images = [c for c in contents if c.content_type == 'image']
+        multimedia = [c for c in contents if c.content_type == 'multimedia']
         
-        current_app.logger.info(f"Found contents for heritage {id}: {len(articles)} articles, {len(videos)} videos, {len(images)} images")
+        current_app.logger.info(f"Found contents for heritage {id}: {len(articles)} articles, {len(videos)} videos, {len(images)} images, {len(multimedia)} rich texts")
         
     except Exception as e:
         current_app.logger.error(f"Error fetching contents for heritage {id}: {str(e)}")
-        articles, videos, images = [], [], []
+        articles, videos, images, multimedia = [], [], [], []
     
     return render_template('heritage/detail.html', 
                            item=item,
                            articles=articles,
                            videos=videos,
-                           images=images)
+                           images=images,
+                           multimedia=multimedia)
 
 @heritage_bp.route('/create', methods=['GET', 'POST'])
 @login_required

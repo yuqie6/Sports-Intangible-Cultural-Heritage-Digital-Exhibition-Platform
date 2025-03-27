@@ -11,7 +11,7 @@ class ContentForm(FlaskForm):
         ('article', '文章'),
         ('image', '图片'),
         ('video', '视频'),
-        ('multimedia', '多媒体文章')  # 新增多媒体文章类型
+        ('multimedia', '富文本文章')  # 使用更清晰的命名
     ])
     cover_image = FileField('封面图片', validators=[
         Optional(),
