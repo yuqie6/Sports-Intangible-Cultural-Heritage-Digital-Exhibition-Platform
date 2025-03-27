@@ -131,6 +131,17 @@ def create():
                 content_type=form.content_type.data
             )
             
+            # 处理封面图片（适用于所有内容类型）
+            if form.cover_image.data:
+                current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
+                cover_path = save_file(form.cover_image.data, 'image')
+                if cover_path:
+                    current_app.logger.info(f"封面图片上传成功，路径: {cover_path}")
+                    content.cover_image = cover_path
+                else:
+                    current_app.logger.error("封面图片上传失败")
+                    flash('封面图片上传失败', 'danger')
+            
             # 根据内容类型处理不同字段
             if form.content_type.data == 'article':
                 content.text_content = form.text_content.data
@@ -166,6 +177,71 @@ def create():
     return render_template('content/create.html', form=form)
 
 # 添加图片上传API端点，并豁免CSRF保护
+@content_bp.route('/upload_cover', methods=['POST'])
+@login_required
+@csrf.exempt
+def upload_cover():
+    """封面图片上传处理"""
+    try:
+        current_app.logger.info("收到封面图片上传请求")
+        
+        # 检查请求中是否包含文件
+        if 'cover_image' not in request.files:
+            current_app.logger.warning("请求中没有'cover_image'文件")
+            return jsonify({
+                'success': False,
+                'error': '没有文件上传'
+            })
+        
+        file = request.files['cover_image']
+        if file.filename == '':
+            current_app.logger.warning("上传了空文件名")
+            return jsonify({
+                'success': False,
+                'error': '未选择文件'
+            })
+        
+        # 检查文件类型
+        if not allowed_file(file.filename, ALLOWED_IMAGE_EXTENSIONS):
+            current_app.logger.warning(f"不支持的文件类型: {file.filename}")
+            return jsonify({
+                'success': False,
+                'error': '不支持的文件类型，请上传jpg, jpeg, png或gif格式'
+            })
+        
+        # 重置文件指针位置
+        file.seek(0)
+        
+        # 保存文件
+        upload_path = os.path.join(
+            current_app.root_path, 
+            'static', 'uploads', 'images'
+        )
+        os.makedirs(upload_path, exist_ok=True)
+        
+        filename = secure_filename(file.filename)
+        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        file_path = os.path.join(upload_path, unique_filename)
+        
+        file.save(file_path)
+        
+        # 构建URL
+        url = url_for('static', filename=f"uploads/images/{unique_filename}")
+        
+        return jsonify({
+            'success': True,
+            'url': url,
+            'fileName': filename
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"封面图片上传失败: {str(e)}")
+        current_app.logger.error(traceback.format_exc())
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
 @content_bp.route('/upload_image', methods=['POST'])
 @login_required
 @csrf.exempt   # 添加CSRF豁免
@@ -293,6 +369,62 @@ def like(id):
         flash('操作失败，请稍后重试', 'danger')
         
     return redirect(url_for('content.detail', id=id))
+
+@content_bp.route('/delete/<int:id>', methods=['POST'])
+@login_required
+
+def delete(id):
+    """删除内容"""
+    content = Content.query.get_or_404(id)
+    
+    # 检查权限：只有作者或管理员可以删除
+    if current_user.id != content.user_id and not current_user.is_admin:
+        flash('无权删除此内容', 'danger')
+        return redirect(url_for('content.list'))
+    
+    try:
+        # 删除关联文件
+        if content.cover_image:
+            try:
+                cover_path = os.path.join(
+                    current_app.root_path, 
+                    'static', 
+                    content.cover_image.lstrip('/static/')
+                )
+                if os.path.exists(cover_path):
+                    os.remove(cover_path)
+            except Exception as e:
+                current_app.logger.error(f"删除封面图片失败: {str(e)}")
+        
+        if content.file_path:
+            try:
+                file_path = os.path.join(
+                    current_app.root_path,
+                    'static',
+                    content.file_path.lstrip('/static/')
+                )
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            except Exception as e:
+                current_app.logger.error(f"删除内容文件失败: {str(e)}")
+        
+        # 删除关联数据
+        Comment.query.filter_by(content_id=id).delete()
+        Like.query.filter_by(content_id=id).delete()
+        Favorite.query.filter_by(content_id=id).delete()
+        
+        # 删除内容
+        db.session.delete(content)
+        db.session.commit()
+        
+        flash('内容删除成功', 'success')
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"删除内容失败: {str(e)}")
+        current_app.logger.error(traceback.format_exc())
+        flash('删除内容失败，请稍后重试', 'danger')
+    
+    return redirect(url_for('content.list'))
 
 @content_bp.route('/favorite/<int:id>', methods=['POST'])
 @login_required

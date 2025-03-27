@@ -55,7 +55,9 @@
         {% for content in items %}
         <div class="col">
             <div class="card h-100">
-                {% if content.file_path %}
+                {% if content.cover_image %}
+                <img src="{{ url_for('static', filename=content.cover_image) }}" class="card-img-top" alt="{{ content.title }}">
+                {% elif content.file_path %}
                 <img src="{{ url_for('static', filename=content.file_path) }}" class="card-img-top" alt="{{ content.title }}">
                 {% else %}
                 <img src="{{ url_for('static', filename='img/default-content.jpg') }}" class="card-img-top" alt="默认图片">
@@ -80,9 +82,19 @@
                         <span class="mx-2">|</span>
                         <i class="fas fa-clock me-1"></i>{{ content.created_at.strftime('%Y-%m-%d') }}
                     </small>
-                    <a href="{{ url_for('content.detail', id=content.id) }}" class="btn btn-sm btn-outline-primary float-end">
-                        查看详情
-                    </a>
+                    <div class="float-end">
+                        <a href="{{ url_for('content.detail', id=content.id) }}" class="btn btn-sm btn-outline-primary">
+                            查看详情
+                        </a>
+                        {% if current_user.is_authenticated and (current_user.id == content.user_id or current_user.is_admin) %}
+                        <form method="post" action="{{ url_for('content.delete', id=content.id) }}" class="d-inline" onsubmit="return confirm('确定要删除此内容吗？删除后无法恢复！');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

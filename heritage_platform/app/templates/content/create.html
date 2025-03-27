@@ -75,6 +75,38 @@
                                 </div>
                             {% endif %}
                         </div>
+
+                        <!-- 封面图片上传区域 -->
+                        <div class="mb-4">
+                            <div class="mb-2 d-flex align-items-center">
+                                <i class="fas fa-image text-primary me-2"></i>
+                                {{ form.cover_image.label(class="form-label fw-bold mb-0") }}
+                            </div>
+                            <div class="input-group">
+                                {{ form.cover_image(class="form-control d-none", id="cover-image-input", onchange="previewCoverImage(this)") }}
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('cover-image-input').click()">
+                                    <i class="fas fa-folder-open me-1"></i>选择文件
+                                </button>
+                                <button type="button" class="btn btn-primary" id="upload-cover-btn" disabled>
+                                    <i class="fas fa-upload me-1"></i>上传封面
+                                </button>
+                                <span class="input-group-text" id="cover-image-name">未选择文件</span>
+                            </div>
+                            {% if form.cover_image.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.cover_image.errors %}
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted mt-1">
+                                <i class="fas fa-info-circle me-1"></i>支持JPG、JPEG、PNG和GIF格式，建议尺寸1200x630像素
+                            </small>
+                            <div id="cover-preview" class="mt-3 p-3 border rounded d-none">
+                                <h6 class="mb-3"><i class="fas fa-eye me-1"></i>封面预览</h6>
+                                <img id="cover-image-preview" class="img-fluid rounded" style="max-height: 300px;" alt="封面预览">
+                            </div>
+                        </div>
                         
                         <div class="mb-4">
                             <div class="form-floating">
@@ -413,6 +445,82 @@
         }
     });
     
+    function previewCoverImage(input) {
+        const preview = document.getElementById('cover-preview');
+        const imagePreview = document.getElementById('cover-image-preview');
+        const fileNameSpan = document.getElementById('cover-image-name');
+        const uploadBtn = document.getElementById('upload-cover-btn');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.classList.remove('d-none');
+                imagePreview.src = e.target.result;
+                fileNameSpan.textContent = input.files[0].name;
+                uploadBtn.disabled = false;
+            };
+            
+            reader.onerror = function(e) {
+                console.error("封面图片读取错误: ", e);
+                fileNameSpan.textContent = "读取失败";
+                uploadBtn.disabled = true;
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.classList.add('d-none');
+            fileNameSpan.textContent = "未选择文件";
+            uploadBtn.disabled = true;
+        }
+    }
+
+    // 添加封面图片上传功能
+    document.getElementById('upload-cover-btn').addEventListener('click', function() {
+        const fileInput = document.getElementById('cover-image-input');
+        if (!fileInput.files || !fileInput.files[0]) {
+            alert('请先选择封面图片');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append('cover_image', file);
+
+        const uploadBtn = this;
+        const originalText = uploadBtn.innerHTML;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>上传中...';
+        uploadBtn.disabled = true;
+
+        fetch('{{ url_for("content.upload_cover") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('封面图片上传成功');
+                document.getElementById('cover-image-name').textContent = file.name + ' (已上传)';
+                // 更新预览图片为服务器返回的URL
+                document.getElementById('cover-image-preview').src = data.url;
+            } else {
+                throw new Error(data.error || '上传失败');
+            }
+        })
+        .catch(error => {
+            console.error('上传错误:', error);
+            alert('上传失败: ' + error.message);
+            document.getElementById('cover-image-name').textContent = '上传失败';
+        })
+        .finally(() => {
+            uploadBtn.innerHTML = originalText;
+            uploadBtn.disabled = false;
+        });
+    });
+
     function previewFile(input) {
         const contentType = document.getElementById('content_type').value;
         const preview = document.getElementById('file-preview');
