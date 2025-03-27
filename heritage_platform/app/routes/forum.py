@@ -212,3 +212,66 @@ def close_topic(id):
         current_app.logger.error(f"更新主题关闭状态失败: {str(e)}")
         flash('操作失败，请稍后重试', 'danger')
     return redirect(url_for('forum.topic', id=id))
+
+@forum_bp.route('/delete_topic/<int:id>', methods=['POST'])
+@login_required
+def delete_topic(id):
+    """删除主题 - 允许作者或管理员删除主题"""
+    topic = ForumTopic.query.get_or_404(id)
+    
+    # 检查是否有权限删除（管理员或作者）
+    if not (current_user.is_admin or topic.user_id == current_user.id):
+        flash('您没有权限删除此主题', 'danger')
+        return redirect(url_for('forum.topic', id=id))
+    
+    try:
+        # 先删除主题下的所有帖子
+        ForumPost.query.filter_by(topic_id=id).delete()
+        
+        # 再删除主题
+        db.session.delete(topic)
+        db.session.commit()
+        
+        flash('主题删除成功', 'success')
+        return redirect(url_for('forum.index'))
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"删除主题失败: {str(e)}")
+        flash('删除主题失败，请稍后重试', 'danger')
+        return redirect(url_for('forum.topic', id=id))
+
+@forum_bp.route('/delete_post/<int:id>', methods=['POST'])
+@login_required
+def delete_post(id):
+    """删除帖子回复 - 允许作者或管理员删除回复"""
+    post = ForumPost.query.get_or_404(id)
+    topic_id = post.topic_id
+    
+    # 检查是否有权限删除（管理员或作者）
+    if not (current_user.is_admin or post.user_id == current_user.id):
+        flash('您没有权限删除此回复', 'danger')
+        return redirect(url_for('forum.topic', id=topic_id))
+    
+    # 不允许删除主题的首个帖子（第一条回复）
+    first_post = ForumPost.query.filter_by(topic_id=topic_id).order_by(ForumPost.created_at.asc()).first()
+    if first_post and first_post.id == post.id:
+        flash('不能删除主题的第一条回复，请删除整个主题', 'warning')
+        return redirect(url_for('forum.topic', id=topic_id))
+    
+    try:
+        db.session.delete(post)
+        
+        # 更新主题的回复计数（依赖于触发器或手动更新）
+        topic = ForumTopic.query.get(topic_id)
+        if topic:
+            # 减少回复计数，依赖于post_count字段的维护逻辑
+            pass
+            
+        db.session.commit()
+        flash('回复删除成功', 'success')
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"删除回复失败: {str(e)}")
+        flash('删除回复失败，请稍后重试', 'danger')
+    
+    return redirect(url_for('forum.topic', id=topic_id))

@@ -16,6 +16,12 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">{{ topic.title }}</h1>
         <div>
+            {% if current_user.is_authenticated and topic.user_id == current_user.id or current_user.is_admin %}
+            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteTopicModal">
+                <i class="fas fa-trash me-1"></i>删除主题
+            </button>
+            {% endif %}
+            
             {% if current_user.is_admin %}
             <form method="POST" action="{{ url_for('forum.pin_topic', id=topic.id) }}" class="d-inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -73,11 +79,24 @@
                     
                     <!-- 帖子内容 -->
                     <div class="flex-grow-1">
-                        <div class="mb-2 text-muted small">
-                            <i class="fas fa-clock me-1"></i> {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
-                            {% if post.created_at != post.updated_at %}
-                            <span class="mx-1">|</span>
-                            <i class="fas fa-edit me-1"></i> 已编辑
+                        <div class="mb-2 text-muted small d-flex justify-content-between">
+                            <div>
+                                <i class="fas fa-clock me-1"></i> {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                {% if post.created_at != post.updated_at %}
+                                <span class="mx-1">|</span>
+                                <i class="fas fa-edit me-1"></i> 已编辑
+                                {% endif %}
+                            </div>
+                            
+                            {% if loop.index > 1 and (current_user.is_authenticated and current_user.is_admin or current_user.username == post.author) %}
+                            <div>
+                                <form method="POST" action="{{ url_for('forum.delete_post', id=post.id) }}" class="d-inline delete-post-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm delete-post-btn">
+                                        <i class="fas fa-trash"></i> 删除回复
+                                    </button>
+                                </form>
+                            </div>
                             {% endif %}
                         </div>
                         <div class="post-content">
@@ -170,4 +189,43 @@
     </div>
     {% endif %}
 </div>
+
+<!-- 删除主题确认模态框 -->
+<div class="modal fade" id="deleteTopicModal" tabindex="-1" aria-labelledby="deleteTopicModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTopicModalLabel">确认删除主题</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除主题 "{{ topic.title }}" 吗？</p>
+                <p class="text-danger">此操作将删除该主题下的所有回复，且无法恢复！</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form method="POST" action="{{ url_for('forum.delete_topic', id=topic.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 为删除回复按钮添加确认提示
+    const deletePostForms = document.querySelectorAll('.delete-post-form');
+    deletePostForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!confirm('确定要删除这条回复吗？此操作不可恢复')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

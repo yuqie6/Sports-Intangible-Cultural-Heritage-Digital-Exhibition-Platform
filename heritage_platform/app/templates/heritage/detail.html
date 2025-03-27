@@ -30,6 +30,9 @@
                     <a href="{{ url_for('heritage.edit', id=item.id) }}" class="btn btn-outline-primary">
                         <i class="fas fa-edit me-1"></i> 编辑
                     </a>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteHeritageModal">
+                        <i class="fas fa-trash me-1"></i> 删除
+                    </button>
                     {% endif %}
                 </div>
             </div>
@@ -173,6 +176,47 @@
             </div>
         </div>
         {% endif %}
+    </div>
+</div>
+
+<!-- 删除非遗项目确认模态框 -->
+<div class="modal fade" id="deleteHeritageModal" tabindex="-1" aria-labelledby="deleteHeritageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteHeritageModalLabel">确认删除项目</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除非遗项目 <strong>{{ item.name }}</strong> 吗？</p>
+                {% if articles or images or videos %}
+                <div class="alert alert-warning">
+                    <p class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> 警告：此项目下有关联内容！</p>
+                    <ul class="mb-0 mt-2">
+                        {% if articles %}<li>{{ articles|length }} 篇文章</li>{% endif %}
+                        {% if images %}<li>{{ images|length }} 张图片</li>{% endif %}
+                        {% if videos %}<li>{{ videos|length }} 个视频</li>{% endif %}
+                    </ul>
+                    {% if not current_user.is_admin %}
+                    <p class="mt-2 mb-0">请先删除所有关联内容或联系管理员</p>
+                    {% else %}
+                    <p class="mt-2 mb-0 text-danger">作为管理员，删除项目将同时删除所有关联内容！</p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <p class="text-danger">此操作不可恢复！</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form method="POST" action="{{ url_for('heritage.delete', id=item.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger" {% if articles or images or videos and not current_user.is_admin %}disabled{% endif %}>
+                        确认删除
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

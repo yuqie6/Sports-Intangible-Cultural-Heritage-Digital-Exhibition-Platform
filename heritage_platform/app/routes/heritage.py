@@ -126,3 +126,41 @@ def edit(id):
             flash('更新非遗项目失败，请稍后重试', 'danger')
     
     return render_template('heritage/edit.html', form=form, item=heritage_item)
+
+@heritage_bp.route('/delete/<int:id>', methods=['POST'])
+@login_required
+@teacher_required
+def delete(id):
+    """删除非遗项目 - 只有创建者和管理员可以删除"""
+    heritage_item = HeritageItem.query.get_or_404(id)
+    
+    # 检查权限 - 只有创建者或管理员可以删除
+    if not (current_user.is_admin or heritage_item.created_by == current_user.id):
+        flash('您没有权限删除此项目', 'danger')
+        return redirect(url_for('heritage.detail', id=id))
+        
+    try:
+        # 检查是否有关联的内容
+        contents = Content.query.filter_by(heritage_id=id).all()
+        
+        if contents and not current_user.is_admin:
+            flash('此项目下有关联内容，无法删除。请先删除所有关联内容或联系管理员', 'warning')
+            return redirect(url_for('heritage.detail', id=id))
+            
+        # 管理员可以强制删除所有关联内容
+        if current_user.is_admin and contents:
+            for content in contents:
+                db.session.delete(content)
+                
+        # 删除非遗项目
+        db.session.delete(heritage_item)
+        db.session.commit()
+        
+        flash('非遗项目删除成功', 'success')
+        return redirect(url_for('heritage.list'))
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"删除非遗项目失败: {str(e)}")
+        flash('删除非遗项目失败，请稍后重试', 'danger')
+        return redirect(url_for('heritage.detail', id=id))
