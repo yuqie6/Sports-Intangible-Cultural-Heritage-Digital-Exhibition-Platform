@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from . import beijing_time
 
 class ForumTopic(db.Model):
     """论坛主题"""
@@ -12,8 +12,8 @@ class ForumTopic(db.Model):
     views = db.Column(db.Integer, default=0)
     is_pinned = db.Column(db.Boolean, default=False)
     is_closed = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    last_activity = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=beijing_time)
+    last_activity = db.Column(db.DateTime, default=beijing_time)
     
     # 关系
     posts = db.relationship('ForumPost', backref='topic', lazy='dynamic')
@@ -53,8 +53,8 @@ class ForumPost(db.Model):
     topic_id = db.Column(db.Integer, db.ForeignKey('forum_topics.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=beijing_time)
+    updated_at = db.Column(db.DateTime, default=beijing_time, onupdate=beijing_time)
     
     # 添加嵌套回复支持
     parent_id = db.Column(db.Integer, db.ForeignKey('forum_posts.id'), nullable=True)

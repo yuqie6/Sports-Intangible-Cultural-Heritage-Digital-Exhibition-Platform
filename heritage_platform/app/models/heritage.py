@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from . import beijing_time
 
 class HeritageItem(db.Model):
     __tablename__ = 'heritage_items'
@@ -10,7 +10,7 @@ class HeritageItem(db.Model):
     description = db.Column(db.Text)
     cover_image = db.Column(db.String(255))
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=beijing_time)
     
     # 关系
     contents = db.relationship('Content', back_populates='heritage', lazy=True)

@@ -1,6 +1,6 @@
 from tokenize import Comment
 from app import db
-from datetime import datetime
+from . import beijing_time
 
 class Content(db.Model):
     __tablename__ = 'contents'
@@ -14,8 +14,8 @@ class Content(db.Model):
     file_path = db.Column(db.String(255))  # for video and image type
     cover_image = db.Column(db.String(255))  # 封面图片路径
     rich_content = db.Column(db.Text)  # 富文本内容字段，包含HTML，支持嵌入图片和视频
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=beijing_time)
+    updated_at = db.Column(db.DateTime, default=beijing_time, onupdate=beijing_time)
     
     # 关系定义
     heritage = db.relationship('HeritageItem', back_populates='contents')

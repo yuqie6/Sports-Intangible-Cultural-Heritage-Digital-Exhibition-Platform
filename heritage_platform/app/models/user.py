@@ -1,7 +1,7 @@
 from app import db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from datetime import datetime
+from . import beijing_time
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)  # 增加长度到255
     role = db.Column(db.String(20), default='student')  # admin, teacher, student
     avatar = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=beijing_time)
     
     # 关系
     heritage_items = db.relationship('HeritageItem', backref='creator', lazy='dynamic')

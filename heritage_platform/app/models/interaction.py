@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from . import beijing_time
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -8,7 +8,7 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     content_id = db.Column(db.Integer, db.ForeignKey('contents.id'))
     text = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=beijing_time)
     
     # 添加嵌套回复支持
     parent_id = db.Column(db.Integer, db.ForeignKey('comments.id'), nullable=True)
@@ -60,7 +60,7 @@ class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     content_id = db.Column(db.Integer, db.ForeignKey('contents.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=beijing_time)
     
     def __repr__(self):
         return f'<Like {self.id}>'
@@ -71,7 +71,7 @@ class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     content_id = db.Column(db.Integer, db.ForeignKey('contents.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=beijing_time)
     
     def __repr__(self):
         return f'<Favorite {self.id}>'

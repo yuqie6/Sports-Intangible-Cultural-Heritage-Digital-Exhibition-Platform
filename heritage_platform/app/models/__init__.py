@@ -1,3 +1,9 @@
+from datetime import datetime, timedelta
+
+def beijing_time():
+    """返回北京时间（UTC+8）"""
+    return datetime.utcnow() + timedelta(hours=8)
+
 # 导入所有模型，确保它们在SQLAlchemy创建会话时被正确注册
 
 from . import user
