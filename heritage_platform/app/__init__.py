@@ -4,6 +4,7 @@ from flask_login import LoginManager
 from config import config
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
+from flask_socketio import SocketIO
 import os
 import markdown
 
@@ -12,6 +13,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 migrate = Migrate()
+socketio = SocketIO()  # 初始化SocketIO
 
 login_manager.login_view = 'auth.login'
 login_manager.login_message = '请先登录再访问此页面'
@@ -32,6 +34,7 @@ def create_app(config_name='default'):
     login_manager.init_app(app)
     csrf.init_app(app)
     migrate.init_app(app, db)
+    socketio.init_app(app, cors_allowed_origins="*")  # 初始化SocketIO并允许跨域访问
     
     # 确保日志目录存在
     os.makedirs('logs', exist_ok=True)
@@ -90,5 +93,9 @@ def create_app(config_name='default'):
         if value:
             return value.replace('\n', '<br>')
         return ''
+    
+    # 导入Socket.IO事件处理
+    with app.app_context():
+        from app import socket_events
     
     return app

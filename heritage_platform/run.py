@@ -1,6 +1,6 @@
 import os
 import click
-from app import create_app, db
+from app import create_app, db, socketio
 from flask_migrate import Migrate
 from app.models import User
 
@@ -42,4 +42,5 @@ def create_admin():
         click.echo(f'创建管理员失败: {str(e)}', err=True)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    # 使用socketio启动应用而非app.run
+    socketio.run(app, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), allow_unsafe_werkzeug=True)

@@ -64,10 +64,10 @@
                     <div class="group-messages mb-4">
                         <h6 class="mb-3 border-bottom pb-2">聊天记录</h6>
                         
-                        {% if messages %}
-                            <div class="chat-messages">
+                        <div class="chat-messages" id="chat-messages">
+                            {% if messages %}
                                 {% for msg in messages %}
-                                <div class="message-item mb-3 {% if msg.sender_id == current_user.id %}message-mine text-end{% endif %}">
+                                <div class="message-item mb-3 {% if msg.sender_id == current_user.id %}message-mine text-end{% endif %}" data-message-id="{{ msg.id }}">
                                     <div class="d-flex {% if msg.sender_id == current_user.id %}justify-content-end{% else %}align-items-start{% endif %}">
                                         {% if msg.sender_id != current_user.id %}
                                         <div class="avatar-sm me-2">
@@ -83,6 +83,14 @@
                                             <div class="message-header d-flex justify-content-{% if msg.sender_id == current_user.id %}end{% else %}start{% endif %} mb-1">
                                                 <small class="text-muted">
                                                     {% if msg.sender_id != current_user.id %}{{ msg.sender.username }}{% else %}我{% endif %} • {{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                                    
+                                                    <!-- 管理员删除或消息发送者删除自己的消息 -->
+                                                    {% if membership.role == 'admin' or msg.sender_id == current_user.id %}
+                                                    <a href="javascript:void(0);" class="text-danger ms-2 delete-message" 
+                                                        data-message-id="{{ msg.id }}" title="删除消息">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                    {% endif %}
                                                 </small>
                                             </div>
                                             <div class="message-body p-3 rounded {% if msg.sender_id == current_user.id %}bg-primary text-white{% else %}bg-light{% endif %}">
@@ -102,21 +110,21 @@
                                     </div>
                                 </div>
                                 {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>群组内暂无消息，可以发送一条消息开始聊天。
-                            </div>
-                        {% endif %}
+                            {% else %}
+                                <div class="alert alert-info" id="no-messages-alert">
+                                    <i class="fas fa-info-circle me-2"></i>群组内暂无消息，可以发送一条消息开始聊天。
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                     
                     <!-- 发送消息表单 -->
                     <div class="send-message">
                         <h6 class="mb-2">发送消息</h6>
-                        <form method="POST" action="{{ url_for('message.send_group_message', id=group.id) }}">
+                        <form id="message-form" method="POST" action="{{ url_for('message.send_group_message', id=group.id) }}">
                             {{ form.hidden_tag() }}
                             <div class="mb-3">
-                                {{ form.content(class="form-control" + (" is-invalid" if form.content.errors else ""), rows=3, placeholder="输入消息内容...") }}
+                                {{ form.content(class="form-control" + (" is-invalid" if form.content.errors else ""), rows=3, placeholder="输入消息内容...", id="message-content") }}
                                 {% for error in form.content.errors %}
                                     <div class="invalid-feedback">{{ error }}</div>
                                 {% endfor %}
@@ -176,17 +184,201 @@
         max-width: 80%;
         word-break: break-word;
     }
+    
+    /* 删除消息按钮样式 */
+    .delete-message {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .message-item:hover .delete-message {
+        opacity: 1;
+    }
+    
+    /* 消息加载样式 */
+    .message-loading {
+        text-align: center;
+        padding: 10px;
+        font-style: italic;
+        color: #666;
+    }
+    
+    /* 消息动画效果 */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .new-message {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
 </style>
 {% endblock %}
 
 {% block scripts %}
+<!-- 仅引入Socket.IO库 -->
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // 滚动到聊天记录底部
-        const chatMessages = document.querySelector('.chat-messages');
-        if (chatMessages) {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chat-messages');
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         }
+        
+        scrollToBottom();
+        
+        // 获取当前用户头像信息（修复未定义错误）
+        const currentUserAvatar = {{ current_user.avatar|tojson if current_user.avatar else 'null' }};
+        
+        // Socket.IO连接
+        const socket = io();
+        const groupId = {{ group.id }};
+        
+        // 连接成功后加入群组聊天室
+        socket.on('connect', function() {
+            console.log('已连接到Socket.IO服务器');
+            socket.emit('join_group', {
+                group_id: groupId
+            });
+        });
+        
+        // 监听新消息事件
+        socket.on('new_group_message', function(data) {
+            // 如果消息已存在（可能是自己发的），则不重复添加
+            if (document.querySelector(`.message-item[data-message-id="${data.id}"]`)) {
+                return;
+            }
+            
+            // 隐藏"暂无消息"提示（如果存在）
+            const noMessagesAlert = document.getElementById('no-messages-alert');
+            if (noMessagesAlert) {
+                noMessagesAlert.style.display = 'none';
+            }
+            
+            // 创建新消息HTML
+            const isOwnMessage = data.sender_id == {{ current_user.id }};
+            const isAdmin = {{ 'true' if membership.role == 'admin' else 'false' }};
+            
+            const messageHtml = `
+                <div class="message-item mb-3 ${isOwnMessage ? 'message-mine text-end' : ''} new-message" data-message-id="${data.id}">
+                    <div class="d-flex ${isOwnMessage ? 'justify-content-end' : 'align-items-start'}">
+                        ${!isOwnMessage ? `
+                        <div class="avatar-sm me-2">
+                            ${data.sender_avatar ? `
+                            <img src="${data.sender_avatar}" alt="${data.sender_username}" class="rounded-circle">
+                            ` : `
+                            <i class="fas fa-user-circle fa-2x"></i>
+                            `}
+                        </div>
+                        ` : ''}
+                        
+                        <div class="message-content">
+                            <div class="message-header d-flex justify-content-${isOwnMessage ? 'end' : 'start'} mb-1">
+                                <small class="text-muted">
+                                    ${!isOwnMessage ? data.sender_username : '我'} • ${data.created_at}
+                                    ${isOwnMessage || isAdmin ? `
+                                    <a href="javascript:void(0);" class="text-danger ms-2 delete-message" 
+                                       data-message-id="${data.id}" title="删除消息">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                    ` : ''}
+                                </small>
+                            </div>
+                            <div class="message-body p-3 rounded ${isOwnMessage ? 'bg-primary text-white' : 'bg-light'}">
+                                ${data.content.replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                        
+                        ${isOwnMessage ? `
+                        <div class="avatar-sm ms-2">
+                            ${currentUserAvatar ? `
+                            <img src="${currentUserAvatar}" alt="{{ current_user.username }}" class="rounded-circle">
+                            ` : `
+                            <i class="fas fa-user-circle fa-2x"></i>
+                            `}
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // 将新消息添加到聊天记录
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.insertAdjacentHTML('beforeend', messageHtml);
+            
+            // 滚动到底部
+            scrollToBottom();
+            
+            // 为新添加的删除按钮绑定事件
+            const newDeleteButton = chatMessages.querySelector(`.message-item[data-message-id="${data.id}"] .delete-message`);
+            if (newDeleteButton) {
+                newDeleteButton.addEventListener('click', handleDeleteMessage);
+            }
+        });
+        
+        // 监听消息删除事件
+        socket.on('message_deleted', function(data) {
+            const messageElement = document.querySelector(`.message-item[data-message-id="${data.message_id}"]`);
+            if (messageElement) {
+                messageElement.remove();
+                
+                // 如果没有消息了，显示"暂无消息"提示
+                const chatMessages = document.getElementById('chat-messages');
+                if (chatMessages.children.length === 0) {
+                    chatMessages.innerHTML = `
+                        <div class="alert alert-info" id="no-messages-alert">
+                            <i class="fas fa-info-circle me-2"></i>群组内暂无消息，可以发送一条消息开始聊天。
+                        </div>
+                    `;
+                }
+            }
+        });
+        
+        // 发送消息表单处理
+        const messageForm = document.getElementById('message-form');
+        const messageContent = document.getElementById('message-content');
+        
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const content = messageContent.value.trim();
+            if (!content) return;
+            
+            // 使用Socket.IO发送消息
+            socket.emit('send_group_message', {
+                group_id: groupId,
+                content: content
+            }, function(response) {
+                if (response && response.status === 'error') {
+                    alert('发送失败: ' + response.message);
+                } else {
+                    // 清空输入框
+                    messageContent.value = '';
+                }
+            });
+        });
+        
+        // 消息删除功能
+        function handleDeleteMessage() {
+            if (!confirm('确定要删除这条消息吗？此操作不可撤销。')) return;
+            
+            const messageId = this.getAttribute('data-message-id');
+            socket.emit('delete_message', {
+                message_id: messageId
+            }, function(response) {
+                if (response && response.status === 'error') {
+                    alert('删除失败: ' + response.message);
+                }
+            });
+        }
+        
+        // 为所有删除按钮添加点击事件
+        document.querySelectorAll('.delete-message').forEach(function(button) {
+            button.addEventListener('click', handleDeleteMessage);
+        });
         
         // 防止表单重复提交
         if (window.history.replaceState) {

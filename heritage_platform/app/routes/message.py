@@ -21,13 +21,19 @@ def message_list():
     sent_messages = Message.query.filter(
         Message.sender_id == current_user.id,
         Message.sender_deleted == False,
-        Message.message_type == 'personal'  # 只查看个人消息
+        or_(
+            Message.message_type == 'personal',
+            Message.message_type == 'broadcast'  # 包含群发消息
+        )
     ).order_by(Message.created_at.desc()).all()
 
     received_messages = Message.query.filter(
         Message.receiver_id == current_user.id,
         Message.receiver_deleted == False,
-        Message.message_type == 'personal'  # 只查看个人消息
+        or_(
+            Message.message_type == 'personal',
+            Message.message_type == 'broadcast'  # 包含群发消息
+        )
     ).order_by(Message.created_at.desc()).all()
 
     # 查询当前用户所在的群组
@@ -114,7 +120,10 @@ def view(id):
             and_(Message.sender_id == current_user.id, Message.sender_deleted == False),
             and_(Message.receiver_id == current_user.id, Message.receiver_deleted == False)
         ),
-        Message.message_type == 'personal'  # 确保是个人消息
+        or_(
+            Message.message_type == 'personal',
+            Message.message_type == 'broadcast'  # 允许查看群发消息
+        )
     ).first_or_404()
     
     # 如果当前用户是接收者且消息未读，则标记为已读
@@ -273,10 +282,10 @@ def view_group(id):
     
     group = MessageGroup.query.get_or_404(id)
     
-    # 查询群组消息，按时间倒序排列
+    # 查询群组消息，按时间升序排列，以便最早的消息显示在上方
     messages = Message.query.filter_by(
         group_id=id
-    ).order_by(Message.created_at.desc()).all()
+    ).order_by(Message.created_at.asc()).all()
     
     # 将所有未读消息标记为已读
     unread_statuses = MessageReadStatus.query.filter_by(
