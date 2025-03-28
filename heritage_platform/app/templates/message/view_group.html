@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}{{ group.name }} - 群组消息 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>{{ group.name }}
+                        {% if group.group_type == 'class' %}
+                            <span class="badge bg-info ms-2">班级</span>
+                        {% elif group.group_type == 'team' %}
+                            <span class="badge bg-success ms-2">小组</span>
+                        {% else %}
+                            <span class="badge bg-secondary ms-2">自定义</span>
+                        {% endif %}
+                    </h5>
+                    <div>
+                        <a href="{{ url_for('message.group_list') }}" class="btn btn-sm btn-light">
+                            <i class="fas fa-arrow-left me-1"></i>返回群组列表
+                        </a>
+                        {% if membership.role == 'admin' %}
+                        <a href="{{ url_for('message.group_members', id=group.id) }}" class="btn btn-sm btn-light ms-2">
+                            <i class="fas fa-users-cog me-1"></i>管理成员
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- 群组信息 -->
+                    <div class="mb-4">
+                        <p class="mb-2"><strong>描述：</strong> {{ group.description or '暂无描述' }}</p>
+                        <p class="mb-2"><strong>创建者：</strong> {{ group.creator.username }}</p>
+                        <p class="mb-0"><strong>创建时间：</strong> {{ group.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                    
+                    <!-- 成员列表 -->
+                    <div class="mb-4">
+                        <h6 class="mb-2">成员列表 ({{ members|length }} 人)</h6>
+                        <div class="d-flex flex-wrap">
+                            {% for member in members %}
+                            <div class="me-2 mb-2 d-flex align-items-center">
+                                <div class="avatar-xs me-1">
+                                    {% if member.avatar %}
+                                    <img src="{{ member.avatar }}" alt="{{ member.username }}" class="rounded-circle">
+                                    {% else %}
+                                    <i class="fas fa-user-circle"></i>
+                                    {% endif %}
+                                </div>
+                                <span class="small">{{ member.username }}</span>
+                                {% if member.id == group.creator_id %}
+                                <span class="badge bg-danger ms-1" title="群主">管理员</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- 消息列表 -->
+                    <div class="group-messages mb-4">
+                        <h6 class="mb-3 border-bottom pb-2">聊天记录</h6>
+                        
+                        {% if messages %}
+                            <div class="chat-messages">
+                                {% for msg in messages %}
+                                <div class="message-item mb-3 {% if msg.sender_id == current_user.id %}message-mine text-end{% endif %}">
+                                    <div class="d-flex {% if msg.sender_id == current_user.id %}justify-content-end{% else %}align-items-start{% endif %}">
+                                        {% if msg.sender_id != current_user.id %}
+                                        <div class="avatar-sm me-2">
+                                            {% if msg.sender.avatar %}
+                                            <img src="{{ msg.sender.avatar }}" alt="{{ msg.sender.username }}" class="rounded-circle">
+                                            {% else %}
+                                            <i class="fas fa-user-circle fa-2x"></i>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <div class="message-content">
+                                            <div class="message-header d-flex justify-content-{% if msg.sender_id == current_user.id %}end{% else %}start{% endif %} mb-1">
+                                                <small class="text-muted">
+                                                    {% if msg.sender_id != current_user.id %}{{ msg.sender.username }}{% else %}我{% endif %} • {{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                                </small>
+                                            </div>
+                                            <div class="message-body p-3 rounded {% if msg.sender_id == current_user.id %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                                {{ msg.content|nl2br|safe }}
+                                            </div>
+                                        </div>
+                                        
+                                        {% if msg.sender_id == current_user.id %}
+                                        <div class="avatar-sm ms-2">
+                                            {% if current_user.avatar %}
+                                            <img src="{{ current_user.avatar }}" alt="{{ current_user.username }}" class="rounded-circle">
+                                            {% else %}
+                                            <i class="fas fa-user-circle fa-2x"></i>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>群组内暂无消息，可以发送一条消息开始聊天。
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- 发送消息表单 -->
+                    <div class="send-message">
+                        <h6 class="mb-2">发送消息</h6>
+                        <form method="POST" action="{{ url_for('message.send_group_message', id=group.id) }}">
+                            {{ form.hidden_tag() }}
+                            <div class="mb-3">
+                                {{ form.content(class="form-control" + (" is-invalid" if form.content.errors else ""), rows=3, placeholder="输入消息内容...") }}
+                                {% for error in form.content.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-end">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .avatar-xs {
+        width: 24px;
+        height: 24px;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .avatar-xs img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .avatar-sm {
+        width: 40px;
+        height: 40px;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .avatar-sm img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .chat-messages {
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+    
+    .message-body {
+        display: inline-block;
+        max-width: 80%;
+        word-break: break-word;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 滚动到聊天记录底部
+        const chatMessages = document.querySelector('.chat-messages');
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // 防止表单重复提交
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    });
+</script>
+{% endblock %}

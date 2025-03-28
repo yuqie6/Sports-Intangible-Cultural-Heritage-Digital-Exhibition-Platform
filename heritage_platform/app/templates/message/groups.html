@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}消息群组 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-users me-2"></i>我的消息群组</h2>
+                {% if current_user.is_teacher or current_user.is_admin %}
+                <a href="{{ url_for('message.create_group') }}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i>创建新群组
+                </a>
+                {% endif %}
+            </div>
+            
+            <!-- 我创建的群组（教师/管理员） -->
+            {% if current_user.is_teacher or current_user.is_admin %}
+                {% if created_groups %}
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>我创建的群组</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for group in created_groups %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">
+                                        <a href="{{ url_for('message.view_group', id=group.id) }}" class="text-decoration-none">
+                                            {{ group.name }}
+                                        </a>
+                                        {% if group.group_type == 'class' %}
+                                            <span class="badge bg-info ms-2">班级</span>
+                                        {% elif group.group_type == 'team' %}
+                                            <span class="badge bg-success ms-2">小组</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary ms-2">自定义</span>
+                                        {% endif %}
+                                    </h5>
+                                    <p class="mb-1 text-muted small">{{ group.description }}</p>
+                                    <p class="mb-0 small">
+                                        <span class="text-muted">成员数: {{ group.members|length }}</span>
+                                        <span class="mx-2">•</span>
+                                        <span class="text-muted">创建于: {{ group.created_at.strftime('%Y-%m-%d') }}</span>
+                                    </p>
+                                </div>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('message.view_group', id=group.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-comments me-1"></i>进入聊天
+                                    </a>
+                                    <a href="{{ url_for('message.group_members', id=group.id) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-users-cog me-1"></i>管理成员
+                                    </a>
+                                    <a href="{{ url_for('message.edit_group', id=group.id) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-edit me-1"></i>编辑信息
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>您还没有创建任何群组，点击右上角的"创建新群组"按钮开始创建。
+                </div>
+                {% endif %}
+            {% endif %}
+            
+            <!-- 我加入的群组 -->
+            {% if user_groups %}
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-users me-2"></i>我加入的群组</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for group in user_groups %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">
+                                        <a href="{{ url_for('message.view_group', id=group.id) }}" class="text-decoration-none">
+                                            {{ group.name }}
+                                        </a>
+                                        {% if group.group_type == 'class' %}
+                                            <span class="badge bg-info ms-2">班级</span>
+                                        {% elif group.group_type == 'team' %}
+                                            <span class="badge bg-success ms-2">小组</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary ms-2">自定义</span>
+                                        {% endif %}
+                                    </h5>
+                                    <p class="mb-1 text-muted small">{{ group.description }}</p>
+                                    <p class="mb-0 small">
+                                        <span class="text-muted">创建者: {{ group.creator.username }}</span>
+                                        <span class="mx-2">•</span>
+                                        <span class="text-muted">成员数: {{ group.members|length }}</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('message.view_group', id=group.id) }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-comments me-1"></i>进入聊天
+                                    </a>
+                                    <form action="{{ url_for('message.leave_group', id=group.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定要退出该群组吗？');">
+                                            <i class="fas fa-sign-out-alt me-1"></i>退出群组
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle me-2"></i>您还没有加入任何群组。
+                </div>
+            {% endif %}
+            
+            <!-- 返回按钮 -->
+            <div class="mt-4 text-center">
+                <a href="{{ url_for('message.message_list') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>返回消息中心
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

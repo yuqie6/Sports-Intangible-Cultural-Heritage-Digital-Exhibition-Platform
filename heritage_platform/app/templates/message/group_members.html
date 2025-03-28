@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}管理群组成员 - {{ group.name }} - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-users-cog me-2"></i>管理群组成员 - {{ group.name }}</h5>
+                    <div>
+                        <a href="{{ url_for('message.view_group', id=group.id) }}" class="btn btn-sm btn-light">
+                            <i class="fas fa-arrow-left me-1"></i>返回群组
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- 添加成员表单 -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">添加新成员</h6>
+                        {% if form.members.choices %}
+                        <form method="POST" action="{{ url_for('message.add_members', id=group.id) }}">
+                            {{ form.hidden_tag() }}
+                            <div class="mb-3">
+                                <label for="{{ form.members.id }}" class="form-label">选择要添加的成员</label>
+                                {{ form.members(class="form-select" + (" is-invalid" if form.members.errors else ""), size=5, multiple=True) }}
+                                {% for error in form.members.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                                <div class="form-text">按住Ctrl键(Mac上为Command键)可以选择多个成员</div>
+                            </div>
+                            <div class="text-end">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle me-2"></i>没有可添加的用户了，所有符合条件的用户都已加入群组。
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- 当前成员列表 -->
+                    <div>
+                        <h6 class="mb-3">当前成员 ({{ members|length }}人)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>用户名</th>
+                                        <th>邮箱</th>
+                                        <th>角色</th>
+                                        <th>加入时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user, membership in members %}
+                                    <tr>
+                                        <td class="d-flex align-items-center">
+                                            {% if user.avatar %}
+                                            <img src="{{ user.avatar }}" alt="{{ user.username }}" class="avatar-xs rounded-circle me-2">
+                                            {% else %}
+                                            <i class="fas fa-user-circle me-2"></i>
+                                            {% endif %}
+                                            {{ user.username }}
+                                            {% if user.id == group.creator_id %}
+                                            <span class="badge bg-danger ms-2">创建者</span>
+                                            {% endif %}
+                                            {% if user.id == current_user.id %}
+                                            <span class="badge bg-info ms-2">我</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            {% if membership.role == 'admin' %}
+                                            <span class="badge bg-primary">管理员</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">成员</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ membership.joined_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            {% if user.id != current_user.id and user.id != group.creator_id %}
+                                            <form action="{{ url_for('message.remove_member', group_id=group.id, user_id=user.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定要将 {{ user.username }} 移出群组吗？');">
+                                                    <i class="fas fa-user-minus"></i>
+                                                </button>
+                                            </form>
+                                            {% else %}
+                                            <button class="btn btn-sm btn-outline-secondary" disabled title="{% if user.id == current_user.id %}不能移除自己{% else %}不能移除群主{% endif %}">
+                                                <i class="fas fa-user-minus"></i>
+                                            </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .avatar-xs {
+        width: 24px;
+        height: 24px;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .avatar-xs img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}

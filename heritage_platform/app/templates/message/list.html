@@ -1,50 +1,79 @@
 {% extends "base.html" %}
 
+{% block title %}消息中心 - 体育非遗数字展示平台{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="row">
         <div class="col-lg-10 offset-lg-1">
-            <div class="card shadow mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-envelope me-2"></i>我的私信
-                    </h5>
-                    <a href="{{ url_for('message.compose') }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-paper-plane me-1"></i>发送新私信
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2><i class="fas fa-envelope me-2"></i>消息中心</h2>
+                <div>
+                    <a href="{{ url_for('message.compose') }}" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i>发送私信
                     </a>
+                    {% if current_user.is_teacher or current_user.is_admin %}
+                    <a href="{{ url_for('message.broadcast') }}" class="btn btn-outline-primary ms-2">
+                        <i class="fas fa-bullhorn me-1"></i>群发消息
+                    </a>
+                    {% endif %}
                 </div>
-                <div class="card-body p-0">
-                    <ul class="nav nav-tabs" id="messageTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true">
-                                <i class="fas fa-inbox me-1"></i>收件箱
-                                {% set unread_count = received_messages|selectattr('is_read', 'equalto', False)|list|length %}
-                                {% if unread_count > 0 %}
-                                <span class="badge bg-danger">{{ unread_count }}</span>
-                                {% endif %}
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false">
-                                <i class="fas fa-paper-plane me-1"></i>发件箱
-                            </button>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="messageTabContent">
-                        <!-- 收件箱 -->
-                        <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
+            </div>
+            
+            <!-- 导航栏 -->
+            <ul class="nav nav-tabs mb-3" id="messageTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="inbox-tab" data-bs-toggle="tab" data-bs-target="#inbox" type="button" role="tab" aria-controls="inbox" aria-selected="true">
+                        <i class="fas fa-inbox me-1"></i>收件箱
+                        {% set unread_count = received_messages|selectattr('is_read', 'equalto', False)|list|length %}
+                        {% if unread_count > 0 %}
+                        <span class="badge bg-danger">{{ unread_count }}</span>
+                        {% endif %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="outbox-tab" data-bs-toggle="tab" data-bs-target="#outbox" type="button" role="tab" aria-controls="outbox" aria-selected="false">
+                        <i class="fas fa-paper-plane me-1"></i>发件箱
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups" type="button" role="tab" aria-controls="groups" aria-selected="false">
+                        <i class="fas fa-users me-1"></i>我的群组
+                        {% set unread_group_count = 0 %}
+                        {% for group in user_groups %}
+                            {% if group.id in group_last_messages and not group_last_messages[group.id]['is_read'] %}
+                                {% set unread_group_count = unread_group_count + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if unread_group_count > 0 %}
+                        <span class="badge bg-danger">{{ unread_group_count }}</span>
+                        {% endif %}
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="messageTabContent">
+                <!-- 收件箱 -->
+                <div class="tab-pane fade show active" id="inbox" role="tabpanel" aria-labelledby="inbox-tab">
+                    <div class="card shadow">
+                        <div class="card-body p-0">
                             <div class="list-group list-group-flush">
                                 {% if received_messages %}
                                     {% for message in received_messages %}
                                     <a href="{{ url_for('message.view', id=message.id) }}" class="list-group-item list-group-item-action {% if not message.is_read %}fw-bold list-group-item-primary{% endif %}">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h6 class="mb-1">
-                                                {% if not message.is_read %}<i class="fas fa-circle text-primary" style="font-size: 0.6em;"></i>{% endif %}
-                                                来自: {{ message.sender.username }}
-                                            </h6>
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    {% if not message.is_read %}<i class="fas fa-circle text-primary me-1" style="font-size: 0.6em;"></i>{% endif %}
+                                                    {% if message.message_type == 'broadcast' %}
+                                                    <span class="badge bg-warning text-dark">广播</span>
+                                                    {% endif %}
+                                                    来自: {{ message.sender.username }}
+                                                </h6>
+                                                <p class="mb-1 text-truncate">{{ message.content }}</p>
+                                            </div>
                                             <small class="text-muted">{{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
                                         </div>
-                                        <p class="mb-1 text-truncate">{{ message.content }}</p>
                                     </a>
                                     {% endfor %}
                                 {% else %}
@@ -54,32 +83,102 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
-                        <!-- 发件箱 -->
-                        <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                    </div>
+                </div>
+                
+                <!-- 发件箱 -->
+                <div class="tab-pane fade" id="outbox" role="tabpanel" aria-labelledby="outbox-tab">
+                    <div class="card shadow">
+                        <div class="card-body p-0">
                             <div class="list-group list-group-flush">
                                 {% if sent_messages %}
                                     {% for message in sent_messages %}
                                     <a href="{{ url_for('message.view', id=message.id) }}" class="list-group-item list-group-item-action">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h6 class="mb-1">
-                                                发给: {{ message.receiver.username }}
-                                            </h6>
-                                            <small class="text-muted">
-                                                {{ message.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    {% if message.message_type == 'broadcast' %}
+                                                    <span class="badge bg-warning text-dark">广播</span>
+                                                    {% endif %}
+                                                    发给: {{ message.receiver.username }}
+                                                </h6>
+                                                <p class="mb-1 text-truncate">{{ message.content }}</p>
+                                            </div>
+                                            <div class="text-end">
+                                                <small class="text-muted d-block">{{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
                                                 {% if message.is_read %}
-                                                <span class="badge bg-success ms-1">已读</span>
+                                                <span class="badge bg-success">已读</span>
                                                 {% else %}
-                                                <span class="badge bg-secondary ms-1">未读</span>
+                                                <span class="badge bg-secondary">未读</span>
                                                 {% endif %}
-                                            </small>
+                                            </div>
                                         </div>
-                                        <p class="mb-1 text-truncate">{{ message.content }}</p>
                                     </a>
                                     {% endfor %}
                                 {% else %}
                                     <div class="list-group-item text-center text-muted py-4">
                                         <i class="fas fa-paper-plane me-2"></i>暂无发送的私信
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 我的群组 -->
+                <div class="tab-pane fade" id="groups" role="tabpanel" aria-labelledby="groups-tab">
+                    <div class="card shadow mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">我的群组</h6>
+                            <a href="{{ url_for('message.group_list') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-users-cog me-1"></i>管理群组
+                            </a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                {% if user_groups %}
+                                    {% for group in user_groups %}
+                                    <a href="{{ url_for('message.view_group', id=group.id) }}" class="list-group-item list-group-item-action {% if group.id in group_last_messages and not group_last_messages[group.id]['is_read'] %}list-group-item-primary{% endif %}">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    {% if group.id in group_last_messages and not group_last_messages[group.id]['is_read'] %}
+                                                    <i class="fas fa-circle text-primary me-1" style="font-size: 0.6em;"></i>
+                                                    {% endif %}
+                                                    {{ group.name }}
+                                                    {% if group.group_type == 'class' %}
+                                                        <span class="badge bg-info">班级</span>
+                                                    {% elif group.group_type == 'team' %}
+                                                        <span class="badge bg-success">小组</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">自定义</span>
+                                                    {% endif %}
+                                                </h6>
+                                                {% if group.id in group_last_messages %}
+                                                <p class="mb-0 text-truncate">
+                                                    <strong>{{ group_last_messages[group.id]['message'].sender.username }}:</strong> 
+                                                    {{ group_last_messages[group.id]['message'].content }}
+                                                </p>
+                                                {% else %}
+                                                <p class="mb-0 text-muted">暂无消息</p>
+                                                {% endif %}
+                                            </div>
+                                            {% if group.id in group_last_messages %}
+                                            <small class="text-muted">{{ group_last_messages[group.id]['message'].created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="list-group-item text-center text-muted py-4">
+                                        <i class="fas fa-users me-2"></i>您还没有加入任何群组
+                                        {% if current_user.is_teacher or current_user.is_admin %}
+                                        <div class="mt-2">
+                                            <a href="{{ url_for('message.create_group') }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-plus-circle me-1"></i>创建群组
+                                            </a>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 {% endif %}
                             </div>

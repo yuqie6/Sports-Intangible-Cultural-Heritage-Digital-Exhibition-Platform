@@ -5,7 +5,6 @@ def beijing_time():
     return datetime.utcnow() + timedelta(hours=8)
 
 # 导入所有模型，确保它们在SQLAlchemy创建会话时被正确注册
-
 from . import user
 from . import heritage
 from . import content
@@ -21,4 +20,5 @@ from .content import Content
 from .interaction import Comment, Like, Favorite
 from .forum import ForumTopic, ForumPost  # 导出论坛模型类
 from .notification import Notification  # 导出通知模型类
-from .message import Message  # 导出私信模型类
+# 从message模块导入模型类，现在已经没有循环导入的问题
+from .message import Message, MessageGroup, UserGroup, MessageReadStatus
