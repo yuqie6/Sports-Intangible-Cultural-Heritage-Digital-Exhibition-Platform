@@ -49,6 +49,7 @@ def create_app(config_name='default'):
     from app.routes.forum import forum_bp
     from app.routes.user import user_bp
     from app.routes.notification import bp as notification_bp
+    from app.routes.message import bp as message_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -57,6 +58,7 @@ def create_app(config_name='default'):
     app.register_blueprint(forum_bp, url_prefix='/forum')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(notification_bp, url_prefix='/notification')
+    app.register_blueprint(message_bp, url_prefix='/message')
     
     # 注册全局错误处理
     from app.routes import errors
@@ -79,6 +81,14 @@ def create_app(config_name='default'):
                 'markdown.extensions.nl2br',        # 换行转为<br>
                 'markdown.extensions.extra'         # 额外功能集合
             ])
+        return ''
+    
+    # 添加nl2br过滤器，用于私信内容显示
+    @app.template_filter('nl2br')
+    def nl2br(value):
+        """将换行符转换为HTML的<br>标签"""
+        if value:
+            return value.replace('\n', '<br>')
         return ''
     
     return app

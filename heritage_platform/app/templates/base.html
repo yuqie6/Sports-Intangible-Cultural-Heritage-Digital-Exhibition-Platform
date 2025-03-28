@@ -79,6 +79,12 @@
                                         <span id="notification-badge" class="badge bg-danger rounded-pill position-absolute end-0 me-2" style="display: none;"></span>
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center position-relative" href="{{ url_for('message.message_list') }}">
+                                        <i class="fas fa-envelope me-2 text-info"></i>私信消息
+                                        <span id="message-badge" class="badge bg-danger rounded-pill position-absolute end-0 me-2" style="display: none;"></span>
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.profile') }}">
@@ -269,12 +275,28 @@
     
     {% if current_user.is_authenticated %}
     <script>
-        // 检查未读通知
+        // 检查未读通知和私信
         function checkUnreadNotifications() {
             fetch('/api/notifications/unread-count')
                 .then(response => response.json())
                 .then(data => {
                     const badge = document.getElementById('notification-badge');
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count;
+                            badge.style.display = 'inline';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+                
+            // 检查未读私信
+            fetch('/api/messages/unread-count')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('message-badge');
                     if (badge) {
                         if (data.count > 0) {
                             badge.textContent = data.count;

@@ -12,6 +12,7 @@ from . import content
 from . import interaction
 from . import forum  # 添加论坛模型导入
 from . import notification  # 添加通知模型导入
+from . import message  # 添加私信模型导入
 
 # 为方便使用，导出主要模型类
 from .user import User
@@ -20,3 +21,4 @@ from .content import Content
 from .interaction import Comment, Like, Favorite
 from .forum import ForumTopic, ForumPost  # 导出论坛模型类
 from .notification import Notification  # 导出通知模型类
+from .message import Message  # 导出私信模型类

@@ -140,6 +140,10 @@
                                         <a href="{{ url_for('notification.list_notifications') }}"><i class="fas fa-angle-right me-2"></i>通知中心</a>
                                         <p class="small text-muted mb-0">查看系统通知和互动提醒</p>
                                     </li>
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('message.message_list') }}"><i class="fas fa-angle-right me-2"></i>私信消息</a>
+                                        <p class="small text-muted mb-0">查看和发送私人消息</p>
+                                    </li>
                                     {% if current_user.is_admin %}
                                     <li class="list-group-item">
                                         <a href="{{ url_for('user.dashboard') }}"><i class="fas fa-angle-right me-2"></i>管理后台</a>

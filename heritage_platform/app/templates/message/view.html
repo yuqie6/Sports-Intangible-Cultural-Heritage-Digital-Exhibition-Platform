@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card shadow mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>查看私信
+                    </h5>
+                    <div>
+                        <a href="{{ url_for('message.message_list') }}" class="btn btn-sm btn-outline-secondary me-2">
+                            <i class="fas fa-arrow-left me-1"></i>返回列表
+                        </a>
+                        <form action="{{ url_for('message.delete', id=message.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定要删除这条私信吗？')">
+                                <i class="fas fa-trash me-1"></i>删除
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                {% if message.sender_id == current_user.id %}
+                                    <strong>发送给:</strong> {{ message.receiver.username }}
+                                {% else %}
+                                    <strong>来自:</strong> {{ message.sender.username }}
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">{{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <div class="border rounded p-3">
+                            {{ message.content|nl2br }}
+                        </div>
+                    </div>
+
+                    {% if message.sender_id != current_user.id or message.receiver_id != current_user.id %}
+                    <!-- 回复表单，展示给接收者查看 -->
+                    <div class="mt-4">
+                        <h6 class="mb-3 border-bottom pb-2">回复</h6>
+                        <form method="POST" action="{{ url_for('message.reply') }}">
+                            {{ form.hidden_tag() }}
+                            <div class="mb-3">
+                                {{ form.content(class="form-control" + (" is-invalid" if form.content.errors else ""), rows=4, placeholder="输入回复内容...") }}
+                                {% for error in form.content.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-end">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 防止刷新页面时重复提交表单
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+</script>
+{% endblock %}

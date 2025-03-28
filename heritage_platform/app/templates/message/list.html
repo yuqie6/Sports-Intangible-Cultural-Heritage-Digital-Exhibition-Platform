@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <div class="card shadow mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>我的私信
+                    </h5>
+                    <a href="{{ url_for('message.compose') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i>发送新私信
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="nav nav-tabs" id="messageTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true">
+                                <i class="fas fa-inbox me-1"></i>收件箱
+                                {% set unread_count = received_messages|selectattr('is_read', 'equalto', False)|list|length %}
+                                {% if unread_count > 0 %}
+                                <span class="badge bg-danger">{{ unread_count }}</span>
+                                {% endif %}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false">
+                                <i class="fas fa-paper-plane me-1"></i>发件箱
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="messageTabContent">
+                        <!-- 收件箱 -->
+                        <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
+                            <div class="list-group list-group-flush">
+                                {% if received_messages %}
+                                    {% for message in received_messages %}
+                                    <a href="{{ url_for('message.view', id=message.id) }}" class="list-group-item list-group-item-action {% if not message.is_read %}fw-bold list-group-item-primary{% endif %}">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">
+                                                {% if not message.is_read %}<i class="fas fa-circle text-primary" style="font-size: 0.6em;"></i>{% endif %}
+                                                来自: {{ message.sender.username }}
+                                            </h6>
+                                            <small class="text-muted">{{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        </div>
+                                        <p class="mb-1 text-truncate">{{ message.content }}</p>
+                                    </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="list-group-item text-center text-muted py-4">
+                                        <i class="fas fa-inbox me-2"></i>暂无收到的私信
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- 发件箱 -->
+                        <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                            <div class="list-group list-group-flush">
+                                {% if sent_messages %}
+                                    {% for message in sent_messages %}
+                                    <a href="{{ url_for('message.view', id=message.id) }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">
+                                                发给: {{ message.receiver.username }}
+                                            </h6>
+                                            <small class="text-muted">
+                                                {{ message.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                                {% if message.is_read %}
+                                                <span class="badge bg-success ms-1">已读</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary ms-1">未读</span>
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                        <p class="mb-1 text-truncate">{{ message.content }}</p>
+                                    </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="list-group-item text-center text-muted py-4">
+                                        <i class="fas fa-paper-plane me-2"></i>暂无发送的私信
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

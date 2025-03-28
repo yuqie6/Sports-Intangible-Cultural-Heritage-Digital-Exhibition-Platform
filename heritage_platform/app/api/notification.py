@@ -1,6 +1,6 @@
 from flask import jsonify, request, abort, current_app
 from flask_login import login_required, current_user
-from app.models import Notification
+from app.models import Notification, Message
 from app import db
 from . import api_bp
 import traceback
@@ -68,3 +68,14 @@ def mark_all_as_read():
         notification.is_read = True
     db.session.commit()
     return jsonify({'message': '所有通知已标记为已读'})
+
+@api_bp.route('/messages/unread-count')
+@login_required
+def get_unread_messages_count():
+    """获取未读私信数量"""
+    count = Message.query.filter_by(
+        receiver_id=current_user.id,
+        is_read=False,
+        receiver_deleted=False
+    ).count()
+    return jsonify({'count': count})
