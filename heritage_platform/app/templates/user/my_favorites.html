@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}我的收藏 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.profile') }}">个人中心</a></li>
+            <li class="breadcrumb-item active" aria-current="page">我的收藏</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">我的收藏</h1>
+        <a href="{{ url_for('content.list') }}" class="btn btn-primary">
+            <i class="fas fa-search me-1"></i> 浏览更多内容
+        </a>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-heart text-danger me-2"></i>收藏的内容</span>
+            <span>共 {{ pagination.total }} 条</span>
+        </div>
+        <div class="list-group list-group-flush">
+            {% if contents %}
+                {% for content in contents %}
+                <div class="list-group-item">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>
+                                <a href="{{ url_for('content.detail', id=content.id) }}" class="text-decoration-none">
+                                    {{ content.title }}
+                                </a>
+                            </h5>
+                            <div class="small text-muted">
+                                <i class="fas fa-user me-1"></i> {{ content.user_id.username }}
+                                <span class="mx-2">|</span>
+                                <i class="fas fa-calendar me-1"></i> {{ content.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                <span class="mx-2">|</span>
+                                <i class="fas fa-tag me-1"></i> {{ content.heritage.name }}
+                                <span class="mx-2">|</span>
+                                <span class="badge bg-secondary">{{ content.content_type }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <div class="mb-2">
+                                <i class="far fa-comment me-1"></i> {{ content.comments.count() }} 评论
+                                <span class="mx-2"></span>
+                                <i class="far fa-heart me-1"></i> {{ content.likes.count() }} 点赞
+                            </div>
+                            <div>
+                                <a href="{{ url_for('content.detail', id=content.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye me-1"></i> 查看
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger btn-unfavorite" data-id="{{ content.id }}">
+                                    <i class="fas fa-heart-broken me-1"></i> 取消收藏
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="list-group-item text-center py-5">
+                    <div class="mb-3">
+                        <i class="far fa-heart text-muted fa-3x"></i>
+                    </div>
+                    <p class="mb-3">您还没有收藏任何内容</p>
+                    <a href="{{ url_for('content.list') }}" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> 浏览内容
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 分页 -->
+    {% if pagination.pages > 1 %}
+    <nav class="mt-4" aria-label="收藏分页">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('user.my_favorites', page=pagination.prev_num) }}">上一页</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一页</a>
+            </li>
+            {% endif %}
+            
+            {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                {% if p %}
+                    {% if p == pagination.page %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="#">{{ p }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('user.my_favorites', page=p) }}">{{ p }}</a>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('user.my_favorites', page=pagination.next_num) }}">下一页</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">下一页</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- 添加取消收藏功能的JavaScript -->
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 首先移除所有已有的事件监听器
+        const unfavoriteButtons = document.querySelectorAll('.btn-unfavorite');
+        unfavoriteButtons.forEach(button => {
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+        });
+        
+        // 重新获取按钮元素并添加事件监听器
+        const newUnfavoriteButtons = document.querySelectorAll('.btn-unfavorite');
+        newUnfavoriteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault(); // 防止可能的默认行为
+                const contentId = this.getAttribute('data-id');
+                
+                // 确认是否取消收藏
+                if (confirm('确定要取消收藏这个内容吗？')) {
+                    // 创建表单并提交，这样可以确保CSRF令牌被正确包含
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/content/favorite/' + contentId;
+                    
+                    // 添加CSRF令牌
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrf_token';
+                    csrfInput.value = csrfToken;
+                    form.appendChild(csrfInput);
+                    
+                    // 添加一个标记，表示请求来自收藏页面
+                    const sourceInput = document.createElement('input');
+                    sourceInput.type = 'hidden';
+                    sourceInput.name = 'source';
+                    sourceInput.value = 'my_favorites';
+                    form.appendChild(sourceInput);
+                    
+                    // 添加表单到页面并提交
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }, { once: true }); // 使用 once: true 确保事件只触发一次
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

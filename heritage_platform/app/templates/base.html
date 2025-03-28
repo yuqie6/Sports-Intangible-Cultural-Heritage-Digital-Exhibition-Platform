@@ -246,7 +246,11 @@
                         <p class="mb-0">&copy; 2025 体育非遗数字展示平台 | 由 <a href="#">contan</a> 开发</p>
                     </div>
                     <div class="col-md-6 text-md-end">
-                        <p class="mb-0"><a href="#">隐私政策</a> | <a href="#">使用条款</a> | <a href="#">网站地图</a></p>
+                        <p class="mb-0">
+                            <a href="{{ url_for('main.privacy_policy') }}">隐私政策</a> | 
+                            <a href="{{ url_for('main.terms_of_service') }}">使用条款</a> | 
+                            <a href="{{ url_for('main.sitemap') }}">网站地图</a>
+                        </p>
                     </div>
                 </div>
             </div>

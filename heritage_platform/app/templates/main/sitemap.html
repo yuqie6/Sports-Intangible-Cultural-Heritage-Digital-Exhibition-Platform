@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}网站地图 - 体育非遗数字展示平台{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow mb-5">
+        <div class="card-header py-3 d-flex flex-row align-items-center">
+            <h4 class="m-0 font-weight-bold">
+                <i class="fas fa-sitemap me-2 text-primary"></i>网站地图
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="sitemap-content">
+                <p class="lead">以下是体育非遗数字展示平台的完整网站结构，帮助您快速找到所需的内容。</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-home me-2 text-primary"></i>主要页面</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('main.index') }}"><i class="fas fa-angle-right me-2"></i>首页</a>
+                                        <p class="small text-muted mb-0">平台主页，展示精选非遗项目和最新内容</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('main.about') }}"><i class="fas fa-angle-right me-2"></i>关于我们</a>
+                                        <p class="small text-muted mb-0">了解平台的使命、愿景和团队</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('main.privacy_policy') }}"><i class="fas fa-angle-right me-2"></i>隐私政策</a>
+                                        <p class="small text-muted mb-0">了解我们如何收集、使用和保护您的信息</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('main.terms_of_service') }}"><i class="fas fa-angle-right me-2"></i>使用条款</a>
+                                        <p class="small text-muted mb-0">使用本平台的规则与协议</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-landmark me-2 text-primary"></i>非遗项目</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('heritage.list') }}"><i class="fas fa-angle-right me-2"></i>非遗项目列表</a>
+                                        <p class="small text-muted mb-0">浏览所有体育非遗项目</p>
+                                    </li>
+                                    {% if current_user.is_teacher or current_user.is_admin %}
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('heritage.create') }}"><i class="fas fa-angle-right me-2"></i>创建非遗项目</a>
+                                        <p class="small text-muted mb-0">教师和管理员可创建新的非遗项目</p>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-book-open me-2 text-primary"></i>内容专区</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('content.list') }}"><i class="fas fa-angle-right me-2"></i>内容列表</a>
+                                        <p class="small text-muted mb-0">浏览所有文章、视频等内容</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('content.create') }}"><i class="fas fa-angle-right me-2"></i>发布内容</a>
+                                        <p class="small text-muted mb-0">创建和发布新的文章或多媒体内容</p>
+                                    </li>
+                                    {% if current_user.is_authenticated %}
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('user.my_contents') }}"><i class="fas fa-angle-right me-2"></i>我的内容</a>
+                                        <p class="small text-muted mb-0">管理您创建的所有内容</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('user.my_favorites') }}"><i class="fas fa-angle-right me-2"></i>我的收藏</a>
+                                        <p class="small text-muted mb-0">查看您收藏的所有内容</p>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-comments me-2 text-primary"></i>交流论坛</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('forum.index') }}"><i class="fas fa-angle-right me-2"></i>论坛首页</a>
+                                        <p class="small text-muted mb-0">浏览所有论坛讨论区</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('forum.create_topic') }}"><i class="fas fa-angle-right me-2"></i>创建主题</a>
+                                        <p class="small text-muted mb-0">发起新的讨论主题</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-user me-2 text-primary"></i>用户中心</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    {% if not current_user.is_authenticated %}
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('auth.login') }}"><i class="fas fa-angle-right me-2"></i>登录</a>
+                                        <p class="small text-muted mb-0">登录您的账户</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('auth.register') }}"><i class="fas fa-angle-right me-2"></i>注册</a>
+                                        <p class="small text-muted mb-0">创建新账户</p>
+                                    </li>
+                                    {% else %}
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('user.profile') }}"><i class="fas fa-angle-right me-2"></i>个人资料</a>
+                                        <p class="small text-muted mb-0">查看和编辑您的个人资料</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('notification.list_notifications') }}"><i class="fas fa-angle-right me-2"></i>通知中心</a>
+                                        <p class="small text-muted mb-0">查看系统通知和互动提醒</p>
+                                    </li>
+                                    {% if current_user.is_admin %}
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('user.dashboard') }}"><i class="fas fa-angle-right me-2"></i>管理后台</a>
+                                        <p class="small text-muted mb-0">管理员专用管理界面</p>
+                                    </li>
+                                    {% endif %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

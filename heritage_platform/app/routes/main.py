@@ -26,3 +26,18 @@ def index():
 def about():
     """关于页面"""
     return render_template('main/about.html')
+
+@main_bp.route('/privacy-policy')
+def privacy_policy():
+    """隐私政策页面"""
+    return render_template('main/privacy_policy.html')
+
+@main_bp.route('/terms-of-service')
+def terms_of_service():
+    """使用条款页面"""
+    return render_template('main/terms_of_service.html')
+
+@main_bp.route('/sitemap')
+def sitemap():
+    """网站地图页面"""
+    return render_template('main/sitemap.html')

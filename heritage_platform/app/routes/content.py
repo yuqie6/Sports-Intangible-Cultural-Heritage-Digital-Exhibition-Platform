@@ -553,9 +553,22 @@ def favorite(id):
         db.session.commit()
         flash(message, 'success')
         
+        # 检查请求来源，如果来自 Referer 头包含 my_favorites，则返回到收藏页面
+        referrer = request.referrer
+        if referrer and 'my_favorites' in referrer:
+            return redirect(url_for('user.my_favorites'))
+        
+        # 处理AJAX请求
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json:
+            return jsonify({'success': True, 'message': message})
+            
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"收藏操作失败: {str(e)}")
         flash('操作失败，请稍后重试', 'danger')
         
+        # 如果是AJAX请求，返回错误JSON
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json:
+            return jsonify({'success': False, 'message': '操作失败，请稍后重试'})
+            
     return redirect(url_for('content.detail', id=id))
