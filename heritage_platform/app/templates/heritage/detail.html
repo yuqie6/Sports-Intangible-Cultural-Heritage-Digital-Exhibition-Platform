@@ -13,18 +13,21 @@
         </ol>
     </nav>
     
-    <!-- 项目基本信息 -->
-    <div class="row mb-4">
-        <div class="col-md-4 mb-4 mb-md-0">
-            {% if item.cover_image %}
-            <img src="{{ url_for('static', filename=item.cover_image) }}" class="img-fluid rounded" alt="{{ item.name }}">
-            {% else %}
-            <img src="{{ url_for('static', filename='img/default-heritage.jpg') }}" class="img-fluid rounded" alt="{{ item.name }}">
-            {% endif %}
-        </div>
-        <div class="col-md-8">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <h1>{{ item.name }}</h1>
+<!-- 项目基本信息 -->
+    <div class="heritage-detail-header">
+        <div class="row">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="heritage-cover">
+                    {% if item.cover_image %}
+                    <img src="{{ url_for('static', filename=item.cover_image) }}" alt="{{ item.name }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/default-heritage.jpg') }}" alt="{{ item.name }}">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-8 heritage-info">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h1 class="gradient-text">{{ item.name }}</h1>
                 <div>
                     {% if current_user.is_authenticated and (current_user.id == item.created_by or current_user.is_admin) %}
                     <a href="{{ url_for('heritage.edit', id=item.id) }}" class="btn btn-outline-primary">
@@ -47,16 +50,18 @@
                 </span>
             </div>
             
-            <h5>项目描述</h5>
-            <p>{{ item.description }}</p>
+            <h5 class="mt-4">项目描述</h5>
+            <div class="heritage-description">
+                <p class="mb-0">{{ item.description }}</p>
+            </div>
             
-            <div class="mt-4">
-                <a href="{{ url_for('content.list', heritage_id=item.id) }}" class="btn btn-primary">
-                    <i class="fas fa-book-open me-1"></i> 浏览相关内容
+            <div class="mt-4 d-flex gap-3">
+                <a href="{{ url_for('content.list', heritage_id=item.id) }}" class="btn btn-primary btn-lg btn-hover-float">
+                    <i class="fas fa-book-open me-2"></i> 浏览相关内容
                 </a>
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('content.create') }}" class="btn btn-outline-primary">
-                    <i class="fas fa-plus-circle me-1"></i> 发布此项目内容
+                <a href="{{ url_for('content.create') }}" class="btn btn-outline-primary btn-lg btn-hover-float">
+                    <i class="fas fa-plus-circle me-2"></i> 发布此项目内容
                 </a>
                 {% endif %}
             </div>
@@ -67,8 +72,8 @@
     <div class="row">
         <!-- 文章 -->
         {% if articles %}
-        <div class="col-12 mb-4">
-            <div class="card">
+        <div class="col-12 mb-4 content-section">
+            <div class="card article-list">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">相关文章</h4>
                     <a href="{{ url_for('content.list', heritage_id=item.id, type='article') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
@@ -99,8 +104,8 @@
         
         <!-- 图片 -->
         {% if images %}
-        <div class="col-12 mb-4">
-            <div class="card">
+        <div class="col-12 mb-4 content-section">
+            <div class="card media-grid">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">相关图片</h4>
                     <a href="{{ url_for('content.list', heritage_id=item.id, type='image') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
@@ -129,9 +134,9 @@
         {% endif %}
         
         <!-- 视频 -->
-        {% if videos %}
-        <div class="col-12 mb-4">
-            <div class="card">
+            {% if videos %}
+        <div class="col-12 mb-4 content-section">
+            <div class="card media-grid">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">相关视频</h4>
                     <a href="{{ url_for('content.list', heritage_id=item.id, type='video') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
@@ -143,10 +148,10 @@
                             <div class="card h-100">
                                 <div class="position-relative">
                                     <a href="{{ url_for('content.detail', id=video.id) }}">
+                                    <div class="video-card">
                                         <img src="{{ url_for('static', filename='img/video-placeholder.jpg') }}" class="card-img-top" alt="{{ video.title }}">
-                                        <div class="position-absolute top-50 start-50 translate-middle">
-                                            <i class="fas fa-play-circle fa-3x text-white"></i>
-                                        </div>
+                                        <i class="fas fa-play-circle play-icon"></i>
+                                    </div>
                                     </a>
                                 </div>
                                 <div class="card-body">
@@ -166,8 +171,8 @@
         
         <!-- 富文本 -->
         {% if multimedia %}
-        <div class="col-12 mb-4">
-            <div class="card">
+        <div class="col-12 mb-4 content-section">
+            <div class="card article-list">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">相关富文本</h4>
                     <a href="{{ url_for('content.list', heritage_id=item.id, type='multimedia') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
