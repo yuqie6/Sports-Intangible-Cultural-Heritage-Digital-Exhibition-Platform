@@ -58,8 +58,8 @@ def edit_profile():
             if form.avatar.data:
                 avatar_path = save_file(form.avatar.data, 'image')
                 if avatar_path:
-                    # 直接存储文件路径，不使用url_for
-                    current_user.avatar = '/' + avatar_path
+                    # 修复：确保路径正确，使用url_for生成带/static/前缀的路径
+                    current_user.avatar = url_for('static', filename=avatar_path)
                     current_app.logger.info(f"设置用户头像路径为: {current_user.avatar}")
             
             db.session.commit()
@@ -261,7 +261,8 @@ def edit_user(id):
             if form.avatar.data:
                 avatar_path = save_file(form.avatar.data, 'image')
                 if avatar_path:
-                    user.avatar = '/' + avatar_path
+                    # 修复：使用url_for生成正确的静态资源URL
+                    user.avatar = url_for('static', filename=avatar_path)
             
             db.session.commit()
             flash('用户信息更新成功', 'success')
@@ -306,7 +307,8 @@ def create_user():
             if form.avatar.data:
                 avatar_path = save_file(form.avatar.data, 'image')
                 if avatar_path:
-                    user.avatar = '/' + avatar_path
+                    # 修复：使用url_for生成正确的静态资源URL
+                    user.avatar = url_for('static', filename=avatar_path)
             
             db.session.add(user)
             db.session.commit()

@@ -21,7 +21,7 @@
         <!-- 封面图片显示 -->
         {% if content.cover_image %}
         <div class="content-cover-image">
-            <img src="{{ url_for('static', filename=content.cover_image) }}" class="w-100" style="max-height: 300px; object-fit: cover;" alt="{{ content.title }}的封面图">
+            <img src="{{ url_for('static', filename=content.cover_image) }}" class="w-100" style="max-height: 500px; object-fit: contain;" alt="{{ content.title }}的封面图">
         </div>
         {% endif %}
         
