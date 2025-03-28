@@ -18,14 +18,25 @@
             <h1 class="h3 mb-0">{{ content.title }}</h1>
         </div>
         
-        <!-- 封面图片显示 -->
+        <!-- 封面图片整合到标题区域 -->
         {% if content.cover_image %}
-        <div class="content-cover-image">
-            <img src="{{ url_for('static', filename=content.cover_image) }}" class="w-100" style="max-height: 500px; object-fit: contain;" alt="{{ content.title }}的封面图">
+        <div class="card-header-image">
+            <img src="{{ url_for('static', filename=content.cover_image) }}" 
+                 class="w-100" 
+                 alt="{{ content.title }}的封面图">
+            <div class="overlay-title">
+                <h1 class="h3 mb-0">{{ content.title }}</h1>
+            </div>
+        </div>
+        {% else %}
+        <div class="card-header bg-light">
+            <h1 class="h3 mb-0">{{ content.title }}</h1>
         </div>
         {% endif %}
         
-        <div class="card-body">
+        <div class="card-body" style="position: relative;">
+            <!-- 装饰性分隔元素 -->
+            <div class="position-absolute top-0 start-50 translate-middle-x" style="width: 80px; height: 4px; background-color: #0d6efd; border-radius: 2px; margin-top: -2px;"></div>
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="d-flex align-items-center">
                     {% if content.author.avatar %}

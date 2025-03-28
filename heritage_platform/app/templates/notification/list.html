@@ -43,7 +43,7 @@
                         </small>
                     </div>
                     {% if notification.sender %}
-                    <small class="text-muted">来自: {{ notification.sender }}</small>
+                    <small class="text-muted">来自: {{ notification.sender.username }}</small>
                     {% endif %}
                 </div>
                 {% endfor %}

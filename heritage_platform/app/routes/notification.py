@@ -13,7 +13,7 @@ def list_notifications():
     """显示当前用户的所有通知"""
     notifications = Notification.query.filter_by(
         user_id=current_user.id
-    ).order_by(Notification.created_at.desc()).all()
+    ).options(db.joinedload(Notification.sender)).order_by(Notification.created_at.desc()).all()
     return render_template('notification/list.html', notifications=notifications)
 
 @bp.route('/announcement', methods=['GET', 'POST'])
