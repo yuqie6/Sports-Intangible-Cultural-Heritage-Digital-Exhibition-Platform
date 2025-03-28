@@ -51,7 +51,8 @@ class UserForm(FlaskForm):
     submit = SubmitField('保存')
     
     def __init__(self, obj=None, *args, **kwargs):
-        super(UserForm, self).__init__(*args, **kwargs)
+        # 修复：确保将obj参数传递给父类的__init__方法
+        super(UserForm, self).__init__(obj=obj, *args, **kwargs)
         self.original_user = obj
         
     def validate_username(self, field):
@@ -63,13 +64,13 @@ class UserForm(FlaskForm):
         user = User.query.filter_by(username=field.data).first()
         if user:
             raise ValidationError('该用户名已被使用')
-
+            
     def validate_email(self, field):
         """验证邮箱是否已存在 - 编辑时允许用户保持原邮箱"""
         if self.original_user and field.data == self.original_user.email:
             # 如果是编辑且邮箱没变，则跳过验证
             return
-            
+        
         user = User.query.filter_by(email=field.data).first()
         if user:
             raise ValidationError('该邮箱已被注册')

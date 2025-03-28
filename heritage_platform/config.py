@@ -8,7 +8,7 @@ class Config:
     
     # 数据库配置
     DB_USER = os.environ.get('DB_USER') or 'root'
-    DB_PASSWORD = os.environ.get('DB_PASSWORD')  # 必须通过环境变量设置
+    DB_PASSWORD = os.environ.get('DB_PASSWORD')  or 'qB6455221153'# 必须通过环境变量设置
     DB_HOST = os.environ.get('DB_HOST') or 'localhost'
     DB_NAME = os.environ.get('DB_NAME') or 'heritage_platform'
     
