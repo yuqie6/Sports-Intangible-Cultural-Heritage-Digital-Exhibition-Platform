@@ -8,14 +8,27 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
             <li class="breadcrumb-item"><a href="{{ url_for('content.list') }}">内容专区</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('content.list', heritage_id=content.heritage_id) }}">{{ content.heritage.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('content.list', heritage_id=content.heritage_id) }}">{{ content.heritage.name }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ content.title }}</li>
         </ol>
     </nav>
     
     <div class="card mb-4">
         <div class="card-header bg-light">
-            <h1 class="h3 mb-0">{{ content.title }}</h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">{{ content.title }}</h1>
+                <!-- 添加编辑和删除按钮 - 仅对作者和管理员可见 -->
+                {% if current_user.is_authenticated and (current_user.id == content.user_id or current_user.is_admin) %}
+                <div>
+                    <a href="{{ url_for('content.edit', id=content.id) }}" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="fas fa-edit me-1"></i>编辑
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteContentModal">
+                        <i class="fas fa-trash-alt me-1"></i>删除
+                    </button>
+                </div>
+                {% endif %}
+            </div>
         </div>
         
         <!-- 封面图片整合到标题区域 -->
@@ -314,6 +327,31 @@
     </div>
     {% endif %}
 </div>
+
+<!-- 删除确认模态框 -->
+{% if current_user.is_authenticated and (current_user.id == content.user_id or current_user.is_admin) %}
+<div class="modal fade" id="deleteContentModal" tabindex="-1" aria-labelledby="deleteContentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteContentModalLabel">确认删除</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除内容 "{{ content.title }}" 吗？</p>
+                <p class="text-danger"><small>此操作将永久删除该内容，包括所有评论、点赞和收藏。</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form action="{{ url_for('content.delete', id=content.id) }}" method="POST" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}

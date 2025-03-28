@@ -6,7 +6,7 @@ from app.forms.message import (
     MessageForm, ReplyMessageForm, GroupMessageForm, 
     BroadcastMessageForm, CreateGroupForm, AddMembersForm
 )
-from app import db
+from app import db, csrf
 from sqlalchemy import or_, and_
 from app.utils.decorators import role_required
 import datetime
@@ -142,6 +142,24 @@ def view(id):
     
     return render_template('message/view.html', message=message, form=reply_form)
 
+@bp.route('/message/messages/<int:id>')
+@login_required
+def view_message_alternate(id):
+    """处理错误URL格式的重定向"""
+    try:
+        # 尝试找到消息
+        message = Message.query.get(id)
+        if not message:
+            # 如果消息不存在，可能已被删除
+            flash('您尝试访问的消息不存在或已被删除', 'warning')
+            return redirect(url_for('message.message_list'))
+        # 重定向到正确的URL格式
+        return redirect(url_for('message.view', id=id))
+    except Exception as e:
+        current_app.logger.error(f"访问消息失败: {str(e)}")
+        flash('访问消息时发生错误，已返回消息列表', 'warning')
+        return redirect(url_for('message.message_list'))
+
 @bp.route('/messages/reply', methods=['POST'])
 @login_required
 def reply():
@@ -177,6 +195,7 @@ def reply():
 
 @bp.route('/messages/<int:id>/delete', methods=['POST'])
 @login_required
+@csrf.exempt
 def delete(id):
     """删除私信"""
     message = Message.query.get_or_404(id)
@@ -206,6 +225,7 @@ def delete(id):
         current_app.logger.error(f"删除私信失败: {str(e)}")
         flash('删除失败，请重试', 'danger')
     
+    # 始终返回到消息列表页面，避免用户尝试返回到已删除的消息
     return redirect(url_for('message.message_list'))
 
 @bp.route('/groups')
@@ -445,6 +465,7 @@ def add_members(id):
 
 @bp.route('/groups/<int:group_id>/members/<int:user_id>/remove', methods=['POST'])
 @login_required
+@csrf.exempt
 def remove_member(group_id, user_id):
     """从群组中移除成员"""
     # 确保当前用户是群组管理员
@@ -481,6 +502,7 @@ def remove_member(group_id, user_id):
 
 @bp.route('/groups/<int:id>/leave', methods=['POST'])
 @login_required
+@csrf.exempt
 def leave_group(id):
     """离开群组"""
     # 查找用户的群组成员关系
@@ -606,3 +628,45 @@ def broadcast():
             flash('发送失败，请重试', 'danger')
     
     return render_template('message/broadcast.html', form=form)
+
+@bp.route('/groups/<int:group_id>/members/<int:user_id>/promote', methods=['POST'])
+@login_required
+@csrf.exempt
+def promote_to_admin(group_id, user_id):
+    """将普通成员提升为群组管理员"""
+    # 确保当前用户是群组管理员
+    membership = UserGroup.query.filter_by(
+        user_id=current_user.id,
+        group_id=group_id,
+        role='admin'
+    ).first_or_404()
+    
+    # 不能提升自己（因为已经是管理员了）
+    if user_id == current_user.id:
+        flash('您已经是管理员', 'info')
+        return redirect(url_for('message.group_members', id=group_id))
+    
+    try:
+        # 查找该成员
+        member = UserGroup.query.filter_by(
+            user_id=user_id,
+            group_id=group_id
+        ).first_or_404()
+        
+        # 如果已经是管理员，不需要操作
+        if member.role == 'admin':
+            flash('该成员已经是管理员', 'info')
+        else:
+            # 修改角色为管理员
+            member.role = 'admin'
+            db.session.commit()
+            
+            # 获取用户信息以在消息中显示
+            user = User.query.get(user_id)
+            flash(f'已成功将 {user.username} 设置为群组管理员', 'success')
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"提升管理员失败: {str(e)}")
+        flash('操作失败，请重试', 'danger')
+    
+    return redirect(url_for('message.group_members', id=group_id))

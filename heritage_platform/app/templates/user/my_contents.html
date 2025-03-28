@@ -27,7 +27,7 @@
         <div class="list-group list-group-flush">
             {% if contents %}
                 {% for content in contents %}
-                <div class="list-group-item">
+                <div class="list-group-item" id="content-item-{{ content.id }}">
                     <div class="row">
                         <div class="col-md-8">
                             <h5>
@@ -38,7 +38,7 @@
                             <div class="small text-muted">
                                 <i class="fas fa-calendar me-1"></i> {{ content.created_at.strftime('%Y-%m-%d %H:%M') }}
                                 <span class="mx-2">|</span>
-    <i class="fas fa-tag me-1"></i> {{ content.heritage.name }}
+                                <i class="fas fa-tag me-1"></i> {{ content.heritage.name }}
                                 <span class="mx-2">|</span>
                                 <span class="badge bg-secondary">{{ content.content_type }}</span>
                             </div>
@@ -50,8 +50,8 @@
                                 <i class="far fa-heart me-1"></i> {{ content.likes.count() }} 点赞
                             </div>
                             <div>
-                                <a href="#" class="btn btn-sm btn-outline-primary">编辑</a>
-                                <a href="#" class="btn btn-sm btn-outline-danger btn-confirm">删除</a>
+                                <a href="{{ url_for('content.edit', id=content.id) }}" class="btn btn-sm btn-outline-primary">编辑</a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-content-id="{{ content.id }}" data-content-title="{{ content.title }}">删除</button>
                             </div>
                         </div>
                     </div>
@@ -113,4 +113,221 @@
     </nav>
     {% endif %}
 </div>
+
+<!-- 修改删除确认模态框的实现方式 -->
+<!-- 使用单一的模态框，通过JavaScript动态更新内容 -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">确认删除</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start">
+                <p id="deleteConfirmText">您确定要删除此内容吗？</p>
+                <p class="text-danger"><small>此操作将永久删除该内容，包括所有评论、点赞和收藏。</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 成功提示模态框 -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">操作成功</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="successMessage">内容删除成功</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 错误提示模态框 -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">错误</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="errorMessage">操作失败，请稍后重试</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 全局变量存储当前操作的内容ID
+    let currentContentId = null;
+    let deleteModal = null;
+    let successModal = null;
+    let errorModal = null;
+    let deleteInProgress = false;
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化模态框
+        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        
+        // 添加模态框隐藏事件监听器
+        document.getElementById('deleteModal').addEventListener('hidden.bs.modal', function() {
+            // 模态框完全隐藏后重置按钮状态
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '确认删除';
+            deleteInProgress = false;
+        });
+        
+        // 为确认删除按钮添加点击事件
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (currentContentId && !deleteInProgress) {
+                performDelete(currentContentId);
+            }
+        });
+    });
+    
+    // 打开删除确认模态框
+    function showDeleteModal(contentId, title) {
+        // 存储当前操作的内容ID
+        currentContentId = contentId;
+        
+        // 更新模态框内容
+        document.getElementById('deleteConfirmText').textContent = `您确定要删除内容 "${title}" 吗？`;
+        
+        // 显示模态框
+        deleteModal.show();
+    }
+    
+    // 执行删除操作
+    function performDelete(contentId) {
+        // 防止重复点击
+        if (deleteInProgress) return;
+        
+        deleteInProgress = true;
+        
+        // 更新按钮状态
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 处理中...';
+        
+        // 发送AJAX请求
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '{{ url_for("content.delete", id=0) }}'.replace('0', contentId));
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token() }}');
+        xhr.responseType = 'json';
+        
+        xhr.onload = function() {
+            if (xhr.status === 200 && xhr.response && xhr.response.success) {
+                // 关闭确认模态框
+                deleteModal.hide();
+                
+                // 等待模态框动画结束后执行后续操作
+                setTimeout(function() {
+                    // 隐藏内容元素
+                    const contentElement = document.getElementById('content-item-' + contentId);
+                    if (contentElement) {
+                        contentElement.style.display = 'none';
+                    }
+                    
+                    // 显示成功提示
+                    document.getElementById('successMessage').textContent = '内容删除成功';
+                    successModal.show();
+                    
+                    // 检查页面是否需要刷新
+                    const visibleItems = document.querySelectorAll('.list-group-item:not([style*="display: none"])').length;
+                    if (visibleItems <= 1) {
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1500);
+                    }
+                }, 300);
+            } else {
+                // 关闭确认模态框
+                deleteModal.hide();
+                
+                // 等待模态框动画结束后显示错误
+                setTimeout(function() {
+                    // 显示错误信息
+                    const errorMsg = xhr.response && xhr.response.message ? xhr.response.message : '删除失败，请稍后重试';
+                    document.getElementById('errorMessage').textContent = errorMsg;
+                    errorModal.show();
+                }, 300);
+            }
+            
+            // 重置状态
+            deleteInProgress = false;
+        };
+        
+        xhr.onerror = function() {
+            // 关闭确认模态框
+            deleteModal.hide();
+            
+            // 等待模态框动画结束后显示错误
+            setTimeout(function() {
+                document.getElementById('errorMessage').textContent = '网络错误，请检查您的连接';
+                errorModal.show();
+            }, 300);
+            
+            // 重置状态
+            deleteInProgress = false;
+        };
+        
+        // 发送请求
+        xhr.send(JSON.stringify({ csrf_token: '{{ csrf_token() }}' }));
+    }
+</script>
+
+<!-- 修改内容列表中的删除按钮，使用新的删除模式 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 为所有删除按钮添加点击事件
+        document.querySelectorAll('.btn-outline-danger').forEach(function(btn) {
+            // 移除原有的data-bs-target属性，防止自动触发模态框
+            btn.removeAttribute('data-bs-target');
+            
+            // 添加自定义的点击事件
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // 获取内容ID和标题
+                const contentId = this.getAttribute('data-content-id');
+                const contentTitle = this.getAttribute('data-content-title');
+                // 显示删除确认模态框
+                showDeleteModal(contentId, contentTitle);
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% block additional_content %}
+<style>
+/* 修复模态框闪烁问题的CSS */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+.modal {
+    z-index: 1050 !important;
+}
+</style>
 {% endblock %}

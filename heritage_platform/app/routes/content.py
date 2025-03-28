@@ -165,6 +165,86 @@ def detail(id):
                            has_favorited=has_favorited,
                            related_contents=related_contents)
 
+@content_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit(id):
+    """编辑内容页面"""
+    content = Content.query.get_or_404(id)
+    
+    # 检查权限：只有作者或管理员可以编辑
+    if current_user.id != content.user_id and not current_user.is_admin:
+        flash('无权编辑此内容', 'danger')
+        return redirect(url_for('content.detail', id=id))
+        
+    form = ContentForm(obj=content)
+    
+    # 动态加载非遗项目选项
+    form.heritage_id.choices = [(h.id, h.name) for h in HeritageItem.query.all()]
+    
+    if form.validate_on_submit():
+        try:
+            content.title = form.title.data
+            content.heritage_id = form.heritage_id.data
+            content.content_type = form.content_type.data
+            
+            # 处理封面图片（适用于所有内容类型）
+            if form.cover_image.data:
+                current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
+                cover_path = save_file(form.cover_image.data, 'image')
+                if cover_path:
+                    current_app.logger.info(f"封面图片上传成功，路径: {cover_path}")
+                    content.cover_image = cover_path
+                else:
+                    current_app.logger.error("封面图片上传失败")
+                    flash('封面图片上传失败', 'danger')
+            
+            # 根据内容类型处理不同字段
+            if form.content_type.data == 'article':
+                content.text_content = form.text_content.data
+                # 清除其他类型的内容字段
+                content.rich_content = ''
+                content.file_path = ''
+            elif form.content_type.data == 'multimedia':
+                content.rich_content = form.rich_content.data
+                # 清除其他类型的内容字段
+                content.text_content = ''
+                content.file_path = ''
+            elif form.content_type.data in ['image', 'video'] and form.file.data:
+                current_app.logger.info(f"处理文件上传: {form.file.data.filename}, 类型: {form.content_type.data}")
+                file_path = save_file(form.file.data, form.content_type.data)
+                if file_path:
+                    current_app.logger.info(f"文件上传成功，路径: {file_path}")
+                    content.file_path = file_path
+                    # 清除其他类型的内容字段
+                    content.text_content = ''
+                    content.rich_content = ''
+                else:
+                    current_app.logger.error("文件上传失败")
+                    flash('文件上传失败', 'danger')
+                    return render_template('content/edit.html', form=form, content=content)
+            
+            db.session.commit()
+            current_app.logger.info(f"内容更新成功：ID={content.id}, 标题={content.title}")
+            
+            flash('内容更新成功', 'success')
+            return redirect(url_for('content.detail', id=content.id))
+            
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"更新内容失败: {str(e)}")
+            current_app.logger.error(traceback.format_exc())
+            flash('更新内容失败，请稍后重试', 'danger')
+    
+    # 预填表单数据
+    if not form.is_submitted():
+        # 根据内容类型预设表单值
+        if content.content_type == 'article':
+            form.text_content.data = content.text_content
+        elif content.content_type == 'multimedia':
+            form.rich_content.data = content.rich_content
+    
+    return render_template('content/edit.html', form=form, content=content)
+
 @content_bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
@@ -437,8 +517,11 @@ def delete(id):
     
     # 检查权限：只有作者或管理员可以删除
     if current_user.id != content.user_id and not current_user.is_admin:
-        flash('无权删除此内容', 'danger')
-        return redirect(url_for('content.list'))
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': '无权删除此内容'}), 403
+        else:
+            flash('无权删除此内容', 'danger')
+            return redirect(url_for('content.list'))
     
     try:
         # 删除关联文件
@@ -477,13 +560,28 @@ def delete(id):
         db.session.delete(content)
         db.session.commit()
         
+        # 处理AJAX请求
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': '内容删除成功'})
+            
         flash('内容删除成功', 'success')
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"删除内容失败: {str(e)}")
         current_app.logger.error(traceback.format_exc())
+        
+        # 处理AJAX请求
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': '删除内容失败，请稍后重试'}), 500
+            
         flash('删除内容失败，请稍后重试', 'danger')
     
+    # 检查请求来源，如果来自my_contents页面，则返回到该页面
+    referrer = request.referrer
+    if referrer and 'my_contents' in referrer:
+        return redirect(url_for('user.my_contents'))
+    
+    # 否则返回内容列表页
     return redirect(url_for('content.list'))
 
 @content_bp.route('/reply_comment/<int:content_id>/<int:comment_id>', methods=['POST'])

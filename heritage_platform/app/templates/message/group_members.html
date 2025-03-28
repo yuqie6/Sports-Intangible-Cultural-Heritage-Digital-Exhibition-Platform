@@ -85,15 +85,25 @@
                                         <td>{{ membership.joined_at.strftime('%Y-%m-%d') }}</td>
                                         <td>
                                             {% if user.id != current_user.id and user.id != group.creator_id %}
-                                            <form action="{{ url_for('message.remove_member', group_id=group.id, user_id=user.id) }}" method="POST" class="d-inline">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定要将 {{ user.username }} 移出群组吗？');">
+                                                <!-- 移除成员按钮 -->
+                                                <form action="{{ url_for('message.remove_member', group_id=group.id, user_id=user.id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定要将 {{ user.username }} 移出群组吗？');">
+                                                        <i class="fas fa-user-minus"></i>
+                                                    </button>
+                                                </form>
+                                                
+                                                <!-- 提升为管理员按钮 -->
+                                                {% if membership.role != 'admin' %}
+                                                <form action="{{ url_for('message.promote_to_admin', group_id=group.id, user_id=user.id) }}" method="POST" class="d-inline ms-1">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="提升为管理员" onclick="return confirm('确定要将 {{ user.username }} 提升为管理员吗？');">
+                                                        <i class="fas fa-user-shield"></i>
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+                                            {% else %}
+                                                <button class="btn btn-sm btn-outline-secondary" disabled title="{% if user.id == current_user.id %}不能移除自己{% else %}不能移除群主{% endif %}">
                                                     <i class="fas fa-user-minus"></i>
                                                 </button>
-                                            </form>
-                                            {% else %}
-                                            <button class="btn btn-sm btn-outline-secondary" disabled title="{% if user.id == current_user.id %}不能移除自己{% else %}不能移除群主{% endif %}">
-                                                <i class="fas fa-user-minus"></i>
-                                            </button>
                                             {% endif %}
                                         </td>
                                     </tr>

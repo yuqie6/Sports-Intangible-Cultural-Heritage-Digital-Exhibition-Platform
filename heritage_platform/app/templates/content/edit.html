@@ -1,0 +1,600 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑内容 - 体育非遗数字展示平台{% endblock %}
+
+{% block styles %}
+<!-- 添加CKEditor样式 -->
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/ckeditor/ckeditor.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('content.list') }}">内容专区</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('content.detail', id=content.id) }}">{{ content.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">编辑内容</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <!-- 小提示卡片 -->
+            <div class="card border-0 shadow-sm mb-4 bg-light">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>内容编辑指南
+                    </h5>
+                    <div class="mb-3">
+                        <p class="card-text">当前内容类型为：<strong>{{ content.content_type }}</strong></p>
+                        <ul class="mb-0">
+                            <li><strong>图文文章</strong> - 适合发布带有图片的长文内容</li>
+                            <li><strong>图片</strong> - 适合分享高清图片作品</li>
+                            <li><strong>视频</strong> - 适合上传和分享精彩视频</li>
+                            <li><strong>多媒体</strong> - 支持富媒体混合排版，更自由的内容创作</li>
+                        </ul>
+                        <p class="mt-2 text-danger"><small>注意：如果您更改内容类型，可能需要重新上传相关文件。</small></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-edit me-2"></i>
+                        <span>编辑内容</span>
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('content.edit', id=content.id) }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.title(class="form-control", placeholder="标题", id="title") }}
+                                {{ form.title.label(for="title", class="required") }}
+                            </div>
+                            {% if form.title.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.title.errors %}
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.heritage_id(class="form-select", id="heritage_id") }}
+                                {{ form.heritage_id.label(for="heritage_id", class="required") }}
+                            </div>
+                            {% if form.heritage_id.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.heritage_id.errors %}
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 封面图片上传区域 -->
+                        <div class="mb-4">
+                            <div class="mb-2 d-flex align-items-center">
+                                <i class="fas fa-image text-primary me-2"></i>
+                                {{ form.cover_image.label(class="form-label fw-bold mb-0") }}
+                            </div>
+                            {% if content.cover_image %}
+                                <div class="my-2">
+                                    <p class="mb-2"><strong>当前封面:</strong></p>
+                                    <img src="{{ content.cover_image }}" class="img-thumbnail" style="max-height: 200px;" alt="当前封面">
+                                </div>
+                            {% endif %}
+                            <div class="input-group mt-2">
+                                {{ form.cover_image(class="form-control d-none", id="cover-image-input", onchange="previewCoverImage(this)") }}
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('cover-image-input').click()">
+                                    <i class="fas fa-folder-open me-1"></i>选择新封面
+                                </button>
+                                <button type="button" class="btn btn-primary" id="upload-cover-btn" disabled>
+                                    <i class="fas fa-upload me-1"></i>上传封面
+                                </button>
+                                <span class="input-group-text" id="cover-image-name">未选择文件</span>
+                            </div>
+                            {% if form.cover_image.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.cover_image.errors %}
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted mt-1">
+                                <i class="fas fa-info-circle me-1"></i>支持JPG、JPEG、PNG和GIF格式，建议尺寸1200x630像素
+                            </small>
+                            <div id="cover-preview" class="mt-3 p-3 border rounded d-none">
+                                <h6 class="mb-3"><i class="fas fa-eye me-1"></i>封面预览</h6>
+                                <img id="cover-image-preview" class="img-fluid rounded" style="max-height: 300px;" alt="封面预览">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.content_type(class="form-select", id="content_type", onchange="toggleContentFields()") }}
+                                {{ form.content_type.label(for="content_type", class="required") }}
+                            </div>
+                            {% if form.content_type.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.content_type.errors %}
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div id="text-content-field" class="mb-4 content-field">
+                            <div class="mb-2 d-flex align-items-center">
+                                <i class="fas fa-paragraph text-primary me-2"></i>
+                                {{ form.text_content.label(class="form-label fw-bold mb-0") }}
+                            </div>
+                            {{ form.text_content(class="form-control", rows=12, style="resize: vertical;") }}
+                            {% if form.text_content.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.text_content.errors %}
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted mt-1">
+                                <i class="fas fa-info-circle me-1"></i>支持Markdown格式，可添加段落、标题、列表等
+                            </small>
+                        </div>
+                        
+                        <div id="file-field" class="mb-4 content-field d-none">
+                            <div class="mb-2 d-flex align-items-center">
+                                <i class="fas fa-file-upload text-primary me-2"></i>
+                                {{ form.file.label(class="form-label fw-bold mb-0") }}
+                            </div>
+                            {% if content.file_path %}
+                                <div class="my-2">
+                                    <p class="mb-2"><strong>当前文件:</strong></p>
+                                    {% if content.content_type == 'image' %}
+                                        <img src="{{ content.file_path }}" class="img-thumbnail" style="max-height: 200px;" alt="当前文件">
+                                    {% elif content.content_type == 'video' %}
+                                        <video src="{{ content.file_path }}" class="img-thumbnail" style="max-height: 200px;" controls></video>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="input-group mt-2">
+                                {{ form.file(class="form-control", onchange="previewFile(this)") }}
+                            </div>
+                            {% if form.file.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.file.errors %}
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted mt-1">
+                                <span id="image-help" class="d-none">
+                                    <i class="fas fa-info-circle me-1"></i>支持JPG、JPEG、PNG和GIF格式，最大文件大小20MB
+                                </span>
+                                <span id="video-help" class="d-none">
+                                    <i class="fas fa-info-circle me-1"></i>支持MP4、WEBM和MOV格式，最大文件大小100MB
+                                </span>
+                            </small>
+                            <div id="file-preview" class="mt-3 p-3 border rounded d-none">
+                                <h6 class="mb-3"><i class="fas fa-eye me-1"></i>预览</h6>
+                                <img id="image-preview" class="img-fluid rounded mb-2 d-none" alt="预览图">
+                                <video id="video-preview" class="img-fluid rounded mb-2 d-none" controls></video>
+                            </div>
+                        </div>
+                        
+                        <div id="multimedia-content-field" class="mb-4 content-field d-none">
+                            <div class="mb-2 d-flex align-items-center">
+                                <i class="fas fa-pen-fancy text-primary me-2"></i>
+                                {{ form.rich_content.label(class="form-label fw-bold mb-0") }}
+                            </div>
+                            {{ form.rich_content(class="form-control", id="rich-editor") }}
+                            {% if form.rich_content.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.rich_content.errors %}
+                                        <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <!-- 媒体文件上传区域 -->
+                            <div class="mt-4 card border-light">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-images me-1"></i>媒体文件管理</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="media-upload">
+                                        <button class="btn btn-outline-primary" type="button" id="insert-media">
+                                            <i class="fas fa-plus-circle me-1"></i>插入到文章
+                                        </button>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">
+                                        <i class="fas fa-info-circle me-1"></i>支持图片和视频，上传后点击"插入到文章"将媒体内容添加到编辑器中
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('content.detail', id=content.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>取消
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>保存更改
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- 引入CKEditor -->
+<script src="{{ url_for('static', filename='vendor/ckeditor/ckeditor.js') }}"></script>
+<script>
+    function toggleContentFields() {
+        const contentType = document.getElementById('content_type').value;
+        const contentFields = document.querySelectorAll('.content-field');
+        const textContentField = document.getElementById('text-content-field');
+        const fileField = document.getElementById('file-field');
+        const multimediaField = document.getElementById('multimedia-content-field');
+        const imageHelp = document.getElementById('image-help');
+        const videoHelp = document.getElementById('video-help');
+        
+        // 隐藏所有字段
+        contentFields.forEach(field => field.classList.add('d-none'));
+        
+        // 根据内容类型显示相应字段
+        if (contentType === 'article') {
+            textContentField.classList.remove('d-none');
+        } else if (contentType === 'multimedia') {
+            multimediaField.classList.remove('d-none');
+        } else {
+            fileField.classList.remove('d-none');
+            
+            // 显示相应的帮助文本
+            if (contentType === 'image') {
+                imageHelp.classList.remove('d-none');
+                videoHelp.classList.add('d-none');
+            } else if (contentType === 'video') {
+                videoHelp.classList.remove('d-none');
+                imageHelp.classList.add('d-none');
+            }
+        }
+        
+        console.log("内容类型更改为: " + contentType);
+    }
+    
+    // 初始化富文本编辑器
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleContentFields();
+        
+        // 如果页面上有富文本编辑器，则初始化它
+        if (document.getElementById('rich-editor')) {
+            // 创建一个调试日志工具
+            const logger = {
+                info: function(msg) {
+                    console.log('[INFO] ' + msg);
+                },
+                error: function(msg) {
+                    console.error('[ERROR] ' + msg);
+                }
+            };
+            
+            logger.info('初始化CKEditor...');
+            
+            try {
+                // 初始化编辑器
+                CKEDITOR.replace('rich-editor', {
+                    height: 400,
+                    filebrowserUploadUrl: '{{ url_for("content.upload_image") }}',
+                    filebrowserImageUploadUrl: '{{ url_for("content.upload_image") }}',
+                    uploadUrl: '{{ url_for("content.upload_image") }}',
+                    imageUploadUrl: '{{ url_for("content.upload_image") }}',
+                    allowedContent: true, // 允许所有内容
+                    // 指定自定义配置文件
+                    customConfig: '{{ url_for("static", filename="vendor/ckeditor/config.js") }}'
+                });
+                
+                logger.info('CKEditor初始化成功');
+                
+                // 监听图片上传事件以显示更友好的反馈
+                CKEDITOR.on('dialogDefinition', function(ev) {
+                    logger.info('对话框定义事件: ' + ev.data.name);
+                    var dialogName = ev.data.name;
+                    var dialogDefinition = ev.data.definition;
+                    
+                    if (dialogName === 'image') {
+                        // 获取上传标签页
+                        var uploadTab = dialogDefinition.getContents('Upload');
+                        
+                        if (uploadTab) {
+                            // 添加更详细的上传说明
+                            uploadTab.elements[0].children[0].label = '选择要上传的图片文件 (支持JPG, JPEG, PNG, GIF)';
+                        }
+                    }
+                });
+                
+                // 添加图片粘贴处理
+                CKEDITOR.instances['rich-editor'].on('paste', function(e) {
+                    logger.info('检测到粘贴事件');
+                    var data = e.data;
+                    
+                    // 检查是否有图片数据
+                    if (data && data.dataTransfer && data.dataTransfer.getFilesCount() > 0) {
+                        var file = data.dataTransfer.getFile(0);
+                        logger.info('粘贴包含文件: ' + file.name + ', 类型: ' + file.type);
+                        
+                        // 检查是否是图片
+                        if (file.type.indexOf('image') === 0) {
+                            logger.info('开始处理粘贴的图片...');
+                            
+                            // 准备FormData
+                            var formData = new FormData();
+                            formData.append('upload', file);
+                            
+                            // 使用原生AJAX上传
+                            var xhr = new XMLHttpRequest();
+                            xhr.open('POST', '{{ url_for("content.upload_image") }}', true);
+                            xhr.onload = function() {
+                                logger.info('XHR状态: ' + xhr.status);
+                                logger.info('XHR响应: ' + xhr.responseText);
+                                
+                                if (xhr.status === 200) {
+                                    try {
+                                        var response = JSON.parse(xhr.responseText);
+                                        if (response.uploaded && response.url) {
+                                            // 插入图片
+                                            var imgHtml = '<p><img src="' + response.url + '" alt="' + response.fileName + '" style="max-width: 100%; height: auto;"></p>';
+                                            CKEDITOR.instances['rich-editor'].insertHtml(imgHtml);
+                                            logger.info('粘贴上传图片成功: ' + response.url);
+                                        } else {
+                                            logger.error('上传成功但返回错误: ' + (response.error ? response.error.message : '未知错误'));
+                                        }
+                                    } catch (error) {
+                                        logger.error('解析响应失败:' + error + ', 响应文本: ' + xhr.responseText);
+                                    }
+                                } else {
+                                    logger.error('上传请求失败, HTTP状态: ' + xhr.status);
+                                }
+                            };
+                            xhr.onerror = function(error) {
+                                logger.error('XHR请求错误: ' + error);
+                            };
+                            xhr.send(formData);
+                        }
+                    }
+                });
+            } catch (error) {
+                logger.error('初始化CKEditor时出错: ' + error);
+            }
+        }
+        
+        // 处理媒体文件插入
+        const insertMediaBtn = document.getElementById('insert-media');
+        if (insertMediaBtn) {
+            insertMediaBtn.addEventListener('click', function() {
+                console.log('点击了媒体文件插入按钮');
+                const fileInput = document.getElementById('media-upload');
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    console.log('选择了文件:', file.name, file.type, file.size + ' 字节');
+                    
+                    // 创建FormData对象上传文件
+                    const formData = new FormData();
+                    formData.append('upload', file);
+                    
+                    // 显示上传进度提示
+                    insertMediaBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>上传中...';
+                    insertMediaBtn.disabled = true;
+                    
+                    console.log('开始上传文件...');
+                    
+                    // 发送AJAX请求上传文件
+                    fetch('{{ url_for("content.upload_image") }}', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        console.log('上传响应状态:', response.status);
+                        if (!response.ok) {
+                            throw new Error('HTTP错误状态: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('上传响应数据:', data);
+                        
+                        if (data.uploaded && data.url) {
+                            // 获取编辑器实例
+                            const editor = CKEDITOR.instances['rich-editor'];
+                            
+                            // 判断文件类型
+                            const isImage = /\.(jpe?g|png|gif)$/i.test(file.name);
+                            const isVideo = /\.(mp4|webm|mov)$/i.test(file.name);
+                            
+                            if (isImage) {
+                                // 插入图片
+                                const imgHtml = `<p><img src="${data.url}" alt="${data.fileName}" style="max-width: 100%; height: auto;"></p>`;
+                                editor.insertHtml(imgHtml);
+                                console.log('成功插入图片:', data.url);
+                            } else if (isVideo) {
+                                // 插入视频
+                                const videoHtml = `<p><video controls width="100%" src="${data.url}"></video></p>`;
+                                editor.insertHtml(videoHtml);
+                                console.log('成功插入视频:', data.url);
+                            }
+                            
+                            // 重置文件输入
+                            fileInput.value = '';
+                            
+                            // 显示成功消息
+                            alert('媒体文件已成功插入到编辑器中');
+                        } else {
+                            console.error('上传失败:', data.error || '未知错误');
+                            alert('上传失败: ' + (data.error ? data.error.message : '未知错误'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('上传错误:', error);
+                        alert('上传失败，请稍后重试');
+                    })
+                    .finally(() => {
+                        // 恢复按钮状态
+                        insertMediaBtn.innerHTML = '<i class="fas fa-plus-circle me-1"></i>插入到文章';
+                        insertMediaBtn.disabled = false;
+                    });
+                } else {
+                    alert('请先选择要上传的文件');
+                }
+            });
+        }
+    });
+    
+    function previewCoverImage(input) {
+        const preview = document.getElementById('cover-preview');
+        const imagePreview = document.getElementById('cover-image-preview');
+        const fileNameSpan = document.getElementById('cover-image-name');
+        const uploadBtn = document.getElementById('upload-cover-btn');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.classList.remove('d-none');
+                imagePreview.src = e.target.result;
+                fileNameSpan.textContent = input.files[0].name;
+                uploadBtn.disabled = false;
+            };
+            
+            reader.onerror = function(e) {
+                console.error("封面图片读取错误: ", e);
+                fileNameSpan.textContent = "读取失败";
+                uploadBtn.disabled = true;
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.classList.add('d-none');
+            fileNameSpan.textContent = "未选择文件";
+            uploadBtn.disabled = true;
+        }
+    }
+
+    // 添加封面图片上传功能
+    document.getElementById('upload-cover-btn').addEventListener('click', function() {
+        const fileInput = document.getElementById('cover-image-input');
+        if (!fileInput.files || !fileInput.files[0]) {
+            alert('请先选择封面图片');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append('cover_image', file);
+
+        const uploadBtn = this;
+        const originalText = uploadBtn.innerHTML;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>上传中...';
+        uploadBtn.disabled = true;
+
+        fetch('{{ url_for("content.upload_cover") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('封面图片上传成功');
+                document.getElementById('cover-image-name').textContent = file.name + ' (已上传)';
+                // 更新预览图片为服务器返回的URL
+                document.getElementById('cover-image-preview').src = data.url;
+            } else {
+                throw new Error(data.error || '上传失败');
+            }
+        })
+        .catch(error => {
+            console.error('上传错误:', error);
+            alert('上传失败: ' + error.message);
+            document.getElementById('cover-image-name').textContent = '上传失败';
+        })
+        .finally(() => {
+            uploadBtn.innerHTML = originalText;
+            uploadBtn.disabled = false;
+        });
+    });
+
+    function previewFile(input) {
+        const contentType = document.getElementById('content_type').value;
+        const preview = document.getElementById('file-preview');
+        const imagePreview = document.getElementById('image-preview');
+        const videoPreview = document.getElementById('video-preview');
+        
+        console.log("预览文件, 类型: " + contentType);
+        
+        if (input.files && input.files[0]) {
+            console.log("文件名: " + input.files[0].name);
+            console.log("文件大小: " + input.files[0].size + " 字节");
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.classList.remove('d-none');
+                
+                if (contentType === 'image') {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('d-none');
+                    videoPreview.classList.add('d-none');
+                    console.log("图片预览已设置");
+                } else if (contentType === 'video') {
+                    videoPreview.src = e.target.result;
+                    videoPreview.classList.remove('d-none');
+                    imagePreview.classList.add('d-none');
+                    console.log("视频预览已设置");
+                }
+            };
+            
+            reader.onerror = function(e) {
+                console.error("文件读取错误: ", e);
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.classList.add('d-none');
+        }
+    }
+    
+    // 表单验证
+    (function() {
+        'use strict'
+        
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %}
