@@ -13,33 +13,17 @@
         </div>
     </div>
 
-    <!-- 系统概览卡片 -->
-<div class="row mb-4">
-        <!-- 趋势图表卡片 -->
-        <div class="col-md-8">
+    <!-- 系统活动概览 -->
+    <div class="row mb-4">
+        <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>活动趋势</h5>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>系统活动趋势</h5>
+                    <div class="text-muted small">过去30天的系统活动数据</div>
                 </div>
                 <div class="card-body">
-                    <canvas id="activityTrend" height="200"></canvas>
-                </div>
-            </div>
-        </div>
-        <!-- 快捷管理卡片 -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>快捷管理</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-3">
-                        <a href="{{ url_for('user.manage_users') }}" class="btn btn-lg btn-outline-primary">
-                            <i class="fas fa-users me-2"></i>进入管理控制台
-                        </a>
-                        <a href="{{ url_for('notification.create_announcement') }}" class="btn btn-lg btn-outline-warning">
-                            <i class="fas fa-bullhorn me-2"></i>发布公告
-                        </a>
+                    <div class="system-activity-chart">
+                        <canvas id="systemActivityTrend"></canvas>
                     </div>
                 </div>
             </div>
@@ -128,7 +112,7 @@
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <a href="{{ url_for('user.manage_users') if 'manage_users' in user_bp.__dict__ else '#' }}" class="btn btn-sm btn-primary" id="view-all-users">查看所有用户</a>
+                    <a href="{{ url_for('user.manage_users') }}" class="btn btn-sm btn-primary">查看所有用户</a>
                 </div>
             </div>
         </div>
@@ -175,296 +159,86 @@
         </div>
     </div>
 
-    <!-- 管理功能快捷按钮 -->
-    <div class="row my-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-cogs me-1"></i>
-                    管理功能
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-3 col-sm-6">
-                            <button id="manage-users-btn" class="btn btn-lg btn-outline-primary w-100">
-                                <i class="fas fa-users me-2"></i>用户管理
-                            </button>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <a href="{{ url_for('heritage.list') }}" class="btn btn-lg btn-outline-success w-100">
-                                <i class="fas fa-landmark me-2"></i>非遗项目管理
-                            </a>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <a href="{{ url_for('content.list') }}" class="btn btn-lg btn-outline-warning w-100">
-                                <i class="fas fa-book-open me-2"></i>内容管理
-                            </a>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <a href="{{ url_for('forum.index') }}" class="btn btn-lg btn-outline-info w-100">
-                                <i class="fas fa-comments me-2"></i>论坛管理
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 管理模块 -->
-    <div id="admin-modules" class="row my-4">
-        <!-- 用户管理模块 -->
-        <div id="user-management-module" class="col-12 mb-4 d-none">
-            <div class="card">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>用户管理</h5>
-                    <button class="btn btn-sm btn-light module-close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="card-body">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#all-users">所有用户</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#admins">管理员</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#teachers">教师</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#students">学生</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content mt-3">
-                        <div class="tab-pane fade show active" id="all-users">
-                            <div class="d-flex justify-content-between mb-3">
-                                <div class="input-group" style="max-width: 300px;">
-                                    <input type="text" class="form-control" placeholder="搜索用户..." id="quick-search">
-                                    <button class="btn btn-outline-secondary" type="button" id="quick-search-btn">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                <a href="{{ url_for('user.create_user') }}" class="btn btn-success">
-                                    <i class="fas fa-plus-circle me-1"></i>新增用户
-                                </a>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>用户名</th>
-                                            <th>邮箱</th>
-                                            <th>角色</th>
-                                            <th>注册时间</th>
-                                            <th>操作</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for user in recent_users %}
-                                        <tr>
-                                            <td>{{ user.id }}</td>
-                                            <td>
-                                                {% if user.avatar %}
-                                                    <img src="{{ user.avatar }}" alt="{{ user.username }}" class="avatar-xs me-2 rounded-circle">
-                                                {% else %}
-                                                    <i class="fas fa-user-circle me-2"></i>
-                                                {% endif %}
-                                                {{ user.username }}
-                                            </td>
-                                            <td>{{ user.email }}</td>
-                                            <td>
-                                                {% if user.is_admin %}
-                                                    <span class="badge bg-danger">管理员</span>
-                                                {% elif user.is_teacher %}
-                                                    <span class="badge bg-info">教师</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">普通用户</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm">
-                                                    <a href="{{ url_for('user.edit_user', id=user.id) }}" class="btn btn-outline-primary">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    {% if user.id != current_user.id %}
-                                                    <button type="button" class="btn btn-outline-danger delete-user-btn"
-                                                            data-bs-toggle="modal" data-bs-target="#deleteUserModal"
-                                                            data-id="{{ user.id }}" data-name="{{ user.username }}">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                    {% else %}
-                                                    <button type="button" class="btn btn-outline-danger" disabled title="不能删除当前登录用户">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                    {% endif %}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="mt-3">
-                                <p class="text-muted">显示 {{ recent_users|length }} 个用户中的 {{ recent_users|length }} 个</p>
-                                <p class="text-center">
-                                    <a href="{{ url_for('user.manage_users') }}" class="btn btn-primary">
-                                        查看全部用户
-                                    </a>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="admins">
-                            <p class="text-center text-muted my-4">
-                                <i class="fas fa-cog fa-spin me-2"></i>正在加载管理员列表...
-                            </p>
-                        </div>
-                        <div class="tab-pane fade" id="teachers">
-                            <p class="text-center text-muted my-4">
-                                <i class="fas fa-cog fa-spin me-2"></i>正在加载教师列表...
-                            </p>
-                        </div>
-                        <div class="tab-pane fade" id="students">
-                            <p class="text-center text-muted my-4">
-                                <i class="fas fa-cog fa-spin me-2"></i>正在加载学生列表...
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 删除用户确认模态框 -->
-<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteUserModalLabel">确认删除用户</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>您确定要删除用户 <strong id="deleteUserName"></strong> 吗？此操作不可撤销！</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <form id="deleteUserForm" method="POST" action="">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-danger">确认删除</button>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 {% endblock %}
 
-{% block styles %}
-<style>
-    .avatar-xs {
-        width: 24px;
-        height: 24px;
-        object-fit: cover;
-    }
-    
-    .card {
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
-        border: none;
-    }
-    
-    .card-header {
-        font-weight: 500;
-    }
-    
-    .module-close-btn {
-        width: 30px;
-        height: 30px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-    }
-</style>
-{% endblock %}
+{% block styles %}{% endblock %}
 
 {% block scripts %}
 <!-- 引入Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // 加载系统活动趋势图
+    function loadSystemActivityTrend() {
+        const ctx = document.getElementById('systemActivityTrend').getContext('2d');
+        fetch('/user/api/system-activity-stats')
+            .then(response => response.json())
+            .then(data => {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.dates,
+                        datasets: [
+                            {
+                                label: '新增用户',
+                                data: data.user_counts,
+                                borderColor: 'rgb(75, 192, 192)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: '新增内容',
+                                data: data.content_counts,
+                                borderColor: 'rgb(255, 159, 64)',
+                                backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: '新增话题',
+                                data: data.topic_counts,
+                                borderColor: 'rgb(54, 162, 235)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    borderDash: [2, 4]
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading system activity stats:', error));
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        // 用户管理按钮点击事件
-        document.getElementById('manage-users-btn').addEventListener('click', function() {
-            // 显示用户管理模块
-            var userManagementModule = document.getElementById('user-management-module');
-            userManagementModule.classList.remove('d-none');
-            
-            // 平滑滚动到用户管理模块
-            userManagementModule.scrollIntoView({ behavior: 'smooth' });
-        });
-        
-        // 查看所有用户按钮点击事件
-        document.getElementById('view-all-users').addEventListener('click', function(e) {
-            // 如果没有对应的路由，则显示用户管理模块
-            if (this.getAttribute('href') === '#') {
-                e.preventDefault();
-                var userManagementModule = document.getElementById('user-management-module');
-                userManagementModule.classList.remove('d-none');
-                userManagementModule.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-        
-        // 关闭模块按钮点击事件
-        document.querySelectorAll('.module-close-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var module = this.closest('.col-12');
-                module.classList.add('d-none');
-            });
-        });
-        
-        // 快速搜索功能
-        document.getElementById('quick-search-btn').addEventListener('click', function() {
-            const searchValue = document.getElementById('quick-search').value;
-            if (searchValue.trim()) {
-                window.location.href = '{{ url_for("user.manage_users") }}?search=' + encodeURIComponent(searchValue);
-            }
-        });
-        
-        // 回车键触发搜索
-        document.getElementById('quick-search').addEventListener('keyup', function(event) {
-            if (event.key === 'Enter') {
-                document.getElementById('quick-search-btn').click();
-            }
-        });
-        
-        // 设置删除用户模态框的信息
-        const deleteUserButtons = document.querySelectorAll('.delete-user-btn');
-        deleteUserButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const userId = this.getAttribute('data-id');
-                const userName = this.getAttribute('data-name');
-                document.getElementById('deleteUserName').textContent = userName;
-                document.getElementById('deleteUserForm').setAttribute('action', 
-                    '{{ url_for("user.delete_user", id=0) }}'.replace('0', userId));
-            });
-        });
-        
-        // 加载更多用户按钮点击事件
-        document.getElementById('load-more-users').addEventListener('click', function() {
-            // 模拟加载中
-            this.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>加载中...';
-            this.disabled = true;
-            
-            // 模拟加载完成
-            setTimeout(() => {
-                this.innerHTML = '加载更多用户';
-                this.disabled = false;
-                alert('此功能需要后端实现，目前仅作演示');
-            }, 1500);
-        });
+        // 加载系统活动趋势图
+        loadSystemActivityTrend();
     });
 </script>
 {% endblock %}

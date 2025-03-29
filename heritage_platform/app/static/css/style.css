@@ -765,6 +765,51 @@ footer .footer-bottom {
     transform: translateY(-50%) scale(1.05);
 }
 
+/* 管理控制台样式 */
+.avatar-xs {
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+}
+
+.module-close-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* 系统活动趋势图 */
+.system-activity-chart {
+    height: 300px;
+    position: relative;
+}
+
+/* 用户管理模块样式 */
+.admin-module {
+    display: none;
+}
+
+.admin-module.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* 搜索工具栏 */
+.search-toolbar {
+    max-width: 300px;
+}
+
+/* 表格响应式设计 */
+.table-container {
+    overflow-x: auto;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+}
+
 /* 控制按钮样式 */
 .cover-controls {
     position: absolute;

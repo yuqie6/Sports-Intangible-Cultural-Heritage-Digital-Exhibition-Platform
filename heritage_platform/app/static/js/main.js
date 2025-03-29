@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const activityTrendCanvas = document.getElementById('activityTrend');
     if (activityTrendCanvas) {
         // 从后端API获取用户活动数据
-        fetch('/api/user/activity-stats')
+        fetch('/user/api/user-activity-stats')
             .then(response => response.json())
             .then(data => {
                 const dates = data.dates;

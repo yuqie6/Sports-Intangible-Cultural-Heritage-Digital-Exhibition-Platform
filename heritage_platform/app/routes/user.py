@@ -376,6 +376,154 @@ def api_delete_user():
         current_app.logger.error(f"API删除用户失败: {str(e)}")
         return jsonify({'success': False, 'message': f'删除失败: {str(e)}'})
 
+@user_bp.route('/api/user-activity-stats')
+@login_required
+def get_user_activity_stats():
+    """获取用户活动统计数据"""
+    from datetime import datetime, timedelta
+    from sqlalchemy import func
+    
+    # 获取过去30天的数据
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+    
+    # 按日期统计内容发布
+    content_stats = db.session.query(
+        func.date(Content.created_at).label('date'),
+        func.count(Content.id).label('count')
+    ).filter(
+        Content.user_id == current_user.id,
+        Content.created_at >= start_date,
+        Content.created_at <= end_date
+    ).group_by(func.date(Content.created_at)).all()
+    
+    # 按日期统计论坛主题
+    topic_stats = db.session.query(
+        func.date(ForumTopic.created_at).label('date'),
+        func.count(ForumTopic.id).label('count')
+    ).filter(
+        ForumTopic.user_id == current_user.id,
+        ForumTopic.created_at >= start_date,
+        ForumTopic.created_at <= end_date
+    ).group_by(func.date(ForumTopic.created_at)).all()
+    
+    # 按日期统计论坛回复
+    post_stats = db.session.query(
+        func.date(ForumPost.created_at).label('date'),
+        func.count(ForumPost.id).label('count')
+    ).filter(
+        ForumPost.user_id == current_user.id,
+        ForumPost.created_at >= start_date,
+        ForumPost.created_at <= end_date
+    ).group_by(func.date(ForumPost.created_at)).all()
+    
+    # 生成日期列表和对应的统计数据
+    dates = [(start_date + timedelta(days=x)).strftime('%Y-%m-%d') for x in range(31)]
+    
+    # 初始化数据数组
+    content_counts = [0] * 31
+    topic_counts = [0] * 31
+    post_counts = [0] * 31
+    
+    # 填充实际数据
+    for stat in content_stats:
+        date_str = stat.date.strftime('%Y-%m-%d')
+        if date_str in dates:
+            idx = dates.index(date_str)
+            content_counts[idx] = stat.count
+            
+    for stat in topic_stats:
+        date_str = stat.date.strftime('%Y-%m-%d')
+        if date_str in dates:
+            idx = dates.index(date_str)
+            topic_counts[idx] = stat.count
+            
+    for stat in post_stats:
+        date_str = stat.date.strftime('%Y-%m-%d')
+        if date_str in dates:
+            idx = dates.index(date_str)
+            post_counts[idx] = stat.count
+    
+    return jsonify({
+        'dates': dates,
+        'content_counts': content_counts,
+        'topic_counts': topic_counts,
+        'post_counts': post_counts
+    })
+
+@user_bp.route('/api/system-activity-stats')
+@login_required
+@admin_required
+def get_system_activity_stats():
+    """获取系统级别的活动统计数据"""
+    from datetime import datetime, timedelta
+    from sqlalchemy import func
+    
+    # 获取过去30天的数据
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+    
+    # 按日期统计全系统的内容发布
+    content_stats = db.session.query(
+        func.date(Content.created_at).label('date'),
+        func.count(Content.id).label('count')
+    ).filter(
+        Content.created_at >= start_date,
+        Content.created_at <= end_date
+    ).group_by(func.date(Content.created_at)).all()
+    
+    # 按日期统计全系统的论坛主题
+    topic_stats = db.session.query(
+        func.date(ForumTopic.created_at).label('date'),
+        func.count(ForumTopic.id).label('count')
+    ).filter(
+        ForumTopic.created_at >= start_date,
+        ForumTopic.created_at <= end_date
+    ).group_by(func.date(ForumTopic.created_at)).all()
+    
+    # 按日期统计全系统的用户注册
+    user_stats = db.session.query(
+        func.date(User.created_at).label('date'),
+        func.count(User.id).label('count')
+    ).filter(
+        User.created_at >= start_date,
+        User.created_at <= end_date
+    ).group_by(func.date(User.created_at)).all()
+    
+    # 生成日期列表和对应的统计数据
+    dates = [(start_date + timedelta(days=x)).strftime('%Y-%m-%d') for x in range(31)]
+    
+    # 初始化数据数组
+    content_counts = [0] * 31
+    topic_counts = [0] * 31
+    user_counts = [0] * 31
+    
+    # 填充实际数据
+    for stat in content_stats:
+        date_str = stat.date.strftime('%Y-%m-%d')
+        if date_str in dates:
+            idx = dates.index(date_str)
+            content_counts[idx] = stat.count
+            
+    for stat in topic_stats:
+        date_str = stat.date.strftime('%Y-%m-%d')
+        if date_str in dates:
+            idx = dates.index(date_str)
+            topic_counts[idx] = stat.count
+            
+    for stat in user_stats:
+        date_str = stat.date.strftime('%Y-%m-%d')
+        if date_str in dates:
+            idx = dates.index(date_str)
+            user_counts[idx] = stat.count
+    
+    return jsonify({
+        'dates': dates,
+        'content_counts': content_counts,
+        'topic_counts': topic_counts,
+        'user_counts': user_counts
+    })
+
 @user_bp.route('/api/change_role', methods=['POST'])
 @login_required
 @admin_required

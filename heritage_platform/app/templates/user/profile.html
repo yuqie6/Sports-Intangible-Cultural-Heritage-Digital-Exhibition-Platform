@@ -7,9 +7,10 @@
     <h1 class="mb-4">个人中心</h1>
     
     <div class="row">
-        <!-- 用户信息卡片 -->
-        <div class="col-md-4 mb-4">
-            <div class="card">
+        <!-- 左侧栏 -->
+        <div class="col-md-4">
+            <!-- 用户信息卡片 -->
+            <div class="card mb-4">
                 <div class="card-body text-center">
                     {% if current_user.avatar %}
                     <img src="{{ current_user.avatar }}" class="avatar-lg mb-3" alt="{{ current_user.username }}">
@@ -33,151 +34,79 @@
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- 用户活动统计 -->
-        <div class="col-md-8 mb-4">
-            <div class="card mb-4 fade-in">
+
+            <!-- 快捷功能卡片 -->
+            <div class="card fade-in">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0">活动统计</h5>
+                    <h5 class="mb-0"><i class="fas fa-rocket me-2"></i>快捷功能</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('user.my_contents') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-file-alt me-2 text-primary"></i>我的内容
+                        </div>
+                        <span class="badge bg-primary rounded-pill">{{ content_count }}</span>
+                    </a>
+                    <a href="{{ url_for('content.create') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-plus-circle me-2 text-success"></i>发布新内容
+                    </a>
+                    <a href="{{ url_for('forum.index') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-comments me-2 text-info"></i>浏览论坛
+                    </a>
+                    <a href="{{ url_for('forum.create_topic') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-plus-circle me-2 text-success"></i>发布新主题
+                    </a>
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('user.dashboard') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2 text-danger"></i>管理控制台
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧栏 -->
+        <div class="col-md-8">
+            <!-- 活动趋势图 -->
+            <div class="card mb-4 fade-in">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2 text-primary"></i>活动统计</h5>
+                    <div class="text-muted small">过去30天的活动记录</div>
                 </div>
                 <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-6 col-md-3 mb-3">
-                            <div class="feature-icon-card">
-                                <i class="fas fa-file-alt text-primary"></i>
-                                <h3 class="mb-2">{{ content_count }}</h3>
-                                <small class="text-muted">发布内容</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 mb-3">
-                            <div class="feature-icon-card">
-                                <i class="fas fa-comments text-primary"></i>
-                                <h3 class="mb-2">{{ topic_count }}</h3>
-                                <small class="text-muted">发布主题</small>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3 mb-3">
-                            <div class="feature-icon-card">
-                                <i class="fas fa-reply text-primary"></i>
-                                <h3 class="mb-2">{{ post_count }}</h3>
-                                <small class="text-muted">论坛回复</small>
-                            </div>
-                        </div>
-                        {% if current_user.is_teacher or current_user.is_admin %}
-                        <div class="col-6 col-md-3 mb-3">
-                            <div class="feature-icon-card">
-                                <i class="fas fa-landmark text-primary"></i>
-                                <h3 class="mb-2">{{ heritage_count }}</h3>
-                                <small class="text-muted">创建项目</small>
-                            </div>
-                        </div>
-                        {% endif %}
+                    <div class="chart-container" style="position: relative; height:360px;">
+                        <canvas id="activityTrend"></canvas>
                     </div>
                 </div>
             </div>
-            
+
             <!-- 收藏内容预览 -->
             <div class="card slide-in-right">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">我的收藏</h5>
-                    <a href="{{ url_for('user.my_favorites') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
+                    <h5 class="mb-0"><i class="fas fa-heart me-2 text-danger"></i>我的收藏</h5>
+                    <a href="{{ url_for('user.my_favorites') }}" class="btn btn-sm btn-outline-primary">
+                        查看全部
+                    </a>
                 </div>
                 <div class="list-group list-group-flush">
                     {% if favorite_contents %}
                         {% for content in favorite_contents %}
                         <a href="{{ url_for('content.detail', id=content.id) }}" class="list-group-item list-group-item-action">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">{{ content.title }}</h6>
-                                    <small class="text-muted">
-                                        {{ content.author.username }} · {{ content.created_at.strftime('%Y-%m-%d') }}
-                                    </small>
-                                </div>
-                                <span class="badge bg-secondary">{{ content.content_type }}</span>
-                            </div>
+                            <h6 class="mb-1 text-truncate">{{ content.title }}</h6>
+                            <small class="text-muted d-flex justify-content-between align-items-center">
+                                <span>{{ content.author.username }}</span>
+                                <span>{{ content.created_at.strftime('%Y-%m-%d') }}</span>
+                            </small>
                         </a>
                         {% endfor %}
                     {% else %}
                         <div class="list-group-item text-center py-3">
-                            <p class="mb-0">您还没有收藏任何内容</p>
+                            <p class="mb-0 text-muted">您还没有收藏任何内容</p>
                         </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- 快捷功能区 -->
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card fade-in">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">内容管理</h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        <a href="{{ url_for('user.my_contents') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="fas fa-file-alt me-2"></i> 我的内容
-                            </div>
-                            <span class="badge bg-primary rounded-pill">{{ content_count }}</span>
-                        </a>
-                        <a href="{{ url_for('content.create') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-plus-circle me-2"></i> 发布新内容
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-6 mb-4">
-            <div class="card fade-in">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">论坛互动</h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        <a href="{{ url_for('forum.index') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-comments me-2"></i> 浏览论坛
-                        </a>
-                        <a href="{{ url_for('forum.create_topic') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-plus-circle me-2"></i> 发布新主题
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 管理员功能区 -->
-    {% if current_user.is_admin %}
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="feature-icon-card">
-                <i class="fas fa-tachometer-alt"></i>
-                <h5 class="card-title">管理控制台</h5>
-                <p class="card-text">管理和监控系统运行状态</p>
-                <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-primary">进入控制台</a>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="feature-icon-card">
-                <i class="fas fa-users-cog"></i>
-                <h5 class="card-title">用户管理</h5>
-                <p class="card-text">管理用户账号和权限</p>
-                <a href="#" class="btn btn-outline-primary">管理用户</a>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="feature-icon-card">
-                <i class="fas fa-cog"></i>
-                <h5 class="card-title">系统设置</h5>
-                <p class="card-text">配置系统参数和选项</p>
-                <a href="#" class="btn btn-outline-primary">系统设置</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
