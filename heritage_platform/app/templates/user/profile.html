@@ -12,9 +12,9 @@
             <div class="card">
                 <div class="card-body text-center">
                     {% if current_user.avatar %}
-                    <img src="{{ current_user.avatar }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;" alt="{{ current_user.username }}">
+                    <img src="{{ current_user.avatar }}" class="avatar-lg mb-3" alt="{{ current_user.username }}">
                     {% else %}
-                    <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center bg-primary text-white mb-3" style="width: 150px; height: 150px; font-size: 60px;">
+                    <div class="avatar-lg avatar-text mb-3 mx-auto" style="font-size: 60px;">
                         {{ current_user.username[0] }}
                     </div>
                     {% endif %}
@@ -37,34 +37,38 @@
         
         <!-- 用户活动统计 -->
         <div class="col-md-8 mb-4">
-            <div class="card mb-4">
+            <div class="card mb-4 fade-in">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">活动统计</h5>
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
                         <div class="col-6 col-md-3 mb-3">
-                            <div class="border rounded p-3">
-                                <h3>{{ content_count }}</h3>
+                            <div class="feature-icon-card">
+                                <i class="fas fa-file-alt text-primary"></i>
+                                <h3 class="mb-2">{{ content_count }}</h3>
                                 <small class="text-muted">发布内容</small>
                             </div>
                         </div>
                         <div class="col-6 col-md-3 mb-3">
-                            <div class="border rounded p-3">
-                                <h3>{{ topic_count }}</h3>
+                            <div class="feature-icon-card">
+                                <i class="fas fa-comments text-primary"></i>
+                                <h3 class="mb-2">{{ topic_count }}</h3>
                                 <small class="text-muted">发布主题</small>
                             </div>
                         </div>
                         <div class="col-6 col-md-3 mb-3">
-                            <div class="border rounded p-3">
-                                <h3>{{ post_count }}</h3>
+                            <div class="feature-icon-card">
+                                <i class="fas fa-reply text-primary"></i>
+                                <h3 class="mb-2">{{ post_count }}</h3>
                                 <small class="text-muted">论坛回复</small>
                             </div>
                         </div>
                         {% if current_user.is_teacher or current_user.is_admin %}
                         <div class="col-6 col-md-3 mb-3">
-                            <div class="border rounded p-3">
-                                <h3>{{ heritage_count }}</h3>
+                            <div class="feature-icon-card">
+                                <i class="fas fa-landmark text-primary"></i>
+                                <h3 class="mb-2">{{ heritage_count }}</h3>
                                 <small class="text-muted">创建项目</small>
                             </div>
                         </div>
@@ -74,7 +78,7 @@
             </div>
             
             <!-- 收藏内容预览 -->
-            <div class="card">
+            <div class="card slide-in-right">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">我的收藏</h5>
                     <a href="{{ url_for('user.my_favorites') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
@@ -107,7 +111,7 @@
     <!-- 快捷功能区 -->
     <div class="row">
         <div class="col-md-6 mb-4">
-            <div class="card">
+            <div class="card fade-in">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">内容管理</h5>
                 </div>
@@ -128,7 +132,7 @@
         </div>
         
         <div class="col-md-6 mb-4">
-            <div class="card">
+            <div class="card fade-in">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">论坛互动</h5>
                 </div>
@@ -149,30 +153,28 @@
     <!-- 管理员功能区 -->
     {% if current_user.is_admin %}
     <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">管理员功能</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-primary d-block">
-                                <i class="fas fa-tachometer-alt me-2"></i> 管理控制台
-                            </a>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <a href="#" class="btn btn-outline-primary d-block">
-                                <i class="fas fa-users-cog me-2"></i> 用户管理
-                            </a>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <a href="#" class="btn btn-outline-primary d-block">
-                                <i class="fas fa-cog me-2"></i> 系统设置
-                            </a>
-                        </div>
-                    </div>
-                </div>
+        <div class="col-md-4 mb-4">
+            <div class="feature-icon-card">
+                <i class="fas fa-tachometer-alt"></i>
+                <h5 class="card-title">管理控制台</h5>
+                <p class="card-text">管理和监控系统运行状态</p>
+                <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-primary">进入控制台</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="feature-icon-card">
+                <i class="fas fa-users-cog"></i>
+                <h5 class="card-title">用户管理</h5>
+                <p class="card-text">管理用户账号和权限</p>
+                <a href="#" class="btn btn-outline-primary">管理用户</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="feature-icon-card">
+                <i class="fas fa-cog"></i>
+                <h5 class="card-title">系统设置</h5>
+                <p class="card-text">配置系统参数和选项</p>
+                <a href="#" class="btn btn-outline-primary">系统设置</a>
             </div>
         </div>
     </div>

@@ -981,6 +981,57 @@ footer .footer-bottom {
     }
 }
 
+/* 趋势图表样式 */
+.chart-container {
+    position: relative;
+    margin: auto;
+}
+
+/* 统计卡片样式 */
+.stats-card {
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.stats-card i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.stats-card h3 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.stats-card p {
+    margin-bottom: 0;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* 快捷管理按钮样式 */
+.btn-lg {
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
 /* 区块标题样式 */
 .section-title {
     position: relative;

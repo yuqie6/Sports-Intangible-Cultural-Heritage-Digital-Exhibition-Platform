@@ -15,15 +15,15 @@
     
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>创建新用户</h4>
+            <div class="card fade-in">
+                <div class="card-header" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                    <h4 class="mb-0 text-white"><i class="fas fa-user-plus me-2"></i>创建新用户</h4>
                 </div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
                         {{ form.hidden_tag() }}
                         
-                        <div class="mb-3">
+                        <div class="mb-3 slide-in-left">
                             {{ form.username.label(class="form-label") }}
                             {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else "")) }}
                             {% for error in form.username.errors %}
@@ -33,7 +33,7 @@
                             {% endfor %}
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-3 slide-in-left" style="animation-delay: 0.1s;">
                             {{ form.email.label(class="form-label") }}
                             {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), type="email") }}
                             {% for error in form.email.errors %}
@@ -43,7 +43,7 @@
                             {% endfor %}
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-3 slide-in-left" style="animation-delay: 0.2s;">
                             {{ form.password.label(class="form-label") }}
                             {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), type="password") }}
                             <div class="form-text">创建用户时必须设置初始密码，长度至少8位</div>
@@ -54,7 +54,7 @@
                             {% endfor %}
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-3 slide-in-left" style="animation-delay: 0.3s;">
                             {{ form.role.label(class="form-label") }}
                             {{ form.role(class="form-select" + (" is-invalid" if form.role.errors else "")) }}
                             {% for error in form.role.errors %}
@@ -64,7 +64,7 @@
                             {% endfor %}
                         </div>
                         
-                        <div class="mb-4">
+                        <div class="mb-4 slide-in-left" style="animation-delay: 0.4s;">
                             {{ form.avatar.label(class="form-label") }}
                             {{ form.avatar(class="form-control" + (" is-invalid" if form.avatar.errors else ""), accept="image/*") }}
                             <div class="form-text">可选。支持JPG、PNG、GIF格式，建议尺寸为200x200像素。</div>
@@ -75,9 +75,9 @@
                             {% endfor %}
                         </div>
                         
-                        <div class="d-grid gap-2">
-                            {{ form.submit(class="btn btn-success") }}
-                            <a href="{{ url_for('user.manage_users') }}" class="btn btn-outline-secondary">取消</a>
+                        <div class="d-grid gap-2 slide-in-left" style="animation-delay: 0.5s;">
+                            {{ form.submit(class="btn btn-success btn-hover-float") }}
+                            <a href="{{ url_for('user.manage_users') }}" class="btn btn-outline-secondary btn-hover-float">取消</a>
                         </div>
                     </form>
                 </div>

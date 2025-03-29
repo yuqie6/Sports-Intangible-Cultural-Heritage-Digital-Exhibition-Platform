@@ -14,95 +14,65 @@
     </div>
 
     <!-- 系统概览卡片 -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="card-title mb-0">{{ user_count }}</h3>
-                            <p class="card-text">用户总数</p>
-                        </div>
-                        <i class="fas fa-users fa-3x opacity-50"></i>
-                    </div>
+<div class="row mb-4">
+        <!-- 趋势图表卡片 -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>活动趋势</h5>
                 </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="{{ url_for('user.manage_users') if 'manage_users' in user_bp.__dict__ else '#' }}">查看详情</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                <div class="card-body">
+                    <canvas id="activityTrend" height="200"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="card-title mb-0">{{ heritage_count }}</h3>
-                            <p class="card-text">非遗项目</p>
-                        </div>
-                        <i class="fas fa-landmark fa-3x opacity-50"></i>
-                    </div>
+        <!-- 快捷管理卡片 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>快捷管理</h5>
                 </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="{{ url_for('heritage.list') }}">查看详情</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('user.manage_users') }}" class="btn btn-lg btn-outline-primary">
+                            <i class="fas fa-users me-2"></i>进入管理控制台
+                        </a>
+                        <a href="{{ url_for('notification.create_announcement') }}" class="btn btn-lg btn-outline-warning">
+                            <i class="fas fa-bullhorn me-2"></i>发布公告
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="card-title mb-0">{{ content_count }}</h3>
-                            <p class="card-text">内容数量</p>
-                        </div>
-                        <i class="fas fa-book-open fa-3x opacity-50"></i>
+        <!-- 统计数字 -->
+        <div class="col-12 mt-4">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stats-card bg-primary text-white">
+                        <i class="fas fa-users"></i>
+                        <h3>{{ user_count }}</h3>
+                        <p>用户总数</p>
                     </div>
                 </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="{{ url_for('content.list') }}">查看详情</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="card-title mb-0">{{ topic_count }}</h3>
-                            <p class="card-text">论坛话题</p>
-                        </div>
-                        <i class="fas fa-comments fa-3x opacity-50"></i>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stats-card bg-success text-white">
+                        <i class="fas fa-landmark"></i>
+                        <h3>{{ heritage_count }}</h3>
+                        <p>非遗项目</p>
                     </div>
                 </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="{{ url_for('forum.index') }}">查看详情</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stats-card bg-warning text-white">
+                        <i class="fas fa-book-open"></i>
+                        <h3>{{ content_count }}</h3>
+                        <p>内容数量</p>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <!-- 公告管理卡片 -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                公告管理</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <a href="{{ url_for('notification.create_announcement') }}" class="btn btn-sm btn-warning mb-2 w-100">
-                                    <i class="fas fa-bullhorn me-1"></i> 发布公告
-                                </a>
-                                <a href="{{ url_for('notification.list_announcements') }}" class="btn btn-sm btn-outline-secondary w-100">
-                                    <i class="fas fa-list me-1"></i> 已发布公告
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
-                        </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stats-card bg-info text-white">
+                        <i class="fas fa-comments"></i>
+                        <h3>{{ topic_count }}</h3>
+                        <p>论坛话题</p>
                     </div>
                 </div>
             </div>
@@ -422,6 +392,8 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- 引入Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // 用户管理按钮点击事件

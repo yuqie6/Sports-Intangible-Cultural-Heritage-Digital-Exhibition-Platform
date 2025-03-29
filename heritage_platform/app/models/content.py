@@ -23,6 +23,7 @@ class Content(db.Model):
     comments = db.relationship('Comment', backref='content', lazy='dynamic')
     likes = db.relationship('Like', backref='content', lazy='dynamic')
     favorites = db.relationship('Favorite', backref='content', lazy='dynamic')
+    views = db.Column(db.Integer, default=0)  # 添加浏览量字段
     
     def __repr__(self):
         return f'<Content {self.title}>'
@@ -52,7 +53,8 @@ class Content(db.Model):
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
             'comment_count': self.comments.count(),
             'like_count': self.likes.count(),
-            'favorite_count': self.favorites.count()
+            'favorite_count': self.favorites.count(),
+            'views': self.views  # 添加浏览量到字典
         }
         
         if include_comments:

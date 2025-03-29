@@ -73,6 +73,14 @@ def detail(id):
     """内容详情页"""
     content = Content.query.options(db.joinedload(Content.heritage)).get_or_404(id)
     
+    # 更新浏览量
+    content.views += 1
+    try:
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(f"更新浏览量失败: {str(e)}")
+        db.session.rollback()
+    
     # 评论表单
     form = CommentForm()
     

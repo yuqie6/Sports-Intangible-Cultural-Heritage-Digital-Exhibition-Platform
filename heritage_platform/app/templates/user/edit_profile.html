@@ -15,27 +15,28 @@
     <div class="row">
         <div class="col-lg-4 mb-4">
             <!-- 侧边用户信息卡片 -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center p-4">
+            <div class="card border-0 shadow-sm fade-in">
+                <div class="card-body text-center p-4 slide-in-left">
                     <div class="position-relative mx-auto mb-4" style="width: 150px; height: 150px;">
                     <img src="{{ current_user.avatar }}" 
-                             alt="{{ current_user.username }}" class="avatar-lg rounded-circle mx-auto" 
-                             style="width: 150px; height: 150px; object-fit: cover;">
+                         alt="{{ current_user.username }}" 
+                         class="avatar-lg rounded-circle mx-auto" 
+                         style="width: 150px; height: 150px; object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;">
                     </div>
                     <h4 class="mb-0">{{ current_user.username }}</h4>
                     <p class="text-muted">{{ current_user.email }}</p>
                     <hr class="my-4">
-                    <div class="d-flex justify-content-around text-center">
-                        <div>
-                            <h5 class="mb-1">{{ current_user.forum_topics.count() }}</h5>
+                    <div class="d-flex justify-content-around text-center slide-in-left" style="animation-delay: 0.2s;">
+                        <div class="hover-scale" style="transition: all 0.3s ease;">
+                            <h5 class="mb-1" style="color: #0d6efd;">{{ current_user.forum_topics.count() }}</h5>
                             <small class="text-muted">话题</small>
                         </div>
-                        <div>
-                            <h5 class="mb-1">{{ current_user.forum_posts.count() }}</h5>
+                        <div class="hover-scale" style="transition: all 0.3s ease;">
+                            <h5 class="mb-1" style="color: #0d6efd;">{{ current_user.forum_posts.count() }}</h5>
                             <small class="text-muted">回复</small>
                         </div>
-                        <div>
-                            <h5 class="mb-1">{{ current_user.likes.count() }}</h5>
+                        <div class="hover-scale" style="transition: all 0.3s ease;">
+                            <h5 class="mb-1" style="color: #0d6efd;">{{ current_user.likes.count() }}</h5>
                             <small class="text-muted">点赞</small>
                         </div>
                     </div>
@@ -49,15 +50,15 @@
         </div>
         
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-primary text-white">
+            <div class="card border-0 shadow-sm fade-in">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #0d6efd, #0099f7);">
                     <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i>编辑个人资料</h4>
                 </div>
                 <div class="card-body p-4">
                     <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                         {{ form.hidden_tag() }}
                         
-                        <div class="mb-4">
+                        <div class="mb-4 slide-in-left" style="animation-delay: 0.1s;">
                             <div class="form-floating">
                                 {{ form.username(class="form-control", placeholder="用户名", id="username") }}
                                 {{ form.username.label(for="username") }}
@@ -71,7 +72,7 @@
                             {% endif %}
                         </div>
                         
-                        <div class="mb-4">
+                        <div class="mb-4 slide-in-left" style="animation-delay: 0.2s;">
                             <div class="form-floating">
                                 {{ form.email(class="form-control", placeholder="电子邮箱", id="email") }}
                                 {{ form.email.label(for="email") }}
@@ -85,7 +86,7 @@
                             {% endif %}
                         </div>
                         
-                        <div class="mb-4">
+                        <div class="mb-4 slide-in-left" style="animation-delay: 0.3s;">
                             <label class="form-label fw-bold" for="avatar">更换头像</label>
                             <div class="custom-file-container mt-2">
                                 <div class="input-group">
@@ -101,30 +102,33 @@
                                 <small class="form-text text-muted"><i class="fas fa-info-circle me-1"></i>支持JPG、JPEG、PNG和GIF格式，建议使用正方形图片</small>
                                 
                                 <div class="mt-3" id="avatar-preview-container">
-                                    <p class="mb-2"><strong>预览</strong></p>
+                                    <p class="mb-2"><strong>头像预览</strong></p>
                                     <div class="d-flex align-items-center">
-                                        <div class="position-relative me-4" style="width: 100px; height: 100px;">
+                                        <div class="position-relative me-4 hover-scale" style="width: 100px; height: 100px;">
                                             <img src="{{ current_user.avatar }}" 
-                                                 alt="头像预览" id="avatar-preview" class="img-thumbnail rounded-circle" 
-                                                 style="width: 100px; height: 100px; object-fit: cover;">
+                                                 alt="头像预览" id="avatar-preview" 
+                                                 class="img-thumbnail rounded-circle" 
+                                                 style="width: 100px; height: 100px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                                            <small class="d-block mt-2 text-muted">当前头像</small>
                                         </div>
-                                        <div id="avatar-preview-new" class="position-relative d-none" style="width: 100px; height: 100px;">
-                                            <img src="" alt="新头像预览" id="avatar-preview-img" class="img-thumbnail rounded-circle" 
-                                                 style="width: 100px; height: 100px; object-fit: cover;">
-                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                                                新
-                                            </span>
+                                        <div id="avatar-preview-new" class="position-relative d-none hover-scale" style="width: 100px; height: 100px;">
+                                            <img src="" alt="新头像预览" id="avatar-preview-img" 
+                                                 class="img-thumbnail rounded-circle" 
+                                                 style="width: 100px; height: 100px; object-fit: cover; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2); transition: all 0.3s ease;">
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" 
+                                                  style="background: linear-gradient(135deg, #28a745, #20c997);">新</span>
+                                            <small class="d-block mt-2 text-muted">新头像</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{{ url_for('user.profile') }}" class="btn btn-outline-secondary">
+                        <div class="d-flex justify-content-between mt-4 slide-in-left" style="animation-delay: 0.4s;">
+                            <a href="{{ url_for('user.profile') }}" class="btn btn-outline-secondary btn-hover-float">
                                 <i class="fas fa-arrow-left me-1"></i>返回
                             </a>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary btn-hover-float" style="background: linear-gradient(135deg, #0d6efd, #0099f7);">
                                 <i class="fas fa-save me-1"></i>{{ form.submit.label.text }}
                             </button>
                         </div>
@@ -147,14 +151,42 @@
             
             reader.onload = function(e) {
                 preview.src = e.target.result;
-                previewContainer.classList.remove('d-none');
+                // 使用requestAnimationFrame确保动画流畅
+                requestAnimationFrame(() => {
+                    previewContainer.style.opacity = '0';
+                    previewContainer.classList.remove('d-none');
+                    // 触发重排来应用过渡动画
+                    previewContainer.offsetHeight;
+                    previewContainer.style.transition = 'all 0.3s ease';
+                    previewContainer.style.opacity = '1';
+                });
             };
             
             reader.readAsDataURL(input.files[0]);
         } else {
-            previewContainer.classList.add('d-none');
+            previewContainer.style.opacity = '0';
+            setTimeout(() => {
+                previewContainer.classList.add('d-none');
+            }, 300);
         }
     }
+
+    // 添加头像预览的悬停效果
+    document.addEventListener('DOMContentLoaded', function() {
+        const previewImages = document.querySelectorAll('#avatar-preview, #avatar-preview-img');
+        
+        previewImages.forEach(img => {
+            img.addEventListener('mouseover', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 6px 15px rgba(13, 110, 253, 0.2)';
+            });
+            
+            img.addEventListener('mouseout', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 4px 10px rgba(0,0,0,0.1)';
+            });
+        });
+    });
     
     // 表单验证
     (function() {

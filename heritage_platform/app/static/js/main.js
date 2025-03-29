@@ -90,12 +90,84 @@ function markAllNotificationsAsRead() {
 
 // 当页面加载完成时执行
 document.addEventListener('DOMContentLoaded', function() {
-    // 如果存在通知徽章元素，则启动定期检查
+    // 通知检查
     const notificationBadge = document.getElementById('notification-badge');
     if (notificationBadge) {
-        // 页面加载时先检查一次
         updateNotificationCount();
-        // 每30秒检查一次新通知
         setInterval(updateNotificationCount, 30000);
+    }
+
+    // 如果存在趋势图canvas
+    const activityTrendCanvas = document.getElementById('activityTrend');
+    if (activityTrendCanvas) {
+        // 从后端API获取用户活动数据
+        fetch('/api/user/activity-stats')
+            .then(response => response.json())
+            .then(data => {
+                const dates = data.dates;
+                const datasets = [
+                    {
+                        label: '发布内容',
+                        data: data.content_counts,
+                        borderColor: 'rgb(13, 110, 253)',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: '发布主题',
+                        data: data.topic_counts,
+                        borderColor: 'rgb(25, 135, 84)',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: '论坛回复',
+                        data: data.post_counts,
+                        borderColor: 'rgb(255, 193, 7)',
+                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ];
+
+                new Chart(activityTrendCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    borderDash: [2, 4]
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching activity stats:', error));
     }
 });
