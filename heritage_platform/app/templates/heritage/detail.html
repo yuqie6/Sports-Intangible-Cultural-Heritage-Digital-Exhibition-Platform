@@ -60,7 +60,7 @@
                     <i class="fas fa-book-open me-2"></i> 浏览相关内容
                 </a>
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('content.create') }}" class="btn btn-outline-primary btn-lg btn-hover-float">
+                <a href="{{ url_for('content.create') }}" class="btn btn-primary btn-lg btn-hover-float">
                     <i class="fas fa-plus-circle me-2"></i> 发布此项目内容
                 </a>
                 {% endif %}

@@ -5,8 +5,20 @@
 // 更新未读通知数量的函数
 function updateNotificationCount() {
     fetch('/api/notifications/unread-count')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 429) {
+                    // 如果遇到频率限制,延迟重试
+                    console.log('Rate limited, retrying in 5 seconds...');
+                    setTimeout(updateNotificationCount, 5000);
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            if (!data) return; // 如果上面的代码返回了undefined(429情况),直接退出
             const badge = document.getElementById('notification-badge');
             if (badge) {
                 if (data.count > 0) {
@@ -17,7 +29,14 @@ function updateNotificationCount() {
                 }
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            // 出错时隐藏badge
+            const badge = document.getElementById('notification-badge');
+            if (badge) {
+                badge.style.display = 'none';
+            }
+        });
 }
 
 // 标记单个通知为已读
@@ -94,7 +113,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const notificationBadge = document.getElementById('notification-badge');
     if (notificationBadge) {
         updateNotificationCount();
-        setInterval(updateNotificationCount, 30000);
+        // 增加检查间隔到2分钟
+        setInterval(updateNotificationCount, 120000);
     }
 
     // 如果存在趋势图canvas
