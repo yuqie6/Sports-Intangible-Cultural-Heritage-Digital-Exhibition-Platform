@@ -13,3 +13,6 @@ with app.app_context(). See the documentation for more information.
 This typically means that you attempted to use functionality that needed
 the current application. To solve this, set up an application context
 with app.app_context(). See the documentation for more information.
+2025-03-30 02:42:10,244 [ERROR] [user:71] - 更新个人资料失败: 'str' object has no attribute 'filename'
+2025-03-30 02:52:29,695 [ERROR] [user:71] - 更新个人资料失败: 'str' object has no attribute 'filename'
+2025-03-30 02:52:32,330 [ERROR] [user:71] - 更新个人资料失败: 'str' object has no attribute 'filename'

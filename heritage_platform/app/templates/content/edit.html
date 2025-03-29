@@ -47,7 +47,7 @@
                     </h4>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('content.edit', id=content.id) }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <form method="POST" action="{{ url_for('content.edit', id=content.id) }}" enctype="multipart/form-data" class="needs-validation content-edit-form" novalidate>
                         {{ form.hidden_tag() }}
                         
                         <div class="mb-4">

@@ -29,18 +29,48 @@ body {
 /* 卡片样式 */
 .card {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1),
-                box-shadow 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: none;
     border-radius: 8px;
     overflow: hidden;
-    will-change: transform, box-shadow;
-    contain: content;
 }
 
 .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* 编辑页面按钮样式 */
+.content-edit-form .input-group .btn {
+    border-radius: 5px;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin: 0 2px;
+}
+
+.content-edit-form .input-group .btn-outline-primary {
+    background-color: transparent;
+    border: 1px solid #0d6efd;
+    color: #0d6efd;
+}
+
+.content-edit-form .input-group .btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.content-edit-form .input-group .btn-primary {
+    background: linear-gradient(135deg, #2980b9 0%, #0d6efd 100%);
+    border: none;
+    color: white;
+}
+
+.content-edit-form .file-upload {
+    position: relative;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 .card-header {
@@ -712,15 +742,15 @@ footer .footer-bottom {
     to { opacity: 1; transform: scale(1); }
 }
 
-.fade-in {
+.my-fade-in {
     animation: fadeIn 0.8s ease-out;
 }
 
-.slide-in-left {
+.my-slide-in-left {
     animation: slideInLeft 0.6s ease-out;
 }
 
-.slide-in-right {
+.my-slide-in-right {
     animation: slideInRight 0.6s ease-out;
 }
 
@@ -1295,10 +1325,49 @@ footer .footer-bottom {
     color: #0d6efd;
 }
 
-/* 编辑器样式 */
-.ck-editor__editable {
+/* 编辑器基础样式 - 移除所有高级特性 */
+.ck-editor__editable,
+.content-edit-form textarea {
     min-height: 300px;
     max-height: 500px;
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 0.75rem;
+}
+
+/* 编辑器交互样式 - 最小化 */
+.content-edit-form textarea {
+    /* 移除所有可能导致渲染问题的属性 */
+    animation: none;
+    transform: none;
+    transition: none;
+    backface-visibility: hidden;
+    perspective: none;
+    transform-style: preserve-3d;
+    will-change: auto;
+}
+
+/* 编辑器焦点样式 - 简单边框效果 */
+.content-edit-form textarea:focus {
+    outline: none;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+.content-edit-form textarea:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    outline: none;
+}
+
+.content-edit-form .form-floating textarea {
+    height: auto;
 }
 
 /* 广播消息按钮样式 */

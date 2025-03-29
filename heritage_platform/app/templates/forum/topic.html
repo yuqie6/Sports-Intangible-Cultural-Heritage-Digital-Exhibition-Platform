@@ -3,8 +3,8 @@
 {% block title %}{{ topic.title }} - 体育非遗数字展示平台{% endblock %}
 
 {% block content %}
-<div class="container py-4 fade-in">
-    <nav aria-label="breadcrumb" class="mb-4 slide-in-left">
+<div class="container py-4 my-fade-in">
+    <nav aria-label="breadcrumb" class="mb-4 my-slide-in-left">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
             <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">论坛</a></li>
@@ -13,7 +13,7 @@
         </ol>
     </nav>
     
-    <div class="content-header mb-4 slide-in-right">
+    <div class="content-header mb-4 my-slide-in-right">
         <div class="d-flex justify-content-between align-items-center">
             <h1 class="gradient-text mb-0">
                 {% if topic.is_pinned %}<i class="fas fa-thumbtack me-2"></i>{% endif %}
@@ -47,7 +47,7 @@
         </div>
     </div>
     
-    <div class="topic-meta mb-4 p-3 bg-light rounded-3 slide-in-left">
+    <div class="topic-meta mb-4 p-3 bg-light rounded-3 my-slide-in-left">
         <span class="badge bg-secondary">{{ topic.category }}</span>
         <span class="mx-2">|</span>
         <i class="fas fa-user me-1"></i> {{ topic.creator }}
@@ -119,7 +119,7 @@
 
                         <!-- 嵌套回复表单 -->
                         {% if current_user.is_authenticated and not topic.is_closed %}
-                        <div class="reply-form mt-3 fade" id="reply-form-{{ post.id }}" style="display: none;">
+                        <div class="reply-form mt-3" id="reply-form-{{ post.id }}" style="display: none;">
                             <form method="POST" action="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="border rounded p-3 bg-light">
                                 {{ form.hidden_tag() }}
                                 <div class="mb-3">
@@ -134,23 +134,21 @@
 
                         <!-- 嵌套回复列表 -->
                         {% if post.replies %}
-                        <div class="replies mt-4">
-                            <div class="ps-4 position-relative">
-                                <div class="position-absolute top-0 bottom-0 start-0 border-start border-2 border-primary bg-opacity-25"></div>
-                                {% for reply in post.replies %}
-                                <div class="reply mb-3 position-relative">
-                                    <div class="position-absolute" style="left: -24px; top: 12px;">
+                        <div class="nested-replies mt-4">
+                            {% for reply in post.replies %}
+                            <div class="reply mb-3">
+                                <div class="d-flex align-items-center small text-muted mb-2">
+                                    <div class="reply-arrow">
                                         <i class="fas fa-reply fa-rotate-180 text-primary"></i>
                                     </div>
-                                    <div class="d-flex align-items-center small text-muted mb-2">
-                                        <span class="fw-bold text-primary me-2">{{ reply.author }}</span>
-                                        <span class="mx-2">·</span>
-                                        <i class="fas fa-clock me-1"></i> {{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}
-                                    </div>
-                                    <div class="reply-content p-2 bg-light rounded">
-                                        {{ reply.content|safe }}
-                                    </div>
+                                    <span class="fw-bold text-primary me-2">{{ reply.author }}</span>
+                                    <span class="mx-2">·</span>
+                                    <i class="fas fa-clock me-1"></i> {{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}
                                 </div>
+                                <div class="reply-content p-2 bg-light rounded">
+                                    {{ reply.content|safe }}
+                                </div>
+                            </div>
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -293,7 +291,13 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const postId = this.dataset.postId;
             const replyForm = document.getElementById(`reply-form-${postId}`);
-            replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+            
+            // 先设置display以启用动画
+            replyForm.style.display = 'block';
+            // 使用requestAnimationFrame确保display生效后再添加active类
+            requestAnimationFrame(() => {
+                replyForm.classList.toggle('active');
+            });
         });
     });
 
@@ -302,7 +306,14 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelButtons.forEach(button => {
         button.addEventListener('click', function() {
             const postId = this.dataset.postId;
-            document.getElementById(`reply-form-${postId}`).style.display = 'none';
+            const replyForm = document.getElementById(`reply-form-${postId}`);
+            
+            // 移除active类触发收起动画
+            replyForm.classList.remove('active');
+            // 等待动画完成后隐藏元素
+            setTimeout(() => {
+                replyForm.style.display = 'none';
+            }, 300);
         });
     });
 });

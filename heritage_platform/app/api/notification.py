@@ -1,7 +1,7 @@
 from flask import jsonify, request, abort, current_app
 from flask_login import login_required, current_user
 from app.models import Notification, Message
-from app import db
+from app import db, limiter
 from . import api_bp
 import traceback
 
@@ -71,6 +71,7 @@ def mark_all_as_read():
 
 @api_bp.route('/messages/unread-count')
 @login_required
+@limiter.limit("15 per minute")
 def get_unread_messages_count():
     """获取未读私信数量"""
     count = Message.query.filter_by(

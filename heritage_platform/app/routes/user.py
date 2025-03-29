@@ -55,7 +55,8 @@ def edit_profile():
             current_user.email = form.email.data
             
             # 处理头像上传
-            if form.avatar.data:
+            if form.avatar.data and hasattr(form.avatar.data, 'filename'):
+                # 确认avatar.data是文件对象而不是字符串
                 avatar_path = save_file(form.avatar.data, 'image')
                 if avatar_path:
                     # 修复：确保路径正确，使用url_for生成带/static/前缀的路径
@@ -258,7 +259,8 @@ def edit_user(id):
                 user.password = form.password.data
             
             # 处理头像上传
-            if form.avatar.data:
+            if form.avatar.data and hasattr(form.avatar.data, 'filename'):
+                # 确认avatar.data是文件对象而不是字符串
                 avatar_path = save_file(form.avatar.data, 'image')
                 if avatar_path:
                     # 修复：使用url_for生成正确的静态资源URL
@@ -304,7 +306,8 @@ def create_user():
             user.password = form.password.data
             
             # 处理头像上传
-            if form.avatar.data:
+            if form.avatar.data and hasattr(form.avatar.data, 'filename'):
+                # 确认avatar.data是文件对象而不是字符串
                 avatar_path = save_file(form.avatar.data, 'image')
                 if avatar_path:
                     # 修复：使用url_for生成正确的静态资源URL

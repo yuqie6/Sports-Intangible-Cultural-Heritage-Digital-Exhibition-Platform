@@ -90,7 +90,9 @@ def create_database_if_not_exists():
 
 def create_test_data():
     """创建测试数据"""
-    from app.models import HeritageItem, Content, ForumTopic, ForumPost
+    from app.models import HeritageItem, Content, Comment, ForumTopic, ForumPost
+    from app.models import Notification, Message, MessageGroup, UserGroup, MessageReadStatus
+    from datetime import datetime
     
     try:
         # 创建示例非遗项目
@@ -113,6 +115,51 @@ def create_test_data():
             db.session.add_all([heritage1, heritage2])
             db.session.commit()
             print("示例非遗项目创建完成!")
+        
+        # 创建示例内容
+        if Content.query.count() == 0:
+            print("创建示例内容...")
+            content1 = Content(
+                heritage_id=1,
+                title='太极拳基本招式',
+                content='太极拳是一种中国传统拳法，以其缓慢、柔和的动作特点而闻名...',
+                content_type='article',
+                user_id=2,  # teacher
+                views=15  # 设置初始浏览量
+            )
+            content2 = Content(
+                heritage_id=2,
+                title='舞龙技巧分享',
+                content='舞龙是中国传统民俗活动，需要多人配合完成...',
+                content_type='article',
+                user_id=2,  # teacher
+                views=8  # 设置初始浏览量
+            )
+            db.session.add_all([content1, content2])
+            db.session.flush()
+            
+            # 创建示例评论
+            comment1 = Comment(
+                content_id=content1.id,
+                user_id=3,  # student
+                text='这篇教程非常实用，谢谢分享！'
+            )
+            comment2 = Comment(
+                content_id=content1.id,
+                user_id=1,  # admin
+                text='老师讲解得很清楚，希望能有更多相关内容。'
+            )
+            # 添加回复评论
+            reply_comment = Comment(
+                content_id=content1.id,
+                user_id=2,  # teacher
+                text='谢谢支持，我会继续更新更多内容的！',
+                parent_id=comment1.id,
+                reply_to_user_id=3  # 回复学生
+            )
+            db.session.add_all([comment1, comment2, reply_comment])
+            db.session.commit()
+            print("示例内容和评论创建完成!")
             
         # 创建示例论坛主题
         if ForumTopic.query.count() == 0:
@@ -125,18 +172,117 @@ def create_test_data():
             db.session.add(topic1)
             db.session.flush()
             
+            # 主贴
             post1 = ForumPost(
                 topic_id=topic1.id,
                 user_id=1,
                 content='欢迎大家在这里分享武术学习的经验和心得!'
             )
             db.session.add(post1)
+            
+            # 回复帖
+            reply1 = ForumPost(
+                topic_id=topic1.id,
+                user_id=2,
+                content='太极拳是我最喜欢的武术形式！',
+                parent_id=post1.id,
+                reply_to_user_id=1
+            )
+            db.session.add(reply1)
             db.session.commit()
             print("示例论坛主题创建完成!")
+        
+        # 创建示例消息
+        if Message.query.filter_by(message_type='private').count() == 0:
+            print("创建示例私信...")
+            message = Message(
+                sender_id=1,  # admin
+                receiver_id=2,  # teacher
+                content='欢迎加入非遗平台教师团队！',
+                is_read=False,
+                created_at=datetime.utcnow(),
+                message_type='private'
+            )
+            db.session.add(message)
+            db.session.commit()
+            print("示例私信创建完成!")
+            
+        # 创建消息群组
+        if MessageGroup.query.count() == 0:
+            print("创建示例消息群组...")
+            group = MessageGroup(
+                name='非遗教学讨论组',
+                description='用于讨论非遗教学相关问题',
+                group_type='discussion',
+                creator_id=1,  # admin
+                created_at=datetime.utcnow(),
+                is_active=True
+            )
+            db.session.add(group)
+            db.session.flush()
+            
+            # 添加群组成员
+            user_group1 = UserGroup(
+                user_id=1,  # admin
+                group_id=group.id,
+                joined_at=datetime.utcnow(),
+                role='owner'
+            )
+            user_group2 = UserGroup(
+                user_id=2,  # teacher
+                group_id=group.id,
+                joined_at=datetime.utcnow(),
+                role='member'
+            )
+            db.session.add_all([user_group1, user_group2])
+            
+            # 添加群组消息
+            group_message = Message(
+                sender_id=1,  # admin
+                group_id=group.id,
+                content='大家好，这是我们的非遗教学讨论组，欢迎交流！',
+                created_at=datetime.utcnow(),
+                message_type='group'
+            )
+            db.session.add(group_message)
+            db.session.flush()
+            
+            # 消息阅读状态
+            read_status1 = MessageReadStatus(
+                message_id=group_message.id,
+                user_id=1,
+                is_read=True,
+                read_at=datetime.utcnow()
+            )
+            read_status2 = MessageReadStatus(
+                message_id=group_message.id,
+                user_id=2,
+                is_read=False
+            )
+            db.session.add_all([read_status1, read_status2])
+            db.session.commit()
+            print("示例消息群组创建完成!")
+            
+        # 创建示例通知
+        if Notification.query.count() == 0:
+            print("创建示例通知...")
+            notification = Notification(
+                user_id=2,  # teacher
+                sender_id=1,  # admin
+                type='system',
+                content='欢迎加入非遗传承平台！请完善您的个人资料。',
+                link='/user/profile',
+                is_read=False,
+                created_at=datetime.utcnow()
+            )
+            db.session.add(notification)
+            db.session.commit()
+            print("示例通知创建完成!")
             
     except Exception as e:
         db.session.rollback()
         print(f"创建测试数据时出错: {e}")
+        print(traceback.format_exc())
 
 def init_db():
     """初始化数据库"""
@@ -147,6 +293,7 @@ def init_db():
         # 从模型导入，确保所有表都会被创建
         from app.models import User, HeritageItem, Content, Comment, Like, Favorite
         from app.models import ForumTopic, ForumPost
+        from app.models import Notification, Message, MessageGroup, UserGroup, MessageReadStatus
         
         # 创建所有表
         print("正在创建数据库表...")
