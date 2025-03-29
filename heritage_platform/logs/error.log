@@ -1,0 +1,15 @@
+2025-03-29 19:51:45,078 [ERROR] [security_config:17] - Redis初始化失败，将使用内存存储作为后备: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.
+2025-03-29 19:53:11,325 [ERROR] [security_config:17] - Redis初始化失败，将使用内存存储作为后备: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.
+2025-03-29 19:53:12,783 [ERROR] [security_config:17] - Redis初始化失败，将使用内存存储作为后备: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.

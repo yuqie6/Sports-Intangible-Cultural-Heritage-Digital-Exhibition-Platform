@@ -7,27 +7,17 @@ import re
 import bleach
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash
-from .redis_manager import RedisManager
 
 def setup_security(app):
-    # 初始化Redis连接
-    try:
-        RedisManager.get_instance()
-    except Exception as e:
-        app.logger.error(f"Redis初始化失败，将使用内存存储作为后备: {str(e)}")
-        redis_url = "memory://"
-    else:
-        redis_url = f"redis://{app.config.get('REDIS_HOST', 'localhost')}:{app.config.get('REDIS_PORT', 6379)}/{app.config.get('REDIS_DB', 0)}"
-    
-    # 配置Limiter使用Redis存储（如果Redis可用）或内存存储（如果Redis不可用）
+    # 配置Limiter使用内存存储
     limiter = Limiter(
         app=app,
         key_func=get_remote_address,
-        storage_uri=redis_url,
+        storage_uri="memory://",
         headers_enabled=True,
         header_name_mapping={"X-RateLimit-Limit": "X-RateLimit-Limit",
-                            "X-RateLimit-Remaining": "X-RateLimit-Remaining",
-                            "X-RateLimit-Reset": "X-RateLimit-Reset"},
+                        "X-RateLimit-Remaining": "X-RateLimit-Remaining",
+                        "X-RateLimit-Reset": "X-RateLimit-Reset"},
         default_limits=["200 per day", "50 per hour"]
     )
 
