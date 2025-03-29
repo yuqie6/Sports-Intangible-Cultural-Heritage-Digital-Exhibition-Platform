@@ -29,10 +29,13 @@ body {
 /* 卡片样式 */
 .card {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1),
+                box-shadow 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     border: none;
     border-radius: 8px;
     overflow: hidden;
+    will-change: transform, box-shadow;
+    contain: content;
 }
 
 .card:hover {
@@ -94,11 +97,13 @@ body {
 
 /* 导航栏增强样式 */
 .navbar {
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    will-change: transform, box-shadow;
 }
 
 .navbar-brand {
@@ -106,8 +111,11 @@ body {
     font-size: 1.4rem;
     background: linear-gradient(45deg, #0d6efd, #0099f7);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
     transition: transform 0.3s ease;
+    will-change: transform;
 }
 
 .navbar-brand:hover {
@@ -388,17 +396,18 @@ body {
 
 @media (max-width: 768px) {
     .display-5 {
-        font-size: 2.5rem;
+        font-size: clamp(2rem, 5vw, 2.5rem);
     }
     
     .fs-4 {
-        font-size: 1.1rem !important;
+        font-size: clamp(1rem, 3vw, 1.1rem) !important;
     }
     
     .mt-4 .btn {
         padding: 0.8rem 1.5rem;
         margin-bottom: 1rem;
         width: 100%;
+        touch-action: manipulation;
     }
 }
 
@@ -406,12 +415,15 @@ body {
 .feature-icon-card {
     padding: 2rem 1.5rem;
     text-align: center;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease,
+                box-shadow 0.3s ease;
     border-radius: 15px;
     background: white;
     position: relative;
     z-index: 1;
     overflow: hidden;
+    will-change: transform;
+    contain: content;
 }
 
 .feature-icon-card::before {

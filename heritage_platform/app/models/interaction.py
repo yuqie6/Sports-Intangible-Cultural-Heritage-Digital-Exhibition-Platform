@@ -24,7 +24,8 @@ class Comment(db.Model):
     # 添加回复目标用户关系
     reply_to_user = db.relationship(
         'User', 
-        foreign_keys=[reply_to_user_id]
+        foreign_keys=[reply_to_user_id],
+        overlaps="comment_replies"
     )
     
     def __repr__(self):

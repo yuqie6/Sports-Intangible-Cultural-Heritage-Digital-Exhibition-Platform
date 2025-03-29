@@ -4,28 +4,28 @@ from flask_socketio import emit, join_room, leave_room
 from app import socketio, db
 from app.models.message import Message, MessageGroup, MessageReadStatus
 from app.models.user import User
+from app.utils.websocket_manager import websocket_error_handler
 import datetime
 import json
 
-# 用于存储用户与Socket.IO会话ID的映射关系
-connected_users = {}
-
 @socketio.on('connect')
+@websocket_error_handler
 def handle_connect():
     """处理客户端连接事件"""
     if current_user.is_authenticated:
-        connected_users[current_user.id] = request.sid
+        current_app.websocket_manager.register_connection(current_user.id, request.sid)
         current_app.logger.info(f"用户 {current_user.username} (ID: {current_user.id}) 已连接")
 
 @socketio.on('disconnect')
+@websocket_error_handler
 def handle_disconnect():
     """处理客户端断开连接事件"""
     if current_user.is_authenticated:
-        if current_user.id in connected_users:
-            del connected_users[current_user.id]
+        current_app.websocket_manager.unregister_connection(current_user.id)
         current_app.logger.info(f"用户 {current_user.username} (ID: {current_user.id}) 已断开连接")
 
 @socketio.on('join_group')
+@websocket_error_handler
 def handle_join_group(data):
     """处理用户加入群组聊天室事件"""
     if current_user.is_authenticated:
@@ -33,10 +33,12 @@ def handle_join_group(data):
         if group_id:
             room_name = f"group_{group_id}"
             join_room(room_name)
+            current_app.websocket_manager.update_activity(current_user.id)
             current_app.logger.info(f"用户 {current_user.username} (ID: {current_user.id}) 加入群组聊天室: {room_name}")
             return {'status': 'success', 'message': f'已加入群组聊天室: {room_name}'}
 
 @socketio.on('leave_group')
+@websocket_error_handler
 def handle_leave_group(data):
     """处理用户离开群组聊天室事件"""
     if current_user.is_authenticated:
@@ -44,10 +46,12 @@ def handle_leave_group(data):
         if group_id:
             room_name = f"group_{group_id}"
             leave_room(room_name)
+            current_app.websocket_manager.update_activity(current_user.id)
             current_app.logger.info(f"用户 {current_user.username} (ID: {current_user.id}) 离开群组聊天室: {room_name}")
             return {'status': 'success', 'message': f'已离开群组聊天室: {room_name}'}
 
 @socketio.on('send_group_message')
+@websocket_error_handler
 def handle_group_message(data):
     """处理群组消息发送事件"""
     if not current_user.is_authenticated:
@@ -126,6 +130,7 @@ def handle_group_message(data):
         return {'status': 'error', 'message': f'发送消息失败: {str(e)}'}
 
 @socketio.on('delete_message')
+@websocket_error_handler
 def handle_delete_message(data):
     """处理消息删除事件"""
     if not current_user.is_authenticated:

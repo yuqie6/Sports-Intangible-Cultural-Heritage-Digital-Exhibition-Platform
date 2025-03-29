@@ -5,6 +5,8 @@ from config import config
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
+from .utils.logging_config import setup_logging, log_access
+from .utils.security_config import setup_security
 import os
 import markdown
 
@@ -13,7 +15,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 migrate = Migrate()
-socketio = SocketIO()  # 初始化SocketIO
+socketio = SocketIO(ping_timeout=20, ping_interval=10)  # 初始化SocketIO，设置心跳检测
 
 login_manager.login_view = 'auth.login'
 login_manager.login_message = '请先登录再访问此页面'
@@ -29,12 +31,25 @@ def create_app(config_name='default'):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
     
+    # 初始化日志系统
+    setup_logging(app)
+    
+    # 初始化安全配置
+    setup_security(app)
+    
+    # 注册访问日志中间件
+    app.after_request(log_access)
+    
     # 初始化扩展
     db.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
     migrate.init_app(app, db)
-    socketio.init_app(app, cors_allowed_origins="*")  # 初始化SocketIO并允许跨域访问
+    socketio.init_app(app, cors_allowed_origins="*", ping_timeout=20, ping_interval=10)  # 初始化SocketIO并允许跨域访问
+    
+    # 初始化WebSocket管理器
+    from app.utils.websocket_manager import init_websocket_manager
+    init_websocket_manager(app)
     
     # 确保日志目录存在
     os.makedirs('logs', exist_ok=True)

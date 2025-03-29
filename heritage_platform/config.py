@@ -31,6 +31,11 @@ class Config:
     
     # 上传文件配置
     UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads')
+    
+    # Redis配置
+    REDIS_HOST = os.environ.get('REDIS_HOST') or 'localhost'
+    REDIS_PORT = int(os.environ.get('REDIS_PORT') or 6379)
+    REDIS_DB = int(os.environ.get('REDIS_DB') or 0)
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB限制
     
     # 日志配置
