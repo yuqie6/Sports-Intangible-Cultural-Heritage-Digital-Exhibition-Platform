@@ -7,19 +7,33 @@ import re
 import bleach
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash
+import warnings
 
 def setup_security(app):
-    # 配置Limiter使用内存存储
+    # 抑制内存存储的警告
+    warnings.filterwarnings("ignore", message="Using the in-memory storage for tracking rate limits")
+    
+    # 配置Limiter使用Redis存储（如果可用），否则回退到内存存储
+    redis_uri = app.config.get('REDIS_URL', None)
+    storage_uri = redis_uri if redis_uri else "memory://"
+    
     limiter = Limiter(
         app=app,
         key_func=get_remote_address,
-        storage_uri="memory://",
+        storage_uri=storage_uri,
         headers_enabled=True,
         header_name_mapping={"X-RateLimit-Limit": "X-RateLimit-Limit",
                         "X-RateLimit-Remaining": "X-RateLimit-Remaining",
                         "X-RateLimit-Reset": "X-RateLimit-Reset"},
-        default_limits=["200 per day", "50 per hour"]
+        default_limits=["200 per day", "50 per hour"],
     )
+    
+    # 为通知相关API设置更宽松的限制
+    limiter.limit("300 per minute")(app.route("/api/notifications/unread-count"))
+    limiter.limit("300 per minute")(app.route("/api/messages/unread-count"))
+    
+    # 存储limiter实例以供其他模块使用
+    app.config['LIMITER'] = limiter
 
     # 配置CSP策略
     csp = {
@@ -62,14 +76,6 @@ def setup_security(app):
             'camera': "'none'",
         }
     )
-
-    # 配置请求速率限制
-    limiter = Limiter(
-        app=app,
-        key_func=get_remote_address,
-        default_limits=["200 per day", "50 per hour"]
-    )
-    app.config['LIMITER'] = limiter
 
     # 配置密码策略
     app.config['PASSWORD_POLICY'] = {

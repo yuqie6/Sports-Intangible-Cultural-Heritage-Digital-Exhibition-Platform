@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+
+{% block title %}技术文档 - 体育非遗数字展示平台{% endblock %}
+
+{% block styles %}
+<!-- highlight.js CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+    /* 文档导航样式 */
+    .doc-sidebar {
+        position: sticky;
+        top: 2rem;
+        height: calc(100vh - 4rem);
+        overflow-y: auto;
+        padding-right: 1rem;
+        border-right: 1px solid #eee;
+    }
+    
+    .doc-sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .doc-sidebar::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,.1);
+        border-radius: 4px;
+    }
+    
+    .doc-nav .nav-link {
+        color: #495057;
+        padding: .25rem 0;
+    }
+    
+    .doc-nav .nav-link:hover {
+        color: #0d6efd;
+    }
+    
+    .doc-nav .nav-link.active {
+        color: #0d6efd;
+        font-weight: 500;
+    }
+    
+    /* 文档内容样式 */
+    .doc-content {
+        font-size: 16px;
+        line-height: 1.7;
+        color: #2c3e50;
+    }
+    
+    .doc-content h1 {
+        font-size: 2em;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eaecef;
+    }
+    
+    .doc-content h2 {
+        font-size: 1.65em;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eaecef;
+    }
+    
+    .doc-content h3 {
+        font-size: 1.35em;
+        margin: 2rem 0 1rem;
+    }
+    
+    /* 代码块相关样式 */
+    .code-wrapper {
+        position: relative;
+        margin: 1rem 0;
+    }
+    
+    .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #282c34;
+        padding: 0.5rem 1rem;
+        border-radius: 6px 6px 0 0;
+        border: 1px solid #3e4451;
+        border-bottom: none;
+    }
+    
+    .code-lang {
+        color: #abb2bf;
+        font-size: 0.9em;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    }
+    
+    .code-copy-btn {
+        background: transparent;
+        border: 1px solid #4b5263;
+        color: #98c379;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8em;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .code-copy-btn:hover {
+        background: #3e4451;
+        border-color: #98c379;
+    }
+    
+    .doc-content pre {
+        margin: 0;
+        padding: 0;
+        background: #282c34;
+        border-radius: 0 0 6px 6px;
+        border: 1px solid #3e4451;
+    }
+    
+    .doc-content pre code {
+        display: block;
+        padding: 1rem;
+        font-size: 0.9em;
+        line-height: 1.5;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        position: relative;
+    }
+    
+    .doc-content pre code::before {
+        content: attr(data-line-numbers);
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding: 1rem 0.5rem;
+        color: #636d83;
+        border-right: 1px solid #3e4451;
+        text-align: right;
+        min-width: 2.5em;
+    }
+    
+    .doc-content pre code.hljs {
+        padding-left: 3.5rem;
+    }
+    
+    .doc-content code:not(pre code) {
+        background: #f1f3f5;
+        color: #e83e8c;
+        padding: 0.2em 0.4em;
+        border-radius: 3px;
+        font-size: 0.85em;
+    }
+    
+    .doc-content ul {
+        padding-left: 1.5rem;
+    }
+    
+    .doc-content blockquote {
+        border-left: 4px solid #42b983;
+        padding: 0 1rem;
+        color: #666;
+        background: #f8f9fa;
+        margin: 1rem 0;
+    }
+    
+    /* 返回顶部按钮样式 */
+    #doc-back-to-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        display: none;
+        z-index: 1000;
+    }
+    
+    /* Mermaid 图表容器样式 */
+    .mermaid {
+        background: white;
+        padding: 1rem;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        margin: 1rem 0;
+    }
+
+    /* 复制成功提示 */
+    .copy-tooltip {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: #98c379;
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8em;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .copy-tooltip.show {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- 左侧导航栏 -->
+        <div class="col-md-3 col-xl-2">
+            <nav class="doc-sidebar" id="doc-nav">
+                <div class="doc-nav">
+                    <!-- 动态生成的目录将通过JS注入到这里 -->
+                </div>
+            </nav>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="col-md-9 col-xl-8">
+            <div class="doc-content">
+                {{ content | markdown | safe }}
+            </div>
+        </div>
+        
+        <!-- 右侧空白区域，用于视觉平衡 -->
+        <div class="col-xl-2 d-none d-xl-block"></div>
+    </div>
+</div>
+
+<!-- 返回顶部按钮 -->
+<button id="doc-back-to-top" class="btn btn-primary rounded-circle" style="width: 50px; height: 50px;">
+    <i class="fas fa-arrow-up"></i>
+</button>
+{% endblock %}
+
+{% block scripts %}
+<!-- highlight.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<!-- highlight.js line numbers plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/plugins/lineNumbers/highlight.min.js"></script>
+<!-- mermaid -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化 Mermaid
+    mermaid.initialize({ startOnLoad: true });
+    
+    // 初始化 highlight.js
+    hljs.highlightAll();
+    
+    // 生成目录
+    function generateTOC() {
+        const content = document.querySelector('.doc-content');
+        const nav = document.querySelector('.doc-nav');
+        const headings = content.querySelectorAll('h1, h2, h3');
+        let toc = '';
+        
+        headings.forEach((heading, index) => {
+            heading.id = `section-${index}`;
+            
+            const level = parseInt(heading.tagName[1]);
+            const padding = (level - 1) * 1;
+            const fontSize = 1 - (level - 1) * 0.1;
+            
+            toc += `
+                <a class="nav-link" href="#${heading.id}" style="padding-left: ${padding}rem; font-size: ${fontSize}rem;">
+                    ${heading.textContent}
+                </a>
+            `;
+        });
+        
+        nav.innerHTML = toc;
+        
+        // 添加滚动监听以高亮当前章节
+        const navLinks = document.querySelectorAll('.nav-link');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            headings.forEach(heading => {
+                const sectionTop = heading.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = heading.id;
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    }
+    
+    // 处理代码块
+    function enhanceCodeBlocks() {
+        document.querySelectorAll('pre code').forEach((block, index) => {
+            const pre = block.parentElement;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'code-wrapper';
+            pre.parentNode.insertBefore(wrapper, pre);
+            
+            // 获取代码块的语言
+            const language = block.className.split(/\s+/).find(cls => cls.startsWith('language-'))?.split('-')[1] || 'plaintext';
+            
+            // 创建代码块头部
+            const header = document.createElement('div');
+            header.className = 'code-header';
+            header.innerHTML = `
+                <span class="code-lang">${language.toUpperCase()}</span>
+                <button class="code-copy-btn" data-index="${index}">
+                    <i class="far fa-copy"></i> Copy
+                </button>
+            `;
+            
+            // 添加行号
+            const lines = block.textContent.split('\n').length;
+            let lineNumbers = '';
+            for(let i = 1; i <= lines; i++) {
+                lineNumbers += i + '\n';
+            }
+            block.setAttribute('data-line-numbers', lineNumbers.trim());
+            
+            // 组装代码块
+            wrapper.appendChild(header);
+            wrapper.appendChild(pre);
+            
+            // 创建复制成功提示
+            const tooltip = document.createElement('div');
+            tooltip.className = 'copy-tooltip';
+            tooltip.textContent = 'Copied!';
+            wrapper.appendChild(tooltip);
+        });
+        
+        // 复制功能
+        document.querySelectorAll('.code-copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const block = document.querySelectorAll('pre code')[btn.dataset.index];
+                const text = block.textContent;
+                
+                navigator.clipboard.writeText(text).then(() => {
+                    const tooltip = btn.closest('.code-wrapper').querySelector('.copy-tooltip');
+                    tooltip.classList.add('show');
+                    setTimeout(() => tooltip.classList.remove('show'), 2000);
+                    
+                    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    btn.style.borderColor = '#98c379';
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="far fa-copy"></i> Copy';
+                        btn.style.borderColor = '#4b5263';
+                    }, 2000);
+                });
+            });
+        });
+    }
+    
+    // 返回顶部按钮
+    const backToTopButton = document.getElementById('doc-back-to-top');
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTopButton.style.display = 'flex';
+            backToTopButton.style.justifyContent = 'center';
+            backToTopButton.style.alignItems = 'center';
+        } else {
+            backToTopButton.style.display = 'none';
+        }
+    });
+    
+    backToTopButton.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // 初始化页面功能
+    generateTOC();
+    enhanceCodeBlocks();
+});
+</script>
+{% endblock %}

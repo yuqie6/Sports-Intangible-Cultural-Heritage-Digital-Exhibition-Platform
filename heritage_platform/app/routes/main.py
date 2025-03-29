@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, current_app
 from app.models import HeritageItem, Content
 from sqlalchemy.exc import SQLAlchemyError
+import os
 
 main_bp = Blueprint('main', __name__)
 
@@ -41,3 +42,14 @@ def terms_of_service():
 def sitemap():
     """网站地图页面"""
     return render_template('main/sitemap.html')
+
+@main_bp.route('/technical-doc')
+def technical_doc():
+    """技术文档页面"""
+    try:
+        with open(os.path.join(current_app.root_path, '..', '技术报告.md'), 'r', encoding='utf-8') as f:
+            content = f.read()
+        return render_template('main/technical_doc.html', content=content)
+    except Exception as e:
+        current_app.logger.error(f"读取技术文档错误: {e}")
+        return render_template('main/technical_doc.html', content="技术文档加载失败")
