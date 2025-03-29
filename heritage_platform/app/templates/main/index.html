@@ -120,7 +120,7 @@
         {% if latest_contents %}
             {% for content in latest_contents %}
             <div class="col">
-                <div class="card h-100">
+                <div class="card h-100 content-card">
                     {% if content.cover_image %}
                     <img src="{{ url_for('static', filename=content.cover_image) }}" class="card-img-top" alt="{{ content.title }}">
                     {% elif content.content_type == 'image' and content.file_path %}

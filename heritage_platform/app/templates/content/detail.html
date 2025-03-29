@@ -17,7 +17,6 @@
         <div class="card-header bg-light">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="h3 mb-0">{{ content.title }}</h1>
-                <!-- 添加编辑和删除按钮 - 仅对作者和管理员可见 -->
                 {% if current_user.is_authenticated and (current_user.id == content.user_id or current_user.is_admin) %}
                 <div>
                     <a href="{{ url_for('content.edit', id=content.id) }}" class="btn btn-sm btn-outline-primary me-2">
@@ -30,38 +29,43 @@
                 {% endif %}
             </div>
         </div>
-        
-        <!-- 封面图片整合到标题区域 -->
+
+        <div class="content-cover-wrapper">
         {% if content.cover_image %}
-        <div class="card-header-image">
+        <div class="content-cover-image fade-in">
             <img src="{{ url_for('static', filename=content.cover_image) }}" 
-                 class="w-100" 
-                 alt="{{ content.title }}的封面图">
-            <div class="overlay-title">
-                <h1 class="h3 mb-0">{{ content.title }}</h1>
+                 alt="{{ content.title }}的封面图"
+                 class="content-cover cover-mode"
+                 id="coverImage">
+            <div class="cover-controls">
+                <button type="button" class="btn btn-light btn-sm active" onclick="switchImageMode('cover')" id="coverBtn">
+                    <i class="fas fa-crop"></i> 填充模式
+                </button>
+                <button type="button" class="btn btn-light btn-sm" onclick="switchImageMode('fit')" id="fitBtn">
+                    <i class="fas fa-expand"></i> 完整模式
+                </button>
             </div>
         </div>
-        {% else %}
-        <div class="card-header bg-light">
-            <h1 class="h3 mb-0">{{ content.title }}</h1>
-        </div>
         {% endif %}
+    </div>
         
-        <div class="card-body" style="position: relative;">
+        <div class="card-body content-body">
             <!-- 装饰性分隔元素 -->
-            <div class="position-absolute top-0 start-50 translate-middle-x" style="width: 80px; height: 4px; background-color: #0d6efd; border-radius: 2px; margin-top: -2px;"></div>
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center">
-                    {% if content.author.avatar %}
-                    <img src="{{ content.author.avatar }}" class="avatar-sm me-2 rounded-circle" alt="{{ content.author.username }}">
-                    {% else %}
-                    <div class="avatar-sm me-2 d-flex align-items-center justify-content-center bg-primary text-white rounded-circle">
-                        {{ content.author.username[0] }}
+            <div class="content-divider"></div>
+            <div class="content-meta slide-in-left">
+                <div class="content-author">
+                    <div class="content-avatar">
+                        {% if content.author.avatar %}
+                        <img src="{{ content.author.avatar }}" class="avatar-sm" alt="{{ content.author.username }}">
+                        {% else %}
+                        <div class="avatar-sm avatar-text">
+                            {{ content.author.username[0] }}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                    <div>
-                        <div>{{ content.author.username }}</div>
-                        <small class="text-muted">{{ content.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    <div class="content-info">
+                        <div class="author-name">{{ content.author.username }}</div>
+                        <div class="content-time">{{ content.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
                     </div>
                 </div>
                 <div>
@@ -76,8 +80,8 @@
                 </div>
             </div>
             
-            <!-- 内容显示区域 -->
-            <div class="content-display mb-4">
+            <!-- 优化后的内容显示区域 -->
+            <div class="content-display fade-in">
                 {% if content.content_type == 'article' %}
                     <div class="article-content markdown-body">
                         {{ content.text_content|markdown|safe }}
@@ -104,14 +108,14 @@
                 {% endif %}
             </div>
             
-            <!-- 互动工具栏 -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <span class="me-3"><i class="far fa-eye"></i> 浏览 {{ content.comments.count() + content.likes.count() * 2 }}</span>
-                    <span class="me-3"><i class="far fa-comment"></i> 评论 {{ content.comments.count() }}</span>
-                    <span><i class="far fa-heart"></i> 点赞 {{ content.likes.count() }}</span>
+            <!-- 优化后的互动工具栏 -->
+            <div class="content-actions slide-in-right">
+                <div class="content-stats">
+                    <span class="stat-item"><i class="far fa-eye"></i> {{ content.comments.count() + content.likes.count() * 2 }}</span>
+                    <span class="stat-item"><i class="far fa-comment"></i> {{ content.comments.count() }}</span>
+                    <span class="stat-item"><i class="far fa-heart"></i> {{ content.likes.count() }}</span>
                 </div>
-                <div>
+                <div class="content-buttons">
                     {% if current_user.is_authenticated %}
                     <form method="POST" action="{{ url_for('content.like', id=content.id) }}" class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -357,6 +361,25 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 图片显示模式切换
+    window.switchImageMode = function(mode) {
+        const image = document.getElementById('coverImage');
+        const coverBtn = document.getElementById('coverBtn');
+        const fitBtn = document.getElementById('fitBtn');
+        
+        if (mode === 'cover') {
+            image.classList.remove('fit-mode');
+            image.classList.add('cover-mode');
+            coverBtn.classList.add('active');
+            fitBtn.classList.remove('active');
+        } else {
+            image.classList.remove('cover-mode');
+            image.classList.add('fit-mode');
+            fitBtn.classList.add('active');
+            coverBtn.classList.remove('active');
+        }
+    };
+
     // 回复按钮点击事件
     const replyButtons = document.querySelectorAll('.reply-btn');
     replyButtons.forEach(button => {

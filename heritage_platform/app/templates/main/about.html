@@ -3,72 +3,176 @@
 {% block title %}关于我们 - 体育非遗数字展示平台{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <h1 class="mb-4 text-center">关于体育非遗数字展示平台</h1>
-    
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="card-title">我们的使命</h3>
-                    <p class="card-text">
-                        体育非遗数字展示平台致力于为体育非物质文化遗产提供数字化展示与交流平台，连接课堂学习与数字化分享。
-                        我们的目标是通过现代技术手段，促进体育非遗文化的传播与保护，建立学习者社区，实现知识交流。
-                    </p>
-                </div>
+<div class="container-fluid py-5" style="background: linear-gradient(to right bottom, #f8f9fa, #ffffff)">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold mb-3" style="color: #2c3e50">关于体育非遗数字展示平台</h1>
+            <div class="col-md-8 mx-auto">
+                <p class="lead text-muted">连接传统与现代，共创数字化非遗新未来</p>
             </div>
-            
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="card-title">核心价值</h3>
-                    <div class="row">
-                        <div class="col-md-4 text-center mb-3">
-                            <i class="fas fa-chalkboard-teacher fa-3x mb-2 text-primary"></i>
-                            <h5>数字化教学</h5>
-                            <p>为体育非遗课程提供数字化辅助工具</p>
-                        </div>
-                        <div class="col-md-4 text-center mb-3">
-                            <i class="fas fa-shield-alt fa-3x mb-2 text-primary"></i>
-                            <h5>文化保护</h5>
-                            <p>促进体育非遗文化的传播与保护</p>
-                        </div>
-                        <div class="col-md-4 text-center mb-3">
-                            <i class="fas fa-users fa-3x mb-2 text-primary"></i>
-                            <h5>社区交流</h5>
-                            <p>建立学习者社区，实现知识交流</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <!-- 使命部分 - 采用卡片式设计 -->
+            <div class="col-lg-10 mb-5">
+                <div class="card border-0 shadow-sm fade-in" style="border-radius: 20px; background: rgba(255, 255, 255, 0.9)">
+                    <div class="card-body p-5">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center mb-4 mb-md-0">
+                                <i class="fas fa-flag fa-4x mb-3" style="color: #0d6efd"></i>
+                                <h3 class="h4 fw-bold">我们的使命</h3>
+                            </div>
+                            <div class="col-md-8">
+                                <p class="lead mb-0" style="line-height: 1.8">
+                                    体育非遗数字展示平台致力于为体育非物质文化遗产提供数字化展示与交流平台，连接课堂学习与数字化分享。
+                                    我们的目标是通过现代技术手段，促进体育非遗文化的传播与保护，建立学习者社区，实现知识交流。
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="card-title">面向用户</h3>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <strong>学生：</strong>记录学习过程，分享学习成果，与同学交流互动
-                        </li>
-                        <li class="list-group-item">
-                            <strong>教师：</strong>发布教学内容，管理学习任务，指导学生学习
-                        </li>
-                        <li class="list-group-item">
-                            <strong>管理员：</strong>维护平台内容与用户，确保平台健康发展
-                        </li>
-                    </ul>
+            <!-- 核心价值 - 采用交错布局 -->
+            <div class="col-lg-10">
+                <h3 class="text-center h2 mb-5 fw-bold" style="color: #2c3e50">核心价值</h3>
+                
+                <div class="row align-items-center mb-5 slide-in-left">
+                    <div class="col-md-6 order-md-2 mb-4 mb-md-0">
+                        <div class="p-4 bg-primary bg-opacity-10 rounded-circle text-center" style="width: 200px; height: 200px; margin: 0 auto;">
+                            <i class="fas fa-chalkboard-teacher fa-4x text-primary" style="line-height: 200px"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6 order-md-1">
+                        <h4 class="fw-bold mb-3">数字化教学</h4>
+                        <p class="lead">为体育非遗课程提供数字化辅助工具，打造沉浸式学习体验。</p>
+                    </div>
+                </div>
+
+                <div class="row align-items-center mb-5 fade-in">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <div class="p-4 bg-success bg-opacity-10 rounded-circle text-center" style="width: 200px; height: 200px; margin: 0 auto;">
+                            <i class="fas fa-shield-alt fa-4x text-success" style="line-height: 200px"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="fw-bold mb-3">文化保护</h4>
+                        <p class="lead">促进体育非遗文化的传播与保护，守护传统文化瑰宝。</p>
+                    </div>
+                </div>
+
+                <div class="row align-items-center mb-5 slide-in-right">
+                    <div class="col-md-6 order-md-2 mb-4 mb-md-0">
+                        <div class="p-4 bg-warning bg-opacity-10 rounded-circle text-center" style="width: 200px; height: 200px; margin: 0 auto;">
+                            <i class="fas fa-users fa-4x text-warning" style="line-height: 200px"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6 order-md-1">
+                        <h4 class="fw-bold mb-3">社区交流</h4>
+                        <p class="lead">建立学习者社区，实现知识交流，共同进步成长。</p>
+                    </div>
                 </div>
             </div>
             
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">联系我们</h3>
-                    <p class="card-text">
-                        如果您有任何问题、建议或合作意向，请随时与我们联系：
-                    </p>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-envelope me-2"></i>Email: 202481313601.m.scnu</li>
-                        <li><i class="fas fa-phone me-2"></i>电话: 15627697219</li>
-                        <li><i class="fas fa-map-marker-alt me-2"></i>地址: 汕尾华师大</li>
-                    </ul>
+            <!-- 面向用户 - 采用时间轴样式 -->
+            <div class="col-lg-10 mb-5">
+                <h3 class="text-center h2 mb-5 fw-bold" style="color: #2c3e50">面向用户</h3>
+                <div class="position-relative">
+                    <!-- 垂直线 -->
+                    <div class="position-absolute h-100" style="width: 2px; background-color: #e9ecef; left: 50%; transform: translateX(-50%); top: 0;"></div>
+                    
+                    <!-- 学生 -->
+                    <div class="row mb-5">
+                        <div class="col-md-5 text-end">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="fw-bold"><i class="fas fa-user-graduate text-primary me-2"></i>学生</h5>
+                                    <p class="mb-0">记录学习过程，分享学习成果，与同学交流互动</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px; position: relative; z-index: 1;">
+                                1
+                            </div>
+                        </div>
+                        <div class="col-md-5"></div>
+                    </div>
+                    
+                    <!-- 教师 -->
+                    <div class="row mb-5">
+                        <div class="col-md-5"></div>
+                        <div class="col-md-2 text-center">
+                            <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px; position: relative; z-index: 1;">
+                                2
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="fw-bold"><i class="fas fa-chalkboard-teacher text-success me-2"></i>教师</h5>
+                                    <p class="mb-0">发布教学内容，管理学习任务，指导学生学习</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 管理员 -->
+                    <div class="row">
+                        <div class="col-md-5 text-end">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="fw-bold"><i class="fas fa-user-shield text-warning me-2"></i>管理员</h5>
+                                    <p class="mb-0">维护平台内容与用户，确保平台健康发展</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="rounded-circle bg-warning text-white d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px; position: relative; z-index: 1;">
+                                3
+                            </div>
+                        </div>
+                        <div class="col-md-5"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 联系我们 - 采用简约设计 -->
+            <div class="col-lg-10">
+                <div class="bg-white rounded-4 shadow-sm p-5 fade-in" style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);">
+                    <h3 class="text-center h2 mb-5 fw-bold" style="color: #2c3e50">联系我们</h3>
+                    <div class="row justify-content-center text-center g-4">
+                        <div class="col-md-4">
+                            <div class="p-4">
+                                <div class="rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" 
+                                     style="width: 80px; height: 80px; background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);">
+                                    <i class="fas fa-envelope fa-2x text-white"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Email</h5>
+                                <p class="mb-0">202481313601.m.scnu</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4">
+                                <div class="rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" 
+                                     style="width: 80px; height: 80px; background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);">
+                                    <i class="fas fa-phone fa-2x text-white"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">电话</h5>
+                                <p class="mb-0">15627697219</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4">
+                                <div class="rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" 
+                                     style="width: 80px; height: 80px; background: linear-gradient(135deg, #ffc107 0%, #d39e00 100%);">
+                                    <i class="fas fa-map-marker-alt fa-2x text-white"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">地址</h5>
+                                <p class="mb-0">汕尾华师大</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

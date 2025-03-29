@@ -3,11 +3,12 @@
 {% block title %}论坛 - 体育非遗数字展示平台{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">交流论坛</h1>
+<div class="container py-4 fade-in">
+    <div class="content-header mb-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="gradient-text">交流论坛</h1>
         {% if current_user.is_authenticated %}
-        <a href="{{ url_for('forum.create_topic') }}" class="btn btn-primary">
+        <a href="{{ url_for('forum.create_topic') }}" class="btn btn-primary btn-lg btn-hover-float">
             <i class="fas fa-plus-circle me-1"></i> 发布新主题
         </a>
         {% else %}
@@ -15,12 +16,16 @@
             登录后发布主题
         </a>
         {% endif %}
+        </div>
+        <p class="text-muted mt-2 fs-5">在这里与其他用户交流分享对非遗文化的见解和感悟</p>
     </div>
     
     <!-- 分类过滤器 -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="d-flex flex-wrap">
+    <div class="filter-section mb-4 slide-in-left">
+        <div class="card">
+            <div class="card-body p-4">
+                <label class="form-label">话题分类</label>
+                <div class="filter-group" role="group">
                 <a href="{{ url_for('forum.index') }}" class="btn {% if not current_category %}btn-primary{% else %}btn-outline-primary{% endif %} me-2 mb-2">全部</a>
                 {% for category in categories %}
                 <a href="{{ url_for('forum.index', category=category) }}" class="btn {% if current_category == category %}btn-primary{% else %}btn-outline-primary{% endif %} me-2 mb-2">{{ category }}</a>
@@ -30,20 +35,20 @@
     </div>
     
     <!-- 主题列表 -->
-    <div class="card">
-        <div class="card-header bg-light">
+    <div class="card slide-in-right">
+        <div class="card-header">
             <div class="row align-items-center">
-                <div class="col-6 col-md-7">主题</div>
-                <div class="col-3 col-md-2 text-center d-none d-md-block">作者</div>
-                <div class="col-3 col-md-1 text-center">回复</div>
-                <div class="col-3 col-md-2 text-center d-none d-md-block">最后活动</div>
+                <div class="col-6 col-md-7"><i class="fas fa-comments me-2"></i>主题</div>
+                <div class="col-3 col-md-2 text-center d-none d-md-block"><i class="fas fa-user me-2"></i>作者</div>
+                <div class="col-3 col-md-1 text-center"><i class="fas fa-reply me-2"></i>回复</div>
+                <div class="col-3 col-md-2 text-center d-none d-md-block"><i class="fas fa-clock me-2"></i>最后活动</div>
             </div>
         </div>
         <div class="list-group list-group-flush">
             {% if topics %}
                 {% for topic in topics %}
-                <a href="{{ url_for('forum.topic', id=topic.id) }}" class="list-group-item list-group-item-action">
-                    <div class="row align-items-center">
+                <a href="{{ url_for('forum.topic', id=topic.id) }}" class="list-group-item list-group-item-action p-3">
+                    <div class="row align-items-center g-3">
                         <div class="col-6 col-md-7">
                             <div class="d-flex align-items-center">
                                 {% if topic.is_pinned %}
@@ -52,7 +57,7 @@
                                 {% if topic.is_closed %}
                                 <span class="badge bg-secondary me-2">已关闭</span>
                                 {% endif %}
-                                <h5 class="mb-0">{{ topic.title }}</h5>
+                                <h5 class="mb-0 text-primary">{{ topic.title }}</h5>
                             </div>
                             <div class="small text-muted d-block d-md-none mt-1">
                                 {{ topic.creator }} · {{ topic.created_at.strftime('%Y-%m-%d') }}
@@ -62,7 +67,7 @@
                             <small>{{ topic.creator }}</small>
                         </div>
                         <div class="col-3 col-md-1 text-center">
-                            <span class="badge bg-light text-dark">{{ topic.post_count }}</span>
+                            <span class="badge bg-primary bg-opacity-10 text-primary">{{ topic.post_count }}</span>
                         </div>
                         <div class="col-3 col-md-2 text-center d-none d-md-block">
                             <small class="text-muted">
@@ -77,8 +82,18 @@
                 </a>
                 {% endfor %}
             {% else %}
-                <div class="list-group-item text-center py-4">
-                    <p class="mb-0">当前没有主题，成为第一个发布者吧！</p>
+                <div class="list-group-item text-center py-5">
+                    <i class="fas fa-comments text-muted mb-3" style="font-size: 3rem;"></i>
+                    <p class="text-muted mb-3">当前没有主题</p>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('forum.create_topic') }}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-1"></i> 发布新主题
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary">
+                        登录后发布主题
+                    </a>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
@@ -86,8 +101,8 @@
     
     <!-- 分页 -->
     {% if pagination.pages > 1 %}
-    <nav class="mt-4" aria-label="主题分页">
-        <ul class="pagination justify-content-center">
+    <nav class="pagination-section mt-5" aria-label="主题分页">
+        <ul class="pagination pagination-lg justify-content-center">
             {% if pagination.has_prev %}
             <li class="page-item">
                 <a class="page-link" href="{{ url_for('forum.index', page=pagination.prev_num, category=current_category) }}">上一页</a>

@@ -3,8 +3,8 @@
 {% block title %}{{ topic.title }} - 体育非遗数字展示平台{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <nav aria-label="breadcrumb" class="mb-4">
+<div class="container py-4 fade-in">
+    <nav aria-label="breadcrumb" class="mb-4 slide-in-left">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
             <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">论坛</a></li>
@@ -13,36 +13,41 @@
         </ol>
     </nav>
     
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">{{ topic.title }}</h1>
-        <div>
+    <div class="content-header mb-4 slide-in-right">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="gradient-text mb-0">
+                {% if topic.is_pinned %}<i class="fas fa-thumbtack me-2"></i>{% endif %}
+                {% if topic.is_closed %}<i class="fas fa-lock me-2"></i>{% endif %}
+                {{ topic.title }}
+            </h1>
+            <div class="d-flex gap-2">
             {% if current_user.is_authenticated and topic.user_id == current_user.id or current_user.is_admin %}
-            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteTopicModal">
-                <i class="fas fa-trash me-1"></i>删除主题
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteTopicModal">
+                <i class="fas fa-trash-alt me-1"></i>删除主题
             </button>
             {% endif %}
             
             {% if current_user.is_admin %}
             <form method="POST" action="{{ url_for('forum.pin_topic', id=topic.id) }}" class="d-inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="btn btn-outline-primary btn-sm">
+                <button type="submit" class="btn btn-outline-primary">
                     {% if topic.is_pinned %}取消置顶{% else %}置顶{% endif %}
                 </button>
             </form>
             <form method="POST" action="{{ url_for('forum.close_topic', id=topic.id) }}" class="d-inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                <button type="submit" class="btn {% if topic.is_closed %}btn-success{% else %}btn-secondary{% endif %}">
                     {% if topic.is_closed %}打开主题{% else %}关闭主题{% endif %}
                 </button>
             </form>
             {% endif %}
-            <a href="{{ url_for('forum.index') }}" class="btn btn-outline-primary btn-sm">
+            <a href="{{ url_for('forum.index') }}" class="btn btn-outline-primary">
                 返回列表
             </a>
         </div>
     </div>
     
-    <div class="mb-3 text-muted small">
+    <div class="topic-meta mb-4 p-3 bg-light rounded-3 slide-in-left">
         <span class="badge bg-secondary">{{ topic.category }}</span>
         <span class="mx-2">|</span>
         <i class="fas fa-user me-1"></i> {{ topic.creator }}
@@ -55,26 +60,26 @@
     </div>
     
     <!-- 主题帖子 -->
-    <div class="card mb-4">
-        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-            <span>帖子列表</span>
-            <span>共 {{ pagination.total }} 条</span>
+    <div class="card mb-4 slide-in-right">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-comments me-2"></i>帖子列表</span>
+            <span class="badge bg-primary bg-opacity-10 text-primary">共 {{ pagination.total }} 条</span>
         </div>
         <div class="list-group list-group-flush">
             {% for post in posts %}
-            <div class="list-group-item" id="post-{{ post.id }}">
-                <div class="d-flex">
+            <div class="list-group-item p-4" id="post-{{ post.id }}">
+                <div class="d-flex gap-4">
                     <!-- 用户信息 -->
-                    <div class="flex-shrink-0 me-3 text-center" style="width: 100px;">
+                    <div class="user-info text-center" style="min-width: 120px;">
                         {% if post.author_avatar %}
                         <img src="{{ url_for('static', filename=post.author_avatar.replace('static/', '')) }}" class="avatar-md mb-2" alt="{{ post.author }}">
                         {% else %}
-                        <div class="avatar-md mb-2 d-flex align-items-center justify-content-center bg-secondary text-white rounded-circle">
+                        <div class="avatar-md mb-2 d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle">
                             {{ post.author[0] }}
                         </div>
                         {% endif %}
-                        <div>{{ post.author }}</div>
-                        <div class="small text-muted">#{{ loop.index }}</div>
+                        <div class="fw-bold text-primary">{{ post.author }}</div>
+                        <div class="badge bg-light text-dark mt-1">#{{ loop.index }}</div>
                     </div>
                     
                     <!-- 帖子内容 -->
@@ -99,7 +104,7 @@
                             </div>
                             {% endif %}
                         </div>
-                        <div class="post-content">
+                        <div class="post-content p-3 bg-light rounded-3">
                             {{ post.content|safe }}
                         </div>
 
@@ -114,8 +119,8 @@
 
                         <!-- 嵌套回复表单 -->
                         {% if current_user.is_authenticated and not topic.is_closed %}
-                        <div class="reply-form mt-3" id="reply-form-{{ post.id }}" style="display: none;">
-                            <form method="POST" action="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}">
+                        <div class="reply-form mt-3 fade" id="reply-form-{{ post.id }}" style="display: none;">
+                            <form method="POST" action="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="border rounded p-3 bg-light">
                                 {{ form.hidden_tag() }}
                                 <div class="mb-3">
                                     {{ form.content.label(class="form-label") }}
@@ -129,18 +134,23 @@
 
                         <!-- 嵌套回复列表 -->
                         {% if post.replies %}
-                        <div class="replies mt-3 ms-4 border-start ps-3">
-                            {% for reply in post.replies %}
-                            <div class="reply mb-3">
-                                <div class="d-flex align-items-center small text-muted mb-1">
-                                    <i class="fas fa-user me-1"></i> {{ reply.author }}
-                                    <span class="mx-2">|</span>
-                                    <i class="fas fa-clock me-1"></i> {{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}
+                        <div class="replies mt-4">
+                            <div class="ps-4 position-relative">
+                                <div class="position-absolute top-0 bottom-0 start-0 border-start border-2 border-primary bg-opacity-25"></div>
+                                {% for reply in post.replies %}
+                                <div class="reply mb-3 position-relative">
+                                    <div class="position-absolute" style="left: -24px; top: 12px;">
+                                        <i class="fas fa-reply fa-rotate-180 text-primary"></i>
+                                    </div>
+                                    <div class="d-flex align-items-center small text-muted mb-2">
+                                        <span class="fw-bold text-primary me-2">{{ reply.author }}</span>
+                                        <span class="mx-2">·</span>
+                                        <i class="fas fa-clock me-1"></i> {{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </div>
+                                    <div class="reply-content p-2 bg-light rounded">
+                                        {{ reply.content|safe }}
+                                    </div>
                                 </div>
-                                <div class="reply-content">
-                                    {{ reply.content|safe }}
-                                </div>
-                            </div>
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -153,8 +163,8 @@
     
     <!-- 分页 -->
     {% if pagination.pages > 1 %}
-    <nav class="mb-4" aria-label="回复分页">
-        <ul class="pagination justify-content-center">
+    <nav class="pagination-section mt-5 mb-4" aria-label="回复分页">
+        <ul class="pagination pagination-lg justify-content-center">
             {% if pagination.has_prev %}
             <li class="page-item">
                 <a class="page-link" href="{{ url_for('forum.topic', id=topic.id, page=pagination.prev_num) }}">上一页</a>
@@ -198,17 +208,22 @@
     
     <!-- 回复表单 -->
     {% if topic.is_closed and not current_user.is_admin %}
-    <div class="alert alert-warning">此主题已关闭，无法回复</div>
+    <div class="alert alert-warning d-flex align-items-center">
+        <i class="fas fa-lock me-2"></i>
+        <div>此主题已关闭，仅管理员可回复</div>
+    </div>
     {% elif current_user.is_authenticated %}
-    <div class="card">
-        <div class="card-header bg-light">回复</div>
-        <div class="card-body">
-            <form method="POST" action="{{ url_for('forum.topic', id=topic.id) }}">
+    <div class="card shadow-sm slide-in-up">
+        <div class="card-header bg-light">
+            <i class="fas fa-reply me-2"></i>发表回复
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" action="{{ url_for('forum.topic', id=topic.id) }}" class="reply-main-form">
                 {{ form.hidden_tag() }}
                 
                 <div class="mb-3">
                     {{ form.content.label(class="form-label") }}
-                    {{ form.content(class="form-control", rows=5) }}
+                    {{ form.content(class="form-control", rows=5, placeholder="分享你的想法...") }}
                     {% if form.content.errors %}
                         <div class="text-danger">
                             {% for error in form.content.errors %}
@@ -218,16 +233,19 @@
                     {% endif %}
                 </div>
                 
-                <div class="d-grid">
-                    {{ form.submit(class="btn btn-primary") }}
+                <div class="d-flex justify-content-end mt-3">
+                    {{ form.submit(class="btn btn-primary btn-lg px-4") }}
                 </div>
             </form>
         </div>
     </div>
     {% else %}
-    <div class="text-center py-4">
-        <p>登录后才能回复内容</p>
-        <a href="{{ url_for('auth.login', next=request.url) }}" class="btn btn-primary">登录</a>
+    <div class="text-center py-5">
+        <i class="fas fa-user-lock text-muted mb-3" style="font-size: 3rem;"></i>
+        <p class="text-muted mb-3">登录后才能参与讨论</p>
+        <a href="{{ url_for('auth.login', next=request.url) }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-sign-in-alt me-2"></i>立即登录
+        </a>
     </div>
     {% endif %}
 </div>
