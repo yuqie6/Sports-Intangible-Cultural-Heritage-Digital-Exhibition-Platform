@@ -25,12 +25,12 @@ def setup_security(app):
         header_name_mapping={"X-RateLimit-Limit": "X-RateLimit-Limit",
                         "X-RateLimit-Remaining": "X-RateLimit-Remaining",
                         "X-RateLimit-Reset": "X-RateLimit-Reset"},
-        default_limits=["200 per day", "50 per hour"],
+        default_limits=["20000000 per day", "50000 per hour"],
     )
     
     # 为通知相关API设置更宽松的限制
-    limiter.limit("300 per minute")(app.route("/api/notifications/unread-count"))
-    limiter.limit("300 per minute")(app.route("/api/messages/unread-count"))
+    limiter.limit("3000000000000 per minute")(app.route("/api/notifications/unread-count"))
+    limiter.limit("3000000000000 per minute")(app.route("/api/messages/unread-count"))
     
     # 存储limiter实例以供其他模块使用
     app.config['LIMITER'] = limiter

@@ -45,3 +45,797 @@ with app.app_context(). See the documentation for more information.
 2025-03-30 03:20:00,532 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\79abf19bcba240419eb293fb8cf16712_IMG_20250309_123405.jpg
 2025-03-30 03:20:00,533 [INFO] [content:203] - 封面图片上传成功，路径: uploads/images/79abf19bcba240419eb293fb8cf16712_IMG_20250309_123405.jpg
 2025-03-30 03:20:00,541 [INFO] [content:235] - 内容更新成功：ID=2, 标题=凤山妈祖游报告
+2025-03-30 21:58:38,012 [INFO] [content:374] - 收到封面图片上传请求
+2025-03-30 21:58:38,549 [INFO] [file_handlers:193] - 文件已保存: G:\项目赛\heritage_platform\app\static/uploads\images\12dd126535cd463b8c95ae3c12cf609d_00020-339795147.png
+2025-03-30 21:58:42,084 [INFO] [content:298] - 处理封面图片上传: 00020-339795147.png
+2025-03-30 21:58:42,520 [INFO] [file_handlers:193] - 文件已保存: G:\项目赛\heritage_platform\app\static/uploads\images\a6b5de6a65284641bfe1ddd1f6e3e0e2_00020-339795147.png
+2025-03-30 21:58:42,521 [INFO] [content:301] - 封面图片上传成功，路径: uploads/images/a6b5de6a65284641bfe1ddd1f6e3e0e2_00020-339795147.png
+2025-03-30 21:58:42,547 [WARNING] [content:337] - 未检测到图片上传
+2025-03-30 21:58:42,557 [INFO] [content:354] - 内容创建成功：ID=3, 标题=test
+2025-03-30 22:06:42,452 [ERROR] [content:264] - 更新内容失败: 'str' object has no attribute 'filename'
+2025-03-30 22:06:42,455 [ERROR] [content:265] - Traceback (most recent call last):
+  File "G:\项目赛\heritage_platform\app\routes\content.py", line 200, in edit
+    current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'filename'
+
+2025-03-30 22:07:11,561 [ERROR] [content:264] - 更新内容失败: 'str' object has no attribute 'filename'
+2025-03-30 22:07:11,562 [ERROR] [content:265] - Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 200, in edit
+    current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'filename'
+
+2025-03-30 22:07:23,652 [ERROR] [content:264] - 更新内容失败: 'str' object has no attribute 'filename'
+2025-03-30 22:07:23,653 [ERROR] [content:265] - Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 200, in edit
+    current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'filename'
+
+2025-03-30 22:07:53,528 [INFO] [content:374] - 收到封面图片上传请求
+2025-03-30 22:07:54,014 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\7308a776b6a64d788583924b0801924b_00038-2459595195.png
+2025-03-30 22:08:12,449 [INFO] [content:200] - 处理封面图片上传: 00038-2459595195.png
+2025-03-30 22:08:12,900 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\a085090a0bae4814a75e57807ba7b1dc_00038-2459595195.png
+2025-03-30 22:08:12,902 [INFO] [content:203] - 封面图片上传成功，路径: uploads/images/a085090a0bae4814a75e57807ba7b1dc_00038-2459595195.png
+2025-03-30 22:08:12,911 [INFO] [content:257] - 内容更新成功：ID=3, 标题=test
+2025-03-30 22:08:22,083 [ERROR] [content:264] - 更新内容失败: 'str' object has no attribute 'filename'
+2025-03-30 22:08:22,085 [ERROR] [content:265] - Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 200, in edit
+    current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'filename'
+
+2025-03-30 22:09:53,804 [WARNING] [content:337] - 未检测到图片上传
+2025-03-30 22:09:53,809 [INFO] [content:354] - 内容创建成功：ID=4, 标题=1
+2025-03-30 22:25:15,452 [INFO] [content:226] - 处理单个图片上传: 00019-3194159250.png
+2025-03-30 22:25:15,876 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\f308b7abc481482b9526e5f7fc77e874_00019-3194159250.png
+2025-03-30 22:25:15,877 [INFO] [content:229] - 图片上传成功，路径: uploads/images/f308b7abc481482b9526e5f7fc77e874_00019-3194159250.png
+2025-03-30 22:25:15,898 [ERROR] [content:286] - 更新内容失败: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 4, 'file_path': 'uploads/images/f308b7abc481482b9526e5f7fc77e874_00019-3194159250.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 25, 15, 882725)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-30 22:25:15,947 [ERROR] [content:287] - Traceback (most recent call last):
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'heritage_platform.content_images' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 278, in edit
+    db.session.commit()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\scoping.py", line 599, in commit
+    return self._proxied.commit()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4353, in flush
+    self._flush(objects)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4488, in _flush
+    with util.safe_reraise():
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4449, in _flush
+    flush_context.execute()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+sqlalchemy.exc.ProgrammingError: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 4, 'file_path': 'uploads/images/f308b7abc481482b9526e5f7fc77e874_00019-3194159250.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 25, 15, 882725)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+2025-03-30 22:25:27,837 [INFO] [content:417] - 收到封面图片上传请求
+2025-03-30 22:25:28,318 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\e550e655363340808cefc3bdce57329e_00020-339795147.png
+2025-03-30 22:25:35,552 [INFO] [content:200] - 处理封面图片上传: 00020-339795147.png
+2025-03-30 22:25:35,998 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\fbbb49da936147be8119b5668f174eb4_00020-339795147.png
+2025-03-30 22:25:35,999 [INFO] [content:203] - 封面图片上传成功，路径: uploads/images/fbbb49da936147be8119b5668f174eb4_00020-339795147.png
+2025-03-30 22:25:35,999 [INFO] [content:226] - 处理单个图片上传: 00021-1936736670.png
+2025-03-30 22:25:36,325 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\a7f066da905b454d869854b5f357f7c9_00021-1936736670.png
+2025-03-30 22:25:36,326 [INFO] [content:229] - 图片上传成功，路径: uploads/images/a7f066da905b454d869854b5f357f7c9_00021-1936736670.png
+2025-03-30 22:25:36,332 [ERROR] [content:286] - 更新内容失败: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 4, 'file_path': 'uploads/images/a7f066da905b454d869854b5f357f7c9_00021-1936736670.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 25, 36, 329208)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-30 22:25:36,335 [ERROR] [content:287] - Traceback (most recent call last):
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'heritage_platform.content_images' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 278, in edit
+    db.session.commit()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\scoping.py", line 599, in commit
+    return self._proxied.commit()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4353, in flush
+    self._flush(objects)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4488, in _flush
+    with util.safe_reraise():
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4449, in _flush
+    flush_context.execute()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+sqlalchemy.exc.ProgrammingError: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 4, 'file_path': 'uploads/images/a7f066da905b454d869854b5f357f7c9_00021-1936736670.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 25, 36, 329208)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+2025-03-30 22:29:13,153 [INFO] [content:200] - 处理封面图片上传: 00020-339795147.png
+2025-03-30 22:29:13,684 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\f9dcf0556b5c435bac4fd6ce851e681d_00020-339795147.png
+2025-03-30 22:29:13,685 [INFO] [content:203] - 封面图片上传成功，路径: uploads/images/f9dcf0556b5c435bac4fd6ce851e681d_00020-339795147.png
+2025-03-30 22:29:13,685 [INFO] [content:226] - 处理单个图片上传: 00021-1936736670.png
+2025-03-30 22:29:13,985 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\e2e78cdd3941431cb1e14745665ea1b4_00021-1936736670.png
+2025-03-30 22:29:13,987 [INFO] [content:229] - 图片上传成功，路径: uploads/images/e2e78cdd3941431cb1e14745665ea1b4_00021-1936736670.png
+2025-03-30 22:29:13,998 [ERROR] [content:289] - 更新内容失败: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 4, 'file_path': 'uploads/images/e2e78cdd3941431cb1e14745665ea1b4_00021-1936736670.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 29, 13, 992354)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-30 22:29:14,007 [ERROR] [content:290] - Traceback (most recent call last):
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'heritage_platform.content_images' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 281, in edit
+    db.session.commit()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\scoping.py", line 599, in commit
+    return self._proxied.commit()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4353, in flush
+    self._flush(objects)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4488, in _flush
+    with util.safe_reraise():
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4449, in _flush
+    flush_context.execute()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+sqlalchemy.exc.ProgrammingError: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 4, 'file_path': 'uploads/images/e2e78cdd3941431cb1e14745665ea1b4_00021-1936736670.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 29, 13, 992354)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+2025-03-30 22:29:22,387 [INFO] [content:226] - 处理单个图片上传: 00028-2499689602.png
+2025-03-30 22:29:22,763 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\c887e5bafde344f4b11d1a680f81c296_00028-2499689602.png
+2025-03-30 22:29:22,764 [INFO] [content:229] - 图片上传成功，路径: uploads/images/c887e5bafde344f4b11d1a680f81c296_00028-2499689602.png
+2025-03-30 22:29:22,772 [ERROR] [content:289] - 更新内容失败: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 4, 'file_path': 'uploads/images/c887e5bafde344f4b11d1a680f81c296_00028-2499689602.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 29, 22, 768878)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-30 22:29:22,775 [ERROR] [content:290] - Traceback (most recent call last):
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'heritage_platform.content_images' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 281, in edit
+    db.session.commit()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\scoping.py", line 599, in commit
+    return self._proxied.commit()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4353, in flush
+    self._flush(objects)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4488, in _flush
+    with util.safe_reraise():
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4449, in _flush
+    flush_context.execute()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+sqlalchemy.exc.ProgrammingError: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 4, 'file_path': 'uploads/images/c887e5bafde344f4b11d1a680f81c296_00028-2499689602.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 29, 22, 768878)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+2025-03-30 22:31:58,144 [INFO] [content:346] - 处理单个图片上传: 00020-339795147.png
+2025-03-30 22:31:58,593 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\1d548b32948641d3b76264c51ee340cb_00020-339795147.png
+2025-03-30 22:31:58,594 [INFO] [content:349] - 图片上传成功，路径: uploads/images/1d548b32948641d3b76264c51ee340cb_00020-339795147.png
+2025-03-30 22:31:58,599 [ERROR] [content:407] - 创建内容失败: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 5, 'file_path': 'uploads/images/1d548b32948641d3b76264c51ee340cb_00020-339795147.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 31, 58, 596097)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-30 22:31:58,604 [ERROR] [content:408] - Traceback (most recent call last):
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'heritage_platform.content_images' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 399, in create
+    db.session.commit()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\scoping.py", line 599, in commit
+    return self._proxied.commit()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4353, in flush
+    self._flush(objects)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4488, in _flush
+    with util.safe_reraise():
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4449, in _flush
+    flush_context.execute()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+sqlalchemy.exc.ProgrammingError: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 5, 'file_path': 'uploads/images/1d548b32948641d3b76264c51ee340cb_00020-339795147.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 31, 58, 596097)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+2025-03-30 22:36:50,323 [INFO] [content:346] - 处理单个图片上传: 00031-2459595188.png
+2025-03-30 22:36:50,794 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\2cc8c4bddede4c8ca9fcc584955ba2bd_00031-2459595188.png
+2025-03-30 22:36:50,795 [INFO] [content:349] - 图片上传成功，路径: uploads/images/2cc8c4bddede4c8ca9fcc584955ba2bd_00031-2459595188.png
+2025-03-30 22:36:50,803 [ERROR] [content:407] - 创建内容失败: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 6, 'file_path': 'uploads/images/2cc8c4bddede4c8ca9fcc584955ba2bd_00031-2459595188.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 36, 50, 797894)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-30 22:36:50,820 [ERROR] [content:408] - Traceback (most recent call last):
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1146, "Table 'heritage_platform.content_images' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 399, in create
+    db.session.commit()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\scoping.py", line 599, in commit
+    return self._proxied.commit()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1313, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 1288, in _prepare_impl
+    self.session.flush()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4353, in flush
+    self._flush(objects)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4488, in _flush
+    with util.safe_reraise():
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\session.py", line 4449, in _flush
+    flush_context.execute()
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\sql\elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "G:\项目赛\.conda\Lib\site-packages\sqlalchemy\engine\default.py", line 942, in do_execute
+    cursor.execute(statement, parameters)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "G:\项目赛\.conda\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+sqlalchemy.exc.ProgrammingError: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.content_images' doesn't exist")
+[SQL: INSERT INTO content_images (content_id, file_path, caption, `order`, created_at) VALUES (%(content_id)s, %(file_path)s, %(caption)s, %(order)s, %(created_at)s)]
+[parameters: {'content_id': 6, 'file_path': 'uploads/images/2cc8c4bddede4c8ca9fcc584955ba2bd_00031-2459595188.png', 'caption': '', 'order': 0, 'created_at': datetime.datetime(2025, 3, 30, 22, 36, 50, 797894)}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+2025-03-30 22:42:31,080 [INFO] [content:346] - 处理单个图片上传: 00031-2459595188.png
+2025-03-30 22:42:31,507 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\722c4cf38fd64a1cbc41aff37a496a41_00031-2459595188.png
+2025-03-30 22:42:31,507 [INFO] [content:349] - 图片上传成功，路径: uploads/images/722c4cf38fd64a1cbc41aff37a496a41_00031-2459595188.png
+2025-03-30 22:42:31,516 [INFO] [content:400] - 内容创建成功：ID=7, 标题=1
+2025-03-30 22:42:40,776 [INFO] [content:226] - 处理单个图片上传: 00021-1936736670.png
+2025-03-30 22:42:41,094 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\de637544468642da990a633a2a189334_00021-1936736670.png
+2025-03-30 22:42:41,095 [INFO] [content:229] - 图片上传成功，路径: uploads/images/de637544468642da990a633a2a189334_00021-1936736670.png
+2025-03-30 22:42:41,103 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 22:47:01,197 [INFO] [content:226] - 处理单个图片上传: 00027-3240313296.png
+2025-03-30 22:47:01,584 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\6446646a9fdd41cda69d8b9b4ba4137d_00027-3240313296.png
+2025-03-30 22:47:01,585 [INFO] [content:229] - 图片上传成功，路径: uploads/images/6446646a9fdd41cda69d8b9b4ba4137d_00027-3240313296.png
+2025-03-30 22:47:01,596 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 22:55:29,223 [INFO] [content:226] - 处理单个图片上传: 00020-339795147.png
+2025-03-30 22:55:29,683 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\516304b9c0804d0b81d37d89130feca6_00020-339795147.png
+2025-03-30 22:55:29,683 [INFO] [content:229] - 图片上传成功，路径: uploads/images/516304b9c0804d0b81d37d89130feca6_00020-339795147.png
+2025-03-30 22:55:29,691 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 22:55:44,433 [INFO] [content:226] - 处理单个图片上传: 00012-138339222.png
+2025-03-30 22:55:44,758 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\115503f9f9fc45bda16f625252186163_00012-138339222.png
+2025-03-30 22:55:44,760 [INFO] [content:229] - 图片上传成功，路径: uploads/images/115503f9f9fc45bda16f625252186163_00012-138339222.png
+2025-03-30 22:55:44,767 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 22:56:34,016 [INFO] [content:226] - 处理单个图片上传: 00029-730120803.png
+2025-03-30 22:56:34,450 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\a7d839c2ec0946f7b2a926d1d74b0d74_00029-730120803.png
+2025-03-30 22:56:34,451 [INFO] [content:229] - 图片上传成功，路径: uploads/images/a7d839c2ec0946f7b2a926d1d74b0d74_00029-730120803.png
+2025-03-30 22:56:34,458 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 22:58:54,691 [INFO] [content:226] - 处理单个图片上传: 00030-2459595187.png
+2025-03-30 22:58:55,139 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\aebc88b161224a73845ef44e2b17f3ba_00030-2459595187.png
+2025-03-30 22:58:55,141 [INFO] [content:229] - 图片上传成功，路径: uploads/images/aebc88b161224a73845ef44e2b17f3ba_00030-2459595187.png
+2025-03-30 22:58:55,148 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 22:59:20,301 [INFO] [content:420] - 收到封面图片上传请求
+2025-03-30 22:59:20,721 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\0686e51091224c6397ecf2993696ab82_00030-2459595187.png
+2025-03-30 22:59:23,523 [INFO] [content:200] - 处理封面图片上传: 00030-2459595187.png
+2025-03-30 22:59:23,928 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\0402809171644d75a816630971ae7d53_00030-2459595187.png
+2025-03-30 22:59:23,930 [INFO] [content:203] - 封面图片上传成功，路径: uploads/images/0402809171644d75a816630971ae7d53_00030-2459595187.png
+2025-03-30 22:59:23,937 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 22:59:28,935 [ERROR] [content:289] - 更新内容失败: 'str' object has no attribute 'filename'
+2025-03-30 22:59:28,939 [ERROR] [content:290] - Traceback (most recent call last):
+  File "g:\项目赛\heritage_platform\app\routes\content.py", line 199, in edit
+    if form.cover_image.data and form.cover_image.data.filename:
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'filename'
+
+2025-03-30 23:00:06,003 [INFO] [content:420] - 收到封面图片上传请求
+2025-03-30 23:00:06,448 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\dd8ae44eb15d41e0905c3a8dd9e72e75_00029-730120803.png
+2025-03-30 23:00:10,545 [INFO] [content:200] - 处理封面图片上传: 00029-730120803.png
+2025-03-30 23:00:10,979 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\664d03530c114597962e196351961efc_00029-730120803.png
+2025-03-30 23:00:10,980 [INFO] [content:203] - 封面图片上传成功，路径: uploads/images/664d03530c114597962e196351961efc_00029-730120803.png
+2025-03-30 23:00:10,986 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1

@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import current_user, login_required
 from app import db, csrf
-from app.models import Content, HeritageItem, Comment, Like, Favorite
+from app.models import Content, HeritageItem, Comment, Like, Favorite, ContentImage
 from app.forms.content import ContentForm, CommentForm
 from app.utils.file_handlers import ALLOWED_IMAGE_EXTENSIONS, allowed_file, save_file
 from sqlalchemy.exc import SQLAlchemyError
@@ -196,7 +196,8 @@ def edit(id):
             content.content_type = form.content_type.data
             
             # 处理封面图片（适用于所有内容类型）
-            if form.cover_image.data:
+            # 注意：只在用户选择了新封面图片时才处理上传
+            if hasattr(form.cover_image.data, 'filename') and form.cover_image.data.filename:
                 current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
                 cover_path = save_file(form.cover_image.data, 'image')
                 if cover_path:
@@ -205,6 +206,7 @@ def edit(id):
                 else:
                     current_app.logger.error("封面图片上传失败")
                     flash('封面图片上传失败', 'danger')
+                    return render_template('content/edit.html', form=form, content=content)
             
             # 根据内容类型处理不同字段
             if form.content_type.data == 'article':
@@ -217,19 +219,64 @@ def edit(id):
                 # 清除其他类型的内容字段
                 content.text_content = ''
                 content.file_path = ''
-            elif form.content_type.data in ['image', 'video'] and form.file.data:
-                current_app.logger.info(f"处理文件上传: {form.file.data.filename}, 类型: {form.content_type.data}")
-                file_path = save_file(form.file.data, form.content_type.data)
-                if file_path:
-                    current_app.logger.info(f"文件上传成功，路径: {file_path}")
-                    content.file_path = file_path
-                    # 清除其他类型的内容字段
-                    content.text_content = ''
-                    content.rich_content = ''
-                else:
-                    current_app.logger.error("文件上传失败")
-                    flash('文件上传失败', 'danger')
-                    return render_template('content/edit.html', form=form, content=content)
+            elif form.content_type.data == 'image':
+                # 处理多图片上传
+                if form.file.data and hasattr(form.file.data, 'filename') and form.file.data.filename:
+                    # 处理单个文件上传（兼容旧版表单）
+                    current_app.logger.info(f"处理单个图片上传: {form.file.data.filename}")
+                    file_path = save_file(form.file.data, 'image')
+                    if file_path:
+                        current_app.logger.info(f"图片上传成功，路径: {file_path}")
+                        # 创建图片记录
+                        image = ContentImage(
+                            content_id=content.id,
+                            file_path=file_path,
+                            caption=''
+                        )
+                        db.session.add(image)
+                    else:
+                        current_app.logger.error(f"图片上传失败: {form.file.data.filename}")
+                        flash(f'图片上传失败: {form.file.data.filename}', 'danger')
+                        # 不要在这里返回，让用户可以继续保存其他内容
+                
+                # 处理多图片上传
+                if form.multiple_images.data and hasattr(form.multiple_images.data, '__iter__'):
+                    for file in form.multiple_images.data:
+                        if hasattr(file, 'filename') and file.filename:
+                            current_app.logger.info(f"处理多图片上传: {file.filename}")
+                            file_path = save_file(file, 'image')
+                            if file_path:
+                                current_app.logger.info(f"图片上传成功，路径: {file_path}")
+                                # 创建图片记录
+                                image = ContentImage(
+                                    content_id=content.id,
+                                    file_path=file_path,
+                                    caption=''  # 可以从form.image_captions.data中解析，如果需要
+                                )
+                                db.session.add(image)
+                            else:
+                                current_app.logger.error(f"图片上传失败: {file.filename}")
+                                flash(f'图片上传失败: {file.filename}', 'danger')
+                                # 不要在这里返回，让用户可以继续保存其他内容
+                # 清除其他类型的内容字段
+                content.text_content = ''
+                content.rich_content = ''
+            elif form.content_type.data == 'video':
+                # 清除其他类型的内容字段
+                content.text_content = ''
+                content.rich_content = ''
+                
+                # 只有当用户上传了新文件时才处理文件上传
+                if form.file.data and hasattr(form.file.data, 'filename') and form.file.data.filename:
+                    current_app.logger.info(f"处理文件上传: {form.file.data.filename}")
+                    file_path = save_file(form.file.data, 'video')
+                    if file_path:
+                        current_app.logger.info(f"文件上传成功，路径: {file_path}")
+                        content.file_path = file_path
+                    else:
+                        current_app.logger.error("文件上传失败")
+                        flash('文件上传失败', 'danger')
+                        return render_template('content/edit.html', form=form, content=content)
             
             db.session.commit()
             current_app.logger.info(f"内容更新成功：ID={content.id}, 标题={content.title}")
@@ -272,7 +319,7 @@ def create():
             )
             
             # 处理封面图片（适用于所有内容类型）
-            if form.cover_image.data:
+            if form.cover_image.data and form.cover_image.data.filename:
                 current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
                 cover_path = save_file(form.cover_image.data, 'image')
                 if cover_path:
@@ -281,25 +328,72 @@ def create():
                 else:
                     current_app.logger.error("封面图片上传失败")
                     flash('封面图片上传失败', 'danger')
+                    # 保留原有封面图片
+                    # 不要在这里返回，让用户可以继续保存其他内容
             
             # 根据内容类型处理不同字段
             if form.content_type.data == 'article':
                 content.text_content = form.text_content.data
             elif form.content_type.data == 'multimedia':
                 content.rich_content = form.rich_content.data
-            elif form.content_type.data in ['image', 'video']:
-                if form.file.data:
-                    current_app.logger.info(f"处理文件上传: {form.file.data.filename}, 类型: {form.content_type.data}")
-                    file_path = save_file(form.file.data, form.content_type.data)
+            elif form.content_type.data == 'image':
+                # 先保存内容对象以获取ID
+                db.session.add(content)
+                db.session.flush()
+                
+                # 处理单个文件上传（兼容旧版表单）
+                if form.file.data and hasattr(form.file.data, 'filename') and form.file.data.filename:
+                    current_app.logger.info(f"处理单个图片上传: {form.file.data.filename}")
+                    file_path = save_file(form.file.data, 'image')
                     if file_path:
-                        current_app.logger.info(f"文件上传成功，路径: {file_path}")
+                        current_app.logger.info(f"图片上传成功，路径: {file_path}")
+                        # 创建图片记录
+                        image = ContentImage(
+                            content_id=content.id,
+                            file_path=file_path,
+                            caption=''
+                        )
+                        db.session.add(image)
+                    else:
+                        current_app.logger.error(f"图片上传失败: {form.file.data.filename}")
+                        flash(f'图片上传失败: {form.file.data.filename}', 'danger')
+                        # 不要在这里返回，让用户可以继续保存其他内容
+                
+                # 处理多图片上传
+                if form.multiple_images.data and hasattr(form.multiple_images.data, '__iter__'):
+                    for file in form.multiple_images.data:
+                        if hasattr(file, 'filename') and file.filename:
+                            current_app.logger.info(f"处理多图片上传: {file.filename}")
+                            file_path = save_file(file, 'image')
+                            if file_path:
+                                current_app.logger.info(f"图片上传成功，路径: {file_path}")
+                                # 创建图片记录
+                                image = ContentImage(
+                                    content_id=content.id,
+                                    file_path=file_path,
+                                    caption=''  # 可以从form.image_captions.data中解析，如果需要
+                                )
+                                db.session.add(image)
+                            else:
+                                current_app.logger.error(f"图片上传失败: {file.filename}")
+                                db.session.rollback()
+                                flash(f'图片上传失败: {file.filename}', 'danger')
+                                # 不要在这里返回，让用户可以继续保存其他内容
+                elif not form.file.data or not hasattr(form.file.data, 'filename') or not form.file.data.filename:
+                    current_app.logger.warning(f"未检测到图片上传")
+            elif form.content_type.data == 'video':
+                if form.file.data:
+                    current_app.logger.info(f"处理视频上传: {form.file.data.filename}")
+                    file_path = save_file(form.file.data, 'video')
+                    if file_path:
+                        current_app.logger.info(f"视频上传成功，路径: {file_path}")
                         content.file_path = file_path
                     else:
-                        current_app.logger.error("文件上传失败")
-                        flash('文件上传失败', 'danger')
+                        current_app.logger.error("视频上传失败")
+                        flash('视频上传失败', 'danger')
                         return render_template('content/create.html', form=form)
                 else:
-                    current_app.logger.warning(f"未检测到文件上传")
+                    current_app.logger.warning(f"未检测到视频上传")
             
             db.session.add(content)
             db.session.commit()
@@ -517,6 +611,47 @@ def like(id):
         
     return redirect(url_for('content.detail', id=id))
 
+@content_bp.route('/delete_image/<int:id>', methods=['POST'])
+@login_required
+def delete_image(id):
+    """删除内容中的单张图片"""
+    image = ContentImage.query.get_or_404(id)
+    content = Content.query.get_or_404(image.content_id)
+    
+    # 检查权限：只有作者或管理员可以删除
+    if current_user.id != content.user_id and not current_user.is_admin:
+        return jsonify({
+            'success': False,
+            'message': '无权删除此图片'
+        }), 403
+    
+    try:
+        # 删除物理文件
+        image_path = os.path.join(
+            current_app.root_path,
+            'static',
+            image.file_path.replace('/static/', '')
+        )
+        if os.path.exists(image_path):
+            os.remove(image_path)
+        
+        # 删除数据库记录
+        db.session.delete(image)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '图片删除成功'
+        })
+    
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"删除图片失败: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': '删除失败，请稍后重试'
+        }), 500
+
 @content_bp.route('/delete/<int:id>', methods=['POST'])
 @login_required
 def delete(id):
@@ -558,6 +693,19 @@ def delete(id):
                     os.remove(file_path)
             except Exception as e:
                 current_app.logger.error(f"删除内容文件失败: {str(e)}")
+        
+        # 删除相关图片文件
+        for image in content.images:
+            try:
+                image_path = os.path.join(
+                    current_app.root_path,
+                    'static',
+                    image.file_path.replace('/static/', '')
+                )
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+            except Exception as e:
+                current_app.logger.error(f"删除图片文件失败: {str(e)}")
         
         # 删除关联数据
         Comment.query.filter_by(content_id=id).delete()

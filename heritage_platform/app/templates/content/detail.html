@@ -86,10 +86,29 @@
                     <div class="article-content markdown-body">
                         {{ content.text_content|markdown|safe }}
                     </div>
-                {% elif content.content_type == 'image' and content.file_path %}
-                    <div class="text-center">
-                        <img src="{{ url_for('static', filename=content.file_path) }}" class="img-fluid" alt="{{ content.title }}">
-                    </div>
+{% elif content.content_type == 'image' %}
+    <div class="text-center">
+        {% if content.file_path %}
+            <img src="{{ url_for('static', filename=content.file_path) }}" class="img-fluid mb-3" alt="{{ content.title }}">
+        {% endif %}
+        {% if content.images.count() > 0 %}
+            <div class="row g-3">
+                {% for image in content.images %}
+                <div class="col-12 col-md-6">
+                    <img src="{{ url_for('static', filename=image.file_path) }}" class="img-fluid" alt="{{ image.caption or content.title }}">
+                    {% if image.caption %}
+                    <p class="mt-2 text-muted">{{ image.caption }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if not content.file_path and content.images.count() == 0 %}
+            <div class="alert alert-warning">
+                没有可显示的图片内容
+            </div>
+        {% endif %}
+    </div>
                 {% elif content.content_type == 'video' and content.file_path %}
                     <div class="text-center">
                         <video controls class="img-fluid">

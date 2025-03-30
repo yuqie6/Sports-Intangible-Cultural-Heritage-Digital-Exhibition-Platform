@@ -87,7 +87,7 @@
                             {% if content.cover_image %}
                                 <div class="my-2">
                                     <p class="mb-2"><strong>当前封面:</strong></p>
-                                    <img src="{{ content.cover_image }}" class="img-thumbnail" style="max-height: 200px;" alt="当前封面">
+                                    <img src="{{ url_for('static', filename=content.cover_image) }}" class="img-thumbnail" style="max-height: 200px;" alt="当前封面">
                                 </div>
                             {% endif %}
                             <div class="input-group mt-2">
@@ -153,14 +153,44 @@
                                 <i class="fas fa-file-upload text-primary me-2"></i>
                                 {{ form.file.label(class="form-label fw-bold mb-0") }}
                             </div>
-                            {% if content.file_path %}
+                            {% if content.content_type == 'image' %}
                                 <div class="my-2">
-                                    <p class="mb-2"><strong>当前文件:</strong></p>
-                                    {% if content.content_type == 'image' %}
-                                        <img src="{{ content.file_path }}" class="img-thumbnail" style="max-height: 200px;" alt="当前文件">
-                                    {% elif content.content_type == 'video' %}
-                                        <video src="{{ content.file_path }}" class="img-thumbnail" style="max-height: 200px;" controls></video>
+                                    <p class="mb-2"><strong>当前图片:</strong></p>
+                                    {% if content.file_path %}
+                                        <div class="mb-3">
+                                            <img src="{{ url_for('static', filename=content.file_path) }}" class="img-thumbnail" style="max-height: 200px;" alt="当前文件">
+                                        </div>
                                     {% endif %}
+                                    {% if content.images.count() > 0 %}
+                                        <p class="mb-2"><strong>其他图片:</strong></p>
+                                        <div class="row g-2">
+                                            {% for image in content.images %}
+                                            <div class="col-6 col-md-4">
+                                                <div class="card h-100">
+                                                    <div class="position-relative">
+                                                        <img src="{{ url_for('static', filename=image.file_path) }}" class="card-img-top" style="height: 120px; object-fit: cover;" alt="{{ image.caption or '图片' }}">
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 delete-image-btn" 
+                                                                data-image-id="{{ image.id }}"
+                                                                title="删除图片">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="card-body p-2">
+                                                        {% if image.caption %}
+                                                        <p class="card-text small text-muted mb-0">{{ image.caption }}</p>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% elif content.content_type == 'video' and content.file_path %}
+                                <div class="my-2">
+                                    <p class="mb-2"><strong>当前视频:</strong></p>
+                                    <video src="{{ url_for('static', filename=content.file_path) }}" class="img-thumbnail" style="max-height: 200px;" controls></video>
                                 </div>
                             {% endif %}
                             <div class="input-group mt-2">
@@ -175,16 +205,21 @@
                             {% endif %}
                             <small class="form-text text-muted mt-1">
                                 <span id="image-help" class="d-none">
-                                    <i class="fas fa-info-circle me-1"></i>支持JPG、JPEG、PNG和GIF格式，最大文件大小20MB
+                                    <i class="fas fa-info-circle me-1"></i>支持JPG、JPEG、PNG和GIF格式，最大文件大小20MB，可以选择多张图片
                                 </span>
                                 <span id="video-help" class="d-none">
                                     <i class="fas fa-info-circle me-1"></i>支持MP4、WEBM和MOV格式，最大文件大小100MB
                                 </span>
                             </small>
                             <div id="file-preview" class="mt-3 p-3 border rounded d-none">
-                                <h6 class="mb-3"><i class="fas fa-eye me-1"></i>预览</h6>
-                                <img id="image-preview" class="img-fluid rounded mb-2 d-none" alt="预览图">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0"><i class="fas fa-eye me-1"></i>预览</h6>
+                                    <span id="image-count" class="badge bg-primary d-none">0 张图片</span>
+                                </div>
+                                <!-- 单视频预览 -->
                                 <video id="video-preview" class="img-fluid rounded mb-2 d-none" controls></video>
+                                <!-- 多图片预览区域 -->
+                                <div id="image-preview-container" class="row g-2 d-none"></div>
                             </div>
                         </div>
                         
@@ -251,6 +286,7 @@
         const multimediaField = document.getElementById('multimedia-content-field');
         const imageHelp = document.getElementById('image-help');
         const videoHelp = document.getElementById('video-help');
+        const fileInput = document.getElementById('file');
         
         // 隐藏所有字段
         contentFields.forEach(field => field.classList.add('d-none'));
@@ -267,10 +303,26 @@
             if (contentType === 'image') {
                 imageHelp.classList.remove('d-none');
                 videoHelp.classList.add('d-none');
+                // 设置为多文件上传
+                if (fileInput) {
+                    fileInput.setAttribute('multiple', 'multiple');
+                    console.log("已启用多图片上传");
+                }
             } else if (contentType === 'video') {
                 videoHelp.classList.remove('d-none');
                 imageHelp.classList.add('d-none');
+                // 取消多文件上传
+                if (fileInput) {
+                    fileInput.removeAttribute('multiple');
+                    console.log("已禁用多图片上传");
+                }
             }
+        }
+        
+        // 清空预览区域
+        const filePreview = document.getElementById('file-preview');
+        if (filePreview) {
+            filePreview.classList.add('d-none');
         }
         
         console.log("内容类型更改为: " + contentType);
@@ -278,7 +330,52 @@
     
     // 初始化富文本编辑器
     document.addEventListener('DOMContentLoaded', function() {
+        // 初始化内容字段显示
         toggleContentFields();
+        
+        // 图片删除功能
+        document.querySelectorAll('.delete-image-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const imageId = this.dataset.imageId;
+                const imageCard = this.closest('.col-6');
+                
+                if (confirm('确定要删除这张图片吗？')) {
+                    // 发送删除请求
+                    fetch(`{{ url_for('content.delete_image', id=0) }}`.replace('0', imageId), {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // 动画效果移除图片卡片
+                            imageCard.style.transition = 'opacity 0.3s';
+                            imageCard.style.opacity = '0';
+                            setTimeout(() => {
+                                imageCard.remove();
+                                // 如果没有图片了，隐藏"其他图片"标题
+                                const imageContainer = document.querySelector('.row.g-2');
+                                if (imageContainer && !imageContainer.children.length) {
+                                    const otherImagesTitle = document.querySelector('p.mb-2:has(strong:contains("其他图片"))');
+                                    if (otherImagesTitle) {
+                                        otherImagesTitle.remove();
+                                    }
+                                    imageContainer.remove();
+                                }
+                            }, 300);
+                        } else {
+                            alert('删除失败: ' + (data.message || '未知错误'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('删除图片时出错:', error);
+                        alert('删除失败，请稍后重试');
+                    });
+                }
+            });
+        });
         
         // 如果页面上有富文本编辑器，则初始化它
         if (document.getElementById('rich-editor')) {
@@ -542,41 +639,138 @@
     function previewFile(input) {
         const contentType = document.getElementById('content_type').value;
         const preview = document.getElementById('file-preview');
-        const imagePreview = document.getElementById('image-preview');
         const videoPreview = document.getElementById('video-preview');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imageCount = document.getElementById('image-count');
         
         console.log("预览文件, 类型: " + contentType);
         
-        if (input.files && input.files[0]) {
-            console.log("文件名: " + input.files[0].name);
-            console.log("文件大小: " + input.files[0].size + " 字节");
+        if (input.files && input.files.length > 0) {
+            preview.classList.remove('d-none');
             
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                preview.classList.remove('d-none');
+            if (contentType === 'image') {
+                // 清空之前的预览
+                imagePreviewContainer.innerHTML = '';
+                imagePreviewContainer.classList.remove('d-none');
+                videoPreview.classList.add('d-none');
                 
-                if (contentType === 'image') {
-                    imagePreview.src = e.target.result;
-                    imagePreview.classList.remove('d-none');
-                    videoPreview.classList.add('d-none');
-                    console.log("图片预览已设置");
-                } else if (contentType === 'video') {
+                // 更新图片计数
+                imageCount.textContent = input.files.length + ' 张图片';
+                imageCount.classList.remove('d-none');
+                
+                console.log("预览 " + input.files.length + " 张图片");
+                
+                // 为每个文件创建预览
+                Array.from(input.files).forEach((file, index) => {
+                    console.log("处理图片 #" + (index + 1) + ": " + file.name + ", 大小: " + file.size + " 字节");
+                    
+                    const reader = new FileReader();
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col-md-4 col-sm-6 mb-3';
+                    colDiv.dataset.index = index;
+                    
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card h-100';
+                    
+                    const img = document.createElement('img');
+                    img.className = 'card-img-top';
+                    img.alt = '图片 #' + (index + 1);
+                    img.style.height = '160px';
+                    img.style.objectFit = 'cover';
+                    
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body p-2';
+                    
+                    const cardText = document.createElement('p');
+                    cardText.className = 'card-text small text-truncate mb-1';
+                    cardText.title = file.name;
+                    cardText.textContent = file.name;
+                    
+                    const cardFooter = document.createElement('div');
+                    cardFooter.className = 'card-footer p-2 d-flex justify-content-between align-items-center';
+                    
+                    const fileSize = document.createElement('small');
+                    fileSize.className = 'text-muted';
+                    fileSize.textContent = formatFileSize(file.size);
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'btn btn-sm btn-outline-danger';
+                    removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                    removeBtn.title = '移除图片';
+                    removeBtn.onclick = function() {
+                        // 移除预览
+                        colDiv.remove();
+                        
+                        // 更新计数
+                        const remainingImages = imagePreviewContainer.querySelectorAll('.col-md-4').length;
+                        imageCount.textContent = remainingImages + ' 张图片';
+                        
+                        if (remainingImages === 0) {
+                            // 如果没有图片了，隐藏预览区域
+                            preview.classList.add('d-none');
+                            imageCount.classList.add('d-none');
+                            // 清空文件输入
+                            input.value = '';
+                        }
+                        
+                        console.log("移除图片 #" + (index + 1) + ", 剩余 " + remainingImages + " 张图片");
+                    };
+                    
+                    reader.onload = function(e) {
+                        img.src = e.target.result;
+                    };
+                    
+                    reader.onerror = function(e) {
+                        console.error("图片 #" + (index + 1) + " 读取错误: ", e);
+                        img.src = '{{ url_for("static", filename="images/error-image.png") }}';
+                    };
+                    
+                    cardFooter.appendChild(fileSize);
+                    cardFooter.appendChild(removeBtn);
+                    cardBody.appendChild(cardText);
+                    cardDiv.appendChild(img);
+                    cardDiv.appendChild(cardBody);
+                    cardDiv.appendChild(cardFooter);
+                    colDiv.appendChild(cardDiv);
+                    imagePreviewContainer.appendChild(colDiv);
+                    
+                    reader.readAsDataURL(file);
+                });
+            } else if (contentType === 'video') {
+                // 视频预览逻辑保持不变
+                imagePreviewContainer.classList.add('d-none');
+                imageCount.classList.add('d-none');
+                videoPreview.classList.remove('d-none');
+                
+                const file = input.files[0];
+                console.log("预览视频: " + file.name + ", 大小: " + file.size + " 字节");
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
                     videoPreview.src = e.target.result;
-                    videoPreview.classList.remove('d-none');
-                    imagePreview.classList.add('d-none');
                     console.log("视频预览已设置");
-                }
-            };
-            
-            reader.onerror = function(e) {
-                console.error("文件读取错误: ", e);
-            };
-            
-            reader.readAsDataURL(input.files[0]);
+                };
+                
+                reader.onerror = function(e) {
+                    console.error("视频读取错误: ", e);
+                };
+                
+                reader.readAsDataURL(file);
+            }
         } else {
             preview.classList.add('d-none');
+            imageCount.classList.add('d-none');
         }
+    }
+    
+    // 格式化文件大小
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
     
     // 表单验证

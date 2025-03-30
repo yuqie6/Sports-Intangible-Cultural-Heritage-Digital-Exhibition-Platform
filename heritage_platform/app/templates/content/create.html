@@ -146,7 +146,7 @@
                                 {{ form.file.label(class="form-label fw-bold mb-0") }}
                             </div>
                             <div class="input-group">
-                                {{ form.file(class="form-control", onchange="previewFile(this)") }}
+                                {{ form.file(class="form-control", onchange="previewFile(this)", multiple=(content_type=='image')) }}
                             </div>
                             {% if form.file.errors %}
                                 <div class="text-danger mt-1">
@@ -157,16 +157,21 @@
                             {% endif %}
                             <small class="form-text text-muted mt-1">
                                 <span id="image-help" class="d-none">
-                                    <i class="fas fa-info-circle me-1"></i>支持JPG、JPEG、PNG和GIF格式，最大文件大小20MB
+                                    <i class="fas fa-info-circle me-1"></i>支持JPG、JPEG、PNG和GIF格式，最大文件大小20MB，可以选择多张图片
                                 </span>
                                 <span id="video-help" class="d-none">
                                     <i class="fas fa-info-circle me-1"></i>支持MP4、WEBM和MOV格式，最大文件大小100MB
                                 </span>
                             </small>
                             <div id="file-preview" class="mt-3 p-3 border rounded d-none">
-                                <h6 class="mb-3"><i class="fas fa-eye me-1"></i>预览</h6>
-                                <img id="image-preview" class="img-fluid rounded mb-2 d-none" alt="预览图">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0"><i class="fas fa-eye me-1"></i>预览</h6>
+                                    <span id="image-count" class="badge bg-primary d-none">0 张图片</span>
+                                </div>
+                                <!-- 单视频预览 -->
                                 <video id="video-preview" class="img-fluid rounded mb-2 d-none" controls></video>
+                                <!-- 多图片预览区域 -->
+                                <div id="image-preview-container" class="row g-2 d-none"></div>
                             </div>
                         </div>
                         
@@ -233,6 +238,7 @@
         const multimediaField = document.getElementById('multimedia-content-field');
         const imageHelp = document.getElementById('image-help');
         const videoHelp = document.getElementById('video-help');
+        const fileInput = document.getElementById('file');
         
         // 隐藏所有字段
         contentFields.forEach(field => field.classList.add('d-none'));
@@ -249,10 +255,26 @@
             if (contentType === 'image') {
                 imageHelp.classList.remove('d-none');
                 videoHelp.classList.add('d-none');
+                // 设置为多文件上传
+                if (fileInput) {
+                    fileInput.setAttribute('multiple', 'multiple');
+                    console.log("已启用多图片上传");
+                }
             } else if (contentType === 'video') {
                 videoHelp.classList.remove('d-none');
                 imageHelp.classList.add('d-none');
+                // 取消多文件上传
+                if (fileInput) {
+                    fileInput.removeAttribute('multiple');
+                    console.log("已禁用多图片上传");
+                }
             }
+        }
+        
+        // 清空预览区域
+        const filePreview = document.getElementById('file-preview');
+        if (filePreview) {
+            filePreview.classList.add('d-none');
         }
         
         console.log("内容类型更改为: " + contentType);
@@ -524,41 +546,138 @@
     function previewFile(input) {
         const contentType = document.getElementById('content_type').value;
         const preview = document.getElementById('file-preview');
-        const imagePreview = document.getElementById('image-preview');
         const videoPreview = document.getElementById('video-preview');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imageCount = document.getElementById('image-count');
         
         console.log("预览文件, 类型: " + contentType);
         
-        if (input.files && input.files[0]) {
-            console.log("文件名: " + input.files[0].name);
-            console.log("文件大小: " + input.files[0].size + " 字节");
+        if (input.files && input.files.length > 0) {
+            preview.classList.remove('d-none');
             
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                preview.classList.remove('d-none');
+            if (contentType === 'image') {
+                // 清空之前的预览
+                imagePreviewContainer.innerHTML = '';
+                imagePreviewContainer.classList.remove('d-none');
+                videoPreview.classList.add('d-none');
                 
-                if (contentType === 'image') {
-                    imagePreview.src = e.target.result;
-                    imagePreview.classList.remove('d-none');
-                    videoPreview.classList.add('d-none');
-                    console.log("图片预览已设置");
-                } else if (contentType === 'video') {
+                // 更新图片计数
+                imageCount.textContent = input.files.length + ' 张图片';
+                imageCount.classList.remove('d-none');
+                
+                console.log("预览 " + input.files.length + " 张图片");
+                
+                // 为每个文件创建预览
+                Array.from(input.files).forEach((file, index) => {
+                    console.log("处理图片 #" + (index + 1) + ": " + file.name + ", 大小: " + file.size + " 字节");
+                    
+                    const reader = new FileReader();
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col-md-4 col-sm-6 mb-3';
+                    colDiv.dataset.index = index;
+                    
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card h-100';
+                    
+                    const img = document.createElement('img');
+                    img.className = 'card-img-top';
+                    img.alt = '图片 #' + (index + 1);
+                    img.style.height = '160px';
+                    img.style.objectFit = 'cover';
+                    
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body p-2';
+                    
+                    const cardText = document.createElement('p');
+                    cardText.className = 'card-text small text-truncate mb-1';
+                    cardText.title = file.name;
+                    cardText.textContent = file.name;
+                    
+                    const cardFooter = document.createElement('div');
+                    cardFooter.className = 'card-footer p-2 d-flex justify-content-between align-items-center';
+                    
+                    const fileSize = document.createElement('small');
+                    fileSize.className = 'text-muted';
+                    fileSize.textContent = formatFileSize(file.size);
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'btn btn-sm btn-outline-danger';
+                    removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                    removeBtn.title = '移除图片';
+                    removeBtn.onclick = function() {
+                        // 移除预览
+                        colDiv.remove();
+                        
+                        // 更新计数
+                        const remainingImages = imagePreviewContainer.querySelectorAll('.col-md-4').length;
+                        imageCount.textContent = remainingImages + ' 张图片';
+                        
+                        if (remainingImages === 0) {
+                            // 如果没有图片了，隐藏预览区域
+                            preview.classList.add('d-none');
+                            imageCount.classList.add('d-none');
+                            // 清空文件输入
+                            input.value = '';
+                        }
+                        
+                        console.log("移除图片 #" + (index + 1) + ", 剩余 " + remainingImages + " 张图片");
+                    };
+                    
+                    reader.onload = function(e) {
+                        img.src = e.target.result;
+                    };
+                    
+                    reader.onerror = function(e) {
+                        console.error("图片 #" + (index + 1) + " 读取错误: ", e);
+                        img.src = '{{ url_for("static", filename="images/error-image.png") }}';
+                    };
+                    
+                    cardFooter.appendChild(fileSize);
+                    cardFooter.appendChild(removeBtn);
+                    cardBody.appendChild(cardText);
+                    cardDiv.appendChild(img);
+                    cardDiv.appendChild(cardBody);
+                    cardDiv.appendChild(cardFooter);
+                    colDiv.appendChild(cardDiv);
+                    imagePreviewContainer.appendChild(colDiv);
+                    
+                    reader.readAsDataURL(file);
+                });
+            } else if (contentType === 'video') {
+                // 视频预览逻辑保持不变
+                imagePreviewContainer.classList.add('d-none');
+                imageCount.classList.add('d-none');
+                videoPreview.classList.remove('d-none');
+                
+                const file = input.files[0];
+                console.log("预览视频: " + file.name + ", 大小: " + file.size + " 字节");
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
                     videoPreview.src = e.target.result;
-                    videoPreview.classList.remove('d-none');
-                    imagePreview.classList.add('d-none');
                     console.log("视频预览已设置");
-                }
-            };
-            
-            reader.onerror = function(e) {
-                console.error("文件读取错误: ", e);
-            };
-            
-            reader.readAsDataURL(input.files[0]);
+                };
+                
+                reader.onerror = function(e) {
+                    console.error("视频读取错误: ", e);
+                };
+                
+                reader.readAsDataURL(file);
+            }
         } else {
             preview.classList.add('d-none');
+            imageCount.classList.add('d-none');
         }
+    }
+    
+    // 格式化文件大小
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
     
     // 表单验证

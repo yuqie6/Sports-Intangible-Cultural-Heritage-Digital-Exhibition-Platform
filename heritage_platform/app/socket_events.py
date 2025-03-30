@@ -10,7 +10,7 @@ import json
 
 @socketio.on('connect')
 @websocket_error_handler
-def handle_connect():
+def handle_connect(data=None):
     """处理客户端连接事件"""
     if current_user.is_authenticated:
         current_app.websocket_manager.register_connection(current_user.id, request.sid)
@@ -18,7 +18,7 @@ def handle_connect():
 
 @socketio.on('disconnect')
 @websocket_error_handler
-def handle_disconnect():
+def handle_disconnect(data=None):
     """处理客户端断开连接事件"""
     if current_user.is_authenticated:
         current_app.websocket_manager.unregister_connection(current_user.id)
