@@ -220,28 +220,11 @@ def edit(id):
                 content.text_content = ''
                 content.file_path = ''
             elif form.content_type.data == 'image':
-                # 处理多图片上传
-                if form.file.data and hasattr(form.file.data, 'filename') and form.file.data.filename:
-                    # 处理单个文件上传（兼容旧版表单）
-                    current_app.logger.info(f"处理单个图片上传: {form.file.data.filename}")
-                    file_path = save_file(form.file.data, 'image')
-                    if file_path:
-                        current_app.logger.info(f"图片上传成功，路径: {file_path}")
-                        # 创建图片记录
-                        image = ContentImage(
-                            content_id=content.id,
-                            file_path=file_path,
-                            caption=''
-                        )
-                        db.session.add(image)
-                    else:
-                        current_app.logger.error(f"图片上传失败: {form.file.data.filename}")
-                        flash(f'图片上传失败: {form.file.data.filename}', 'danger')
-                        # 不要在这里返回，让用户可以继续保存其他内容
-                
-                # 处理多图片上传
-                if form.multiple_images.data and hasattr(form.multiple_images.data, '__iter__'):
-                    for file in form.multiple_images.data:
+                # 首先处理多图片上传
+                if form.multiple_images.data:
+                    current_app.logger.info("处理多图片上传")
+                    files = request.files.getlist('multiple_images')
+                    for file in files:
                         if hasattr(file, 'filename') and file.filename:
                             current_app.logger.info(f"处理多图片上传: {file.filename}")
                             file_path = save_file(file, 'image')
@@ -341,27 +324,11 @@ def create():
                 db.session.add(content)
                 db.session.flush()
                 
-                # 处理单个文件上传（兼容旧版表单）
-                if form.file.data and hasattr(form.file.data, 'filename') and form.file.data.filename:
-                    current_app.logger.info(f"处理单个图片上传: {form.file.data.filename}")
-                    file_path = save_file(form.file.data, 'image')
-                    if file_path:
-                        current_app.logger.info(f"图片上传成功，路径: {file_path}")
-                        # 创建图片记录
-                        image = ContentImage(
-                            content_id=content.id,
-                            file_path=file_path,
-                            caption=''
-                        )
-                        db.session.add(image)
-                    else:
-                        current_app.logger.error(f"图片上传失败: {form.file.data.filename}")
-                        flash(f'图片上传失败: {form.file.data.filename}', 'danger')
-                        # 不要在这里返回，让用户可以继续保存其他内容
-                
                 # 处理多图片上传
-                if form.multiple_images.data and hasattr(form.multiple_images.data, '__iter__'):
-                    for file in form.multiple_images.data:
+                if form.multiple_images.data:
+                    current_app.logger.info("处理多图片上传")
+                    files = request.files.getlist('multiple_images')
+                    for file in files:
                         if hasattr(file, 'filename') and file.filename:
                             current_app.logger.info(f"处理多图片上传: {file.filename}")
                             file_path = save_file(file, 'image')

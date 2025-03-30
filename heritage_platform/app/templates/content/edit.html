@@ -194,7 +194,11 @@
                                 </div>
                             {% endif %}
                             <div class="input-group mt-2">
-                                {{ form.file(class="form-control", onchange="previewFile(this)") }}
+                                {% if content.content_type == 'image' %}
+                                    {{ form.multiple_images(class="form-control", onchange="previewFile(this)") }}
+                                {% else %}
+                                    {{ form.file(class="form-control", onchange="previewFile(this)") }}
+                                {% endif %}
                             </div>
                             {% if form.file.errors %}
                                 <div class="text-danger mt-1">
@@ -286,8 +290,6 @@
         const multimediaField = document.getElementById('multimedia-content-field');
         const imageHelp = document.getElementById('image-help');
         const videoHelp = document.getElementById('video-help');
-        const fileInput = document.getElementById('file');
-        
         // 隐藏所有字段
         contentFields.forEach(field => field.classList.add('d-none'));
         
@@ -303,19 +305,17 @@
             if (contentType === 'image') {
                 imageHelp.classList.remove('d-none');
                 videoHelp.classList.add('d-none');
-                // 设置为多文件上传
-                if (fileInput) {
-                    fileInput.setAttribute('multiple', 'multiple');
-                    console.log("已启用多图片上传");
-                }
+                // 切换到多图片上传字段
+                document.querySelector('[name="multiple_images"]').classList.remove('d-none');
+                document.querySelector('[name="file"]').classList.add('d-none');
+                console.log("已切换到多图片上传字段");
             } else if (contentType === 'video') {
                 videoHelp.classList.remove('d-none');
                 imageHelp.classList.add('d-none');
-                // 取消多文件上传
-                if (fileInput) {
-                    fileInput.removeAttribute('multiple');
-                    console.log("已禁用多图片上传");
-                }
+                // 切换到普通文件上传字段
+                document.querySelector('[name="multiple_images"]').classList.add('d-none');
+                document.querySelector('[name="file"]').classList.remove('d-none');
+                console.log("已切换到视频上传字段");
             }
         }
         

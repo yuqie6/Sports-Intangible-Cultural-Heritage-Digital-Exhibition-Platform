@@ -87,18 +87,27 @@
                         {{ content.text_content|markdown|safe }}
                     </div>
 {% elif content.content_type == 'image' %}
-    <div class="text-center">
+    <div class="image-gallery">
         {% if content.file_path %}
-            <img src="{{ url_for('static', filename=content.file_path) }}" class="img-fluid mb-3" alt="{{ content.title }}">
+            <div class="gallery-item main-image">
+                <a href="{{ url_for('static', filename=content.file_path) }}" class="gallery-link" data-lightbox="gallery" data-title="{{ content.title }}">
+                    <img src="{{ url_for('static', filename=content.file_path) }}" class="img-fluid" alt="{{ content.title }}">
+                </a>
+            </div>
         {% endif %}
         {% if content.images.count() > 0 %}
-            <div class="row g-3">
+            <div class="gallery-grid">
                 {% for image in content.images %}
-                <div class="col-12 col-md-6">
-                    <img src="{{ url_for('static', filename=image.file_path) }}" class="img-fluid" alt="{{ image.caption or content.title }}">
-                    {% if image.caption %}
-                    <p class="mt-2 text-muted">{{ image.caption }}</p>
-                    {% endif %}
+                <div class="gallery-item">
+                    <a href="{{ url_for('static', filename=image.file_path) }}" class="gallery-link" data-lightbox="gallery" data-title="{{ image.caption or content.title }}">
+                        <img src="{{ url_for('static', filename=image.file_path) }}" class="img-fluid" alt="{{ image.caption or content.title }}">
+                        <div class="gallery-item-overlay">
+                            <i class="fas fa-search-plus"></i>
+                            {% if image.caption %}
+                            <div class="gallery-caption">{{ image.caption }}</div>
+                            {% endif %}
+                        </div>
+                    </a>
                 </div>
                 {% endfor %}
             </div>
@@ -378,9 +387,20 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }} {# 继承父模板的scripts块内容 #}
+<!-- Lightbox2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 图片显示模式切换
+    lightbox.option({
+        'resizeDuration': 200,
+        'wrapAround': true,
+        'albumLabel': '图片 %1 of %2',
+        'fadeDuration': 300,
+        'imageFadeDuration': 300
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 图片显示模式切换
     window.switchImageMode = function(mode) {
         const image = document.getElementById('coverImage');
         const coverBtn = document.getElementById('coverBtn');
@@ -422,6 +442,9 @@ document.addEventListener('DOMContentLoaded', function() {
 {% endblock %}
 
 {% block styles %}
+{{ super() }} {# 继承父模板的styles块内容 #}
+<!-- Lightbox2 CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
 <style>
 .markdown-body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";

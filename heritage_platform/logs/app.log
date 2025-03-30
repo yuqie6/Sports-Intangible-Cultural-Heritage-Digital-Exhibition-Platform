@@ -839,3 +839,90 @@ AttributeError: 'str' object has no attribute 'filename'
 2025-03-30 23:00:10,979 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\664d03530c114597962e196351961efc_00029-730120803.png
 2025-03-30 23:00:10,980 [INFO] [content:203] - 封面图片上传成功，路径: uploads/images/664d03530c114597962e196351961efc_00029-730120803.png
 2025-03-30 23:00:10,986 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 23:01:24,571 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 23:01:59,411 [INFO] [content:346] - 处理单个图片上传: 00030-2459595187.png
+2025-03-30 23:01:59,842 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\191b826053a443768f94ebfcd14abf26_00030-2459595187.png
+2025-03-30 23:01:59,843 [INFO] [content:349] - 图片上传成功，路径: uploads/images/191b826053a443768f94ebfcd14abf26_00030-2459595187.png
+2025-03-30 23:01:59,849 [INFO] [content:400] - 内容创建成功：ID=8, 标题=欢迎
+2025-03-30 23:07:45,772 [INFO] [content:386] - 处理视频上传: 屏幕录制 2024-10-20 013317.mp4
+2025-03-30 23:07:45,784 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\videos\8560dd94c2604c30b728bae9534f44c6_2024-10-20_013317.mp4
+2025-03-30 23:07:45,785 [INFO] [content:389] - 视频上传成功，路径: uploads/videos/8560dd94c2604c30b728bae9534f44c6_2024-10-20_013317.mp4
+2025-03-30 23:07:45,794 [INFO] [content:400] - 内容创建成功：ID=9, 标题=欢迎
+2025-03-30 23:24:48,649 [INFO] [content:201] - 处理封面图片上传: 00070-3740821447.png
+2025-03-30 23:24:48,958 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\b6ffd47005c84dbc8561eebedd160240_00070-3740821447.png
+2025-03-30 23:24:48,959 [INFO] [content:204] - 封面图片上传成功，路径: uploads/images/b6ffd47005c84dbc8561eebedd160240_00070-3740821447.png
+2025-03-30 23:24:48,967 [INFO] [content:282] - 内容更新成功：ID=9, 标题=欢迎
+2025-03-30 23:25:07,590 [WARNING] [content:396] - 未检测到视频上传
+2025-03-30 23:25:07,599 [INFO] [content:400] - 内容创建成功：ID=10, 标题=1
+2025-03-30 23:27:44,060 [INFO] [socket_events:17] - 用户 yuqie (ID: 1) 已连接
+2025-03-30 23:27:44,168 [INFO] [socket_events:37] - 用户 yuqie (ID: 1) 加入群组聊天室: group_1
+2025-03-30 23:27:47,151 [INFO] [socket_events:25] - 用户 yuqie (ID: 1) 已断开连接
+2025-03-30 23:30:28,413 [INFO] [socket_events:17] - 用户 yuqie (ID: 1) 已连接
+2025-03-30 23:30:28,525 [INFO] [socket_events:37] - 用户 yuqie (ID: 1) 加入群组聊天室: group_1
+2025-03-30 23:30:54,619 [INFO] [socket_events:25] - 用户 yuqie (ID: 1) 已断开连接
+2025-03-30 23:31:02,845 [INFO] [socket_events:17] - 用户 yuqie (ID: 1) 已连接
+2025-03-30 23:31:02,874 [INFO] [socket_events:37] - 用户 yuqie (ID: 1) 加入群组聊天室: group_1
+2025-03-30 23:31:03,461 [INFO] [socket_events:25] - 用户 yuqie (ID: 1) 已断开连接
+2025-03-30 23:31:12,439 [INFO] [socket_events:17] - 用户 yuqie (ID: 1) 已连接
+2025-03-30 23:31:12,628 [INFO] [socket_events:37] - 用户 yuqie (ID: 1) 加入群组聊天室: group_1
+2025-03-30 23:31:15,922 [INFO] [socket_events:25] - 用户 yuqie (ID: 1) 已断开连接
+2025-03-30 23:31:18,919 [INFO] [socket_events:17] - 用户 yuqie (ID: 1) 已连接
+2025-03-30 23:31:18,940 [INFO] [socket_events:37] - 用户 yuqie (ID: 1) 加入群组聊天室: group_1
+2025-03-30 23:33:09,337 [INFO] [socket_events:25] - 用户 yuqie (ID: 1) 已断开连接
+2025-03-30 23:33:09,835 [INFO] [socket_events:17] - 用户 yuqie (ID: 1) 已连接
+2025-03-30 23:33:09,872 [INFO] [socket_events:37] - 用户 yuqie (ID: 1) 加入群组聊天室: group_1
+2025-03-30 23:33:22,207 [INFO] [socket_events:25] - 用户 yuqie (ID: 1) 已断开连接
+2025-03-30 23:33:42,557 [INFO] [socket_events:17] - 用户 yuqie (ID: 1) 已连接
+2025-03-30 23:33:42,582 [INFO] [socket_events:37] - 用户 yuqie (ID: 1) 加入群组聊天室: group_1
+2025-03-30 23:33:44,691 [INFO] [socket_events:25] - 用户 yuqie (ID: 1) 已断开连接
+2025-03-30 23:35:45,675 [INFO] [content:226] - 处理单个图片上传: 00073-3838779906 - 副本.png
+2025-03-30 23:35:46,145 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\3d1d279e9f8b4476bbb7071fc9955a93_00073-3838779906_-_.png
+2025-03-30 23:35:46,146 [INFO] [content:229] - 图片上传成功，路径: uploads/images/3d1d279e9f8b4476bbb7071fc9955a93_00073-3838779906_-_.png
+2025-03-30 23:35:46,154 [INFO] [content:282] - 内容更新成功：ID=1, 标题=测试
+2025-03-30 23:36:22,119 [INFO] [content:226] - 处理单个图片上传: 00088-3838779921.png
+2025-03-30 23:36:22,686 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\cb8dd088605d4219b7a6a35ac16e36b7_00088-3838779921.png
+2025-03-30 23:36:22,687 [INFO] [content:229] - 图片上传成功，路径: uploads/images/cb8dd088605d4219b7a6a35ac16e36b7_00088-3838779921.png
+2025-03-30 23:36:22,696 [INFO] [content:282] - 内容更新成功：ID=1, 标题=测试
+2025-03-30 23:36:52,989 [INFO] [content:226] - 处理单个图片上传: 00080-3838779913.png
+2025-03-30 23:36:53,427 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\331e6939bdef47779f2e9415ef4e574a_00080-3838779913.png
+2025-03-30 23:36:53,427 [INFO] [content:229] - 图片上传成功，路径: uploads/images/331e6939bdef47779f2e9415ef4e574a_00080-3838779913.png
+2025-03-30 23:36:53,433 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 23:37:50,857 [INFO] [content:226] - 处理单个图片上传: 00088-3838779921.png
+2025-03-30 23:37:51,408 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\bdd9c77b0d494a3584fcf6d80f2c8b39_00088-3838779921.png
+2025-03-30 23:37:51,409 [INFO] [content:229] - 图片上传成功，路径: uploads/images/bdd9c77b0d494a3584fcf6d80f2c8b39_00088-3838779921.png
+2025-03-30 23:37:51,415 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 23:39:17,232 [INFO] [content:226] - 处理单个图片上传: 00059-3129917822.png
+2025-03-30 23:39:17,789 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\7ef1b11c7174459abf2bd9f2a67778fa_00059-3129917822.png
+2025-03-30 23:39:17,790 [INFO] [content:229] - 图片上传成功，路径: uploads/images/7ef1b11c7174459abf2bd9f2a67778fa_00059-3129917822.png
+2025-03-30 23:39:17,798 [INFO] [content:282] - 内容更新成功：ID=7, 标题=1
+2025-03-30 23:42:13,659 [INFO] [content:346] - 处理单个图片上传: 00104-3838779937.png
+2025-03-30 23:42:14,060 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\654aa25e4c8644ac9a197f4e1d875d1d_00104-3838779937.png
+2025-03-30 23:42:14,061 [INFO] [content:349] - 图片上传成功，路径: uploads/images/654aa25e4c8644ac9a197f4e1d875d1d_00104-3838779937.png
+2025-03-30 23:42:14,068 [INFO] [content:400] - 内容创建成功：ID=11, 标题=欢迎
+2025-03-30 23:45:42,221 [INFO] [content:299] - 内容更新成功：ID=11, 标题=欢迎
+2025-03-30 23:57:56,173 [INFO] [content:264] - 内容更新成功：ID=11, 标题=欢迎
+2025-03-31 00:27:06,310 [INFO] [content:264] - 内容更新成功：ID=11, 标题=欢迎
+2025-03-31 00:28:28,503 [INFO] [content:226] - 处理单个图片上传: 00090-3838779923.png
+2025-03-31 00:28:28,897 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\4b77202d98c347d3a0080a2bc010cf22_00090-3838779923.png
+2025-03-31 00:28:28,898 [INFO] [content:229] - 图片上传成功，路径: uploads/images/4b77202d98c347d3a0080a2bc010cf22_00090-3838779923.png
+2025-03-31 00:28:28,908 [INFO] [content:282] - 内容更新成功：ID=11, 标题=欢迎
+2025-03-31 00:32:06,135 [INFO] [content:282] - 内容更新成功：ID=11, 标题=欢迎
+2025-03-31 00:35:14,551 [INFO] [content:225] - 处理多图片上传
+2025-03-31 00:35:14,551 [INFO] [content:229] - 处理多图片上传: 00087-3838779920.png
+2025-03-31 00:35:14,956 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\0a1799a1c0414680b92d344c4ba89b38_00087-3838779920.png
+2025-03-31 00:35:14,958 [INFO] [content:232] - 图片上传成功，路径: uploads/images/0a1799a1c0414680b92d344c4ba89b38_00087-3838779920.png
+2025-03-31 00:35:14,960 [INFO] [content:229] - 处理多图片上传: 00088-3838779921.png
+2025-03-31 00:35:15,520 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\b714e170fa39423186315662c0f277ad_00088-3838779921.png
+2025-03-31 00:35:15,521 [INFO] [content:232] - 图片上传成功，路径: uploads/images/b714e170fa39423186315662c0f277ad_00088-3838779921.png
+2025-03-31 00:35:15,530 [INFO] [content:265] - 内容更新成功：ID=11, 标题=欢迎
+2025-03-31 00:41:22,768 [INFO] [content:225] - 处理多图片上传
+2025-03-31 00:41:22,769 [INFO] [content:229] - 处理多图片上传: 00078-3838779911.png
+2025-03-31 00:41:23,215 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\bcaba8508dff4cd5aca1dc217f26ec30_00078-3838779911.png
+2025-03-31 00:41:23,216 [INFO] [content:232] - 图片上传成功，路径: uploads/images/bcaba8508dff4cd5aca1dc217f26ec30_00078-3838779911.png
+2025-03-31 00:41:23,217 [INFO] [content:229] - 处理多图片上传: 00079-3838779912.png
+2025-03-31 00:41:23,603 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\8f9ccf02d86b4cb4b9a5f4438386debc_00079-3838779912.png
+2025-03-31 00:41:23,604 [INFO] [content:232] - 图片上传成功，路径: uploads/images/8f9ccf02d86b4cb4b9a5f4438386debc_00079-3838779912.png
+2025-03-31 00:41:23,604 [INFO] [content:229] - 处理多图片上传: 00080-3838779913.png
+2025-03-31 00:41:24,026 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\9aab5729638749bbab4cbdebe2122d1f_00080-3838779913.png
+2025-03-31 00:41:24,027 [INFO] [content:232] - 图片上传成功，路径: uploads/images/9aab5729638749bbab4cbdebe2122d1f_00080-3838779913.png
+2025-03-31 00:41:24,035 [INFO] [content:265] - 内容更新成功：ID=11, 标题=欢迎
