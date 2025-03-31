@@ -926,3 +926,5 @@ AttributeError: 'str' object has no attribute 'filename'
 2025-03-31 00:41:24,026 [INFO] [file_handlers:193] - 文件已保存: g:\项目赛\heritage_platform\app\static/uploads\images\9aab5729638749bbab4cbdebe2122d1f_00080-3838779913.png
 2025-03-31 00:41:24,027 [INFO] [content:232] - 图片上传成功，路径: uploads/images/9aab5729638749bbab4cbdebe2122d1f_00080-3838779913.png
 2025-03-31 00:41:24,035 [INFO] [content:265] - 内容更新成功：ID=11, 标题=欢迎
+2025-03-31 17:35:31,849 [INFO] [content:36] - 处理搜索请求: '武术'
+2025-03-31 17:40:09,485 [INFO] [content:36] - 处理搜索请求: '武术'

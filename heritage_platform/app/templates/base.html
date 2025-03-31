@@ -24,48 +24,91 @@
                 <i class="fas fa-dragon me-2"></i>
                 <span>体育非遗数字平台</span>
             </a>
+
+            <!-- 移动端顶部搜索框 -->
+            <form class="d-lg-none flex-grow-1 mx-2" action="{{ url_for('content.list') }}" method="GET"> <!-- flex-grow-1 让其填充空间, mx-2 增加左右边距 -->
+                <div class="input-group input-group-sm"> <!-- 使用小尺寸输入组 -->
+                    <input class="form-control" type="search" name="q" placeholder="搜索非遗内容文章" aria-label="Search">
+                    <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+
+            <!-- 移动端顶部右侧图标区域 -->
+            <div class="d-lg-none d-flex align-items-center ms-auto order-lg-1"> <!-- order-lg-1 确保在桌面端不影响布局 -->
+                {% if current_user.is_authenticated %}
+                <!-- 通知图标 (仅移动端顶部) -->
+                <a class="nav-link position-relative px-2" href="{{ url_for('notification.list_notifications') }}" title="通知中心"> <!-- 调整内边距 -->
+                    <i class="fas fa-bell fs-5 text-warning"></i>
+                    <span id="mobile-notification-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 0.6em; padding: 0.2em 0.4em;"></span>
+                </a>
+                <!-- 私信图标 (仅移动端顶部) -->
+                <a class="nav-link position-relative px-2" href="{{ url_for('message.message_list') }}" title="私信消息"> <!-- 调整内边距 -->
+                    <i class="fas fa-envelope fs-5 text-info"></i>
+                    <span id="mobile-message-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 0.6em; padding: 0.2em 0.4em;"></span>
+                </a>
+                {% endif %}
+            </div>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- 主导航链接 (桌面端) -->
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
+                    <li class="nav-item d-none d-lg-block">
                         <a class="nav-link {% if request.path == url_for('main.index') %}active{% endif %}" href="{{ url_for('main.index') }}">
                             <i class="fas fa-home me-1"></i>首页
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-none d-lg-block">
                         <a class="nav-link {% if request.path.startswith('/heritage') %}active{% endif %}" href="{{ url_for('heritage.list') }}">
                             <i class="fas fa-landmark me-1"></i>非遗项目
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-none d-lg-block">
                         <a class="nav-link {% if request.path.startswith('/content') %}active{% endif %}" href="{{ url_for('content.list') }}">
                             <i class="fas fa-book-open me-1"></i>内容专区
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-none d-lg-block">
                         <a class="nav-link {% if request.path.startswith('/forum') %}active{% endif %}" href="{{ url_for('forum.index') }}">
                             <i class="fas fa-comments me-1"></i>交流论坛
                         </a>
                     </li>
-                    <li class="nav-item">
+                     <li class="nav-item d-none d-lg-block"> <!-- 关于我们 (桌面端) -->
                         <a class="nav-link {% if request.path == url_for('main.about') %}active{% endif %}" href="{{ url_for('main.about') }}">
                             <i class="fas fa-info-circle me-1"></i>关于我们
                         </a>
                     </li>
                 </ul>
-                
-                <!-- 搜索框 -->
-                <form class="search-form d-none d-md-flex me-3" action="{{ url_for('content.list') }}" method="GET">
-                    <input class="form-control" type="search" name="q" placeholder="搜索内容..." aria-label="Search">
+
+                <!-- 搜索框 (仅桌面) -->
+                <form class="search-form d-none d-lg-flex me-3" action="{{ url_for('content.list') }}" method="GET">
+                    <input class="form-control" type="search" name="q" placeholder="搜索非遗内容文章" aria-label="Search">
                     <button class="btn btn-sm btn-primary" type="submit"><i class="fas fa-search"></i></button>
                 </form>
-                
-                <div class="navbar-nav">
+
+                <!-- 用户区域 -->
+                <ul class="navbar-nav align-items-center"> <!-- 使用 ul 统一结构 -->
                     {% if current_user.is_authenticated %}
-                        <div class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <!-- 通知图标 (仅桌面端) -->
+                        <li class="nav-item d-none d-lg-block order-lg-1"> <!-- 添加 d-none d-lg-block -->
+                            <a class="nav-link position-relative mx-lg-2" href="{{ url_for('notification.list_notifications') }}" title="通知中心">
+                                <i class="fas fa-bell fs-5 text-warning"></i>
+                                <span id="notification-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 0.6em; padding: 0.2em 0.4em;"></span>
+                            </a>
+                        </li>
+                        <!-- 私信图标 (仅桌面端) -->
+                         <li class="nav-item d-none d-lg-block order-lg-2"> <!-- 添加 d-none d-lg-block -->
+                            <a class="nav-link position-relative me-lg-3 mx-lg-0 mx-2" href="{{ url_for('message.message_list') }}" title="私信消息">
+                                <i class="fas fa-envelope fs-5 text-info"></i>
+                                <span id="message-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 0.6em; padding: 0.2em 0.4em;"></span>
+                            </a>
+                        </li>
+
+                        <!-- 桌面端用户下拉菜单 -->
+                        <li class="nav-item dropdown d-none d-lg-block order-lg-3">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownDesktop" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% if current_user.avatar %}
                                 <img src="{{ current_user.avatar }}" alt="{{ current_user.username }}" class="avatar-sm me-2">
                                 {% else %}
@@ -73,71 +116,68 @@
                                 {% endif %}
                                 <span>{{ current_user.username }}</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow">
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center position-relative" href="{{ url_for('notification.list_notifications') }}">
-                                        <i class="fas fa-bell me-2 text-warning"></i>通知中心
-                                        <span id="notification-badge" class="badge bg-danger rounded-pill position-absolute end-0 me-2" style="display: none;"></span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center position-relative" href="{{ url_for('message.message_list') }}">
-                                        <i class="fas fa-envelope me-2 text-info"></i>私信消息
-                                        <span id="message-badge" class="badge bg-danger rounded-pill position-absolute end-0 me-2" style="display: none;"></span>
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.profile') }}">
-                                        <i class="fas fa-user me-2 text-primary"></i>个人中心
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.my_contents') }}">
-                                        <i class="fas fa-file-alt me-2 text-primary"></i>我的内容
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.my_favorites') }}">
-                                        <i class="fas fa-heart me-2 text-primary"></i>我的收藏
-                                    </a>
-                                </li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdownDesktop">
+                                <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.profile') }}"><i class="fas fa-user me-2 text-primary"></i>个人中心</a></li>
+                                <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.my_contents') }}"><i class="fas fa-file-alt me-2 text-primary"></i>我的内容</a></li>
+                                <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.my_favorites') }}"><i class="fas fa-heart me-2 text-primary"></i>我的收藏</a></li>
                                 {% if current_user.is_admin %}
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.dashboard') }}">
-                                        <i class="fas fa-tachometer-alt me-2 text-danger"></i>管理后台
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.dashboard') }}"><i class="fas fa-tachometer-alt me-2 text-danger"></i>管理后台</a></li>
                                 {% endif %}
                                 {% if current_user.is_teacher or current_user.is_admin %}
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('heritage.create') }}">
-                                        <i class="fas fa-plus-circle me-2 text-success"></i>创建非遗项目
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('heritage.create') }}"><i class="fas fa-plus-circle me-2 text-success"></i>创建非遗项目</a></li>
                                 {% endif %}
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('content.create') }}">
-                                        <i class="fas fa-edit me-2 text-info"></i>发布内容
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('content.create') }}"><i class="fas fa-edit me-2 text-info"></i>发布内容</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center text-danger" href="{{ url_for('auth.logout') }}">
-                                        <i class="fas fa-sign-out-alt me-2"></i>退出登录
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item d-flex align-items-center text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>退出登录</a></li>
                             </ul>
-                        </div>
+                        </li>
+
+                        <!-- 移动端用户菜单项 (直接显示在展开的菜单中) -->
+                        <li class="nav-item d-lg-none w-100 order-4"> <hr class="dropdown-divider"> </li> <!-- 分割线 -->
+                        <li class="nav-item d-lg-none w-100 order-5"> <!-- 头像和用户名 (非链接) -->
+                             <div class="d-flex align-items-center ps-3 mb-2 nav-link"> <!-- 使用 nav-link 保持对齐 -->
+                                 {% if current_user.avatar %}
+                                 <img src="{{ current_user.avatar }}" alt="{{ current_user.username }}" class="avatar-sm me-2">
+                                 {% else %}
+                                 <img src="{{ url_for('static', filename='img/default-avatar.jpg') }}" alt="{{ current_user.username }}" class="avatar-sm me-2">
+                                 {% endif %}
+                                 <span class="fw-bold">{{ current_user.username }}</span>
+                             </div>
+                        </li>
+                         <li class="nav-item d-lg-none order-6"> <a class="nav-link" href="{{ url_for('user.profile') }}"><i class="fas fa-user me-2 text-primary"></i>个人中心</a> </li>
+                         <li class="nav-item d-lg-none order-7"> <a class="nav-link" href="{{ url_for('user.my_contents') }}"><i class="fas fa-file-alt me-2 text-primary"></i>我的内容</a> </li>
+                         <li class="nav-item d-lg-none order-8"> <a class="nav-link" href="{{ url_for('user.my_favorites') }}"><i class="fas fa-heart me-2 text-primary"></i>我的收藏</a> </li>
+                         {% if current_user.is_admin %}
+                         <li class="nav-item d-lg-none order-9"> <a class="nav-link" href="{{ url_for('user.dashboard') }}"><i class="fas fa-tachometer-alt me-2 text-danger"></i>管理后台</a> </li>
+                         {% endif %}
+                         {% if current_user.is_teacher or current_user.is_admin %}
+                         <li class="nav-item d-lg-none order-10"> <a class="nav-link" href="{{ url_for('heritage.create') }}"><i class="fas fa-plus-circle me-2 text-success"></i>创建非遗项目</a> </li>
+                         {% endif %}
+                         <li class="nav-item d-lg-none order-11"> <a class="nav-link" href="{{ url_for('content.create') }}"><i class="fas fa-edit me-2 text-info"></i>发布内容</a> </li>
+                         <li class="nav-item d-lg-none w-100 order-12"> <hr class="dropdown-divider"> </li>
+                         <li class="nav-item d-lg-none order-13"> <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>退出登录</a> </li>
+
                     {% else %}
-                        <a class="nav-link btn btn-outline-primary me-2" href="{{ url_for('auth.login') }}">
-                            <i class="fas fa-sign-in-alt me-1"></i>登录
-                        </a>
-                        <a class="nav-link btn btn-primary" href="{{ url_for('auth.register') }}">
-                            <i class="fas fa-user-plus me-1"></i>注册
-                        </a>
+                        <!-- 未登录状态按钮 -->
+                         <li class="nav-item">
+                            <a class="nav-link btn btn-outline-primary me-2" href="{{ url_for('auth.login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i>登录
+                            </a>
+                         </li>
+                         <li class="nav-item">
+                            <a class="nav-link btn btn-primary" href="{{ url_for('auth.register') }}">
+                                <i class="fas fa-user-plus me-1"></i>注册
+                            </a>
+                         </li>
                     {% endif %}
-                </div>
+                     <!-- 关于我们链接 (移动端显示在用户菜单后) -->
+                     <li class="nav-item d-lg-none w-100 order-14"> <hr class="dropdown-divider"> </li>
+                     <li class="nav-item d-lg-none order-15">
+                         <a class="nav-link {% if request.path == url_for('main.about') %}active{% endif %}" href="{{ url_for('main.about') }}">
+                             <i class="fas fa-info-circle me-1"></i>关于我们
+                         </a>
+                     </li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -273,36 +313,59 @@
     <script>
         // 检查未读通知和私信
         function checkUnreadNotifications() {
+            // 检查未读通知
             fetch('/api/notifications/unread-count')
                 .then(response => response.json())
                 .then(data => {
-                    const badge = document.getElementById('notification-badge');
-                    if (badge) {
+                    // 更新桌面端角标
+                    const desktopNotificationBadge = document.getElementById('notification-badge');
+                    if (desktopNotificationBadge) {
                         if (data.count > 0) {
-                            badge.textContent = data.count;
-                            badge.style.display = 'inline';
+                            desktopNotificationBadge.textContent = data.count;
+                            desktopNotificationBadge.style.display = 'inline';
                         } else {
-                            badge.style.display = 'none';
+                            desktopNotificationBadge.style.display = 'none';
+                        }
+                    }
+                    // 更新移动端角标
+                    const mobileNotificationBadge = document.getElementById('mobile-notification-badge');
+                    if (mobileNotificationBadge) {
+                         if (data.count > 0) {
+                            mobileNotificationBadge.textContent = data.count;
+                            mobileNotificationBadge.style.display = 'inline';
+                        } else {
+                            mobileNotificationBadge.style.display = 'none';
                         }
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => console.error('Error fetching notification count:', error));
                 
             // 检查未读私信
             fetch('/api/messages/unread-count')
                 .then(response => response.json())
                 .then(data => {
-                    const badge = document.getElementById('message-badge');
-                    if (badge) {
+                    // 更新桌面端角标
+                    const desktopMessageBadge = document.getElementById('message-badge');
+                    if (desktopMessageBadge) {
                         if (data.count > 0) {
-                            badge.textContent = data.count;
-                            badge.style.display = 'inline';
+                            desktopMessageBadge.textContent = data.count;
+                            desktopMessageBadge.style.display = 'inline';
                         } else {
-                            badge.style.display = 'none';
+                            desktopMessageBadge.style.display = 'none';
+                        }
+                    }
+                     // 更新移动端角标
+                    const mobileMessageBadge = document.getElementById('mobile-message-badge');
+                    if (mobileMessageBadge) {
+                         if (data.count > 0) {
+                            mobileMessageBadge.textContent = data.count;
+                            mobileMessageBadge.style.display = 'inline';
+                        } else {
+                            mobileMessageBadge.style.display = 'none';
                         }
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => console.error('Error fetching message count:', error));
         }
 
         // 页面加载时检查
@@ -336,5 +399,37 @@
     </script>
     
     {% block scripts %}{% endblock %}
+
+    <!-- 移动端底部导航栏 -->
+    <nav class="bottom-nav d-lg-none">
+        <a href="{{ url_for('main.index') }}" class="bottom-nav-item {% if request.path == url_for('main.index') %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="{{ url_for('heritage.list') }}" class="bottom-nav-item {% if request.path.startswith('/heritage') %}active{% endif %}">
+            <i class="fas fa-landmark"></i>
+            <span>非遗项目</span>
+        </a>
+        <a href="{{ url_for('content.list') }}" class="bottom-nav-item {% if request.path.startswith('/content') %}active{% endif %}">
+            <i class="fas fa-book-open"></i>
+            <span>内容专区</span>
+        </a>
+        <a href="{{ url_for('forum.index') }}" class="bottom-nav-item {% if request.path.startswith('/forum') %}active{% endif %}">
+            <i class="fas fa-comments"></i>
+            <span>论坛</span>
+        </a>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('user.profile') }}" class="bottom-nav-item {% if request.path.startswith('/user') or request.path.startswith('/message') or request.path.startswith('/notification') %}active{% endif %}">
+            <i class="fas fa-user"></i>
+            <span>我的</span>
+        </a>
+        {% else %}
+        <a href="{{ url_for('auth.login') }}" class="bottom-nav-item">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>登录</span>
+        </a>
+        {% endif %}
+    </nav>
+
 </body>
 </html>
