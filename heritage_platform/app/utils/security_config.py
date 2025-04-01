@@ -67,14 +67,12 @@ def setup_security(app):
     Talisman(
         app,
         content_security_policy=csp,
-        force_https=False,  # 在生产环境中设置为True
-        session_cookie_secure=False,  # 在生产环境中设置为True
+        force_https=False,  # 确保不强制HTTPS，由CloudFlare处理
+        session_cookie_secure=False,  # 确保不强制HTTPS Cookie
         session_cookie_http_only=True,
-        feature_policy={
-            'geolocation': "'none'",
-            'microphone': "'none'",
-            'camera': "'none'",
-        }
+        force_file_save=False,  # 禁用强制文件下载
+        strict_transport_security=False,  # 禁用HSTS，由CloudFlare处理
+        frame_options="SAMEORIGIN"  # 允许同域名框架
     )
 
     # 配置密码策略
@@ -89,9 +87,17 @@ def setup_security(app):
 
     # 配置会话安全
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
-    app.config['SESSION_COOKIE_SECURE'] = False  # 在生产环境中设置为True
+    app.config['SESSION_COOKIE_SECURE'] = False  # 禁用安全Cookie
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    
+    # 添加CloudFlare特定配置
+    app.config['PREFERRED_URL_SCHEME'] = 'http'  # 确保URL生成使用http
+    
+    # 禁用Flask-Login强制HTTPS
+    from flask_login import LoginManager
+    app.config['LOGIN_DISABLED'] = False
+    app.config['USE_SESSION_FOR_NEXT'] = True
 
 def validate_password(password):
     """验证密码是否符合安全策略"""

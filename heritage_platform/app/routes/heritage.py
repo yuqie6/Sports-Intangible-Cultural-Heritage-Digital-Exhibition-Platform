@@ -73,7 +73,9 @@ def create():
             # 处理封面图片上传
             cover_image = ''
             if form.cover_image.data:
-                cover_image = save_file(form.cover_image.data, 'image')
+                # 确保cover_image.data是文件对象而不是字符串
+                if hasattr(form.cover_image.data, 'filename'):
+                    cover_image = save_file(form.cover_image.data, 'image')
                 
             heritage_item = HeritageItem(
                 name=form.name.data,
@@ -118,9 +120,11 @@ def edit(id):
             
             # 处理封面图片上传
             if form.cover_image.data:
-                cover_image = save_file(form.cover_image.data, 'image')
-                if cover_image:
-                    heritage_item.cover_image = cover_image
+                # 确保cover_image.data是文件对象而不是字符串
+                if hasattr(form.cover_image.data, 'filename'):
+                    cover_image = save_file(form.cover_image.data, 'image')
+                    if cover_image:
+                        heritage_item.cover_image = cover_image
                     
             db.session.commit()
             

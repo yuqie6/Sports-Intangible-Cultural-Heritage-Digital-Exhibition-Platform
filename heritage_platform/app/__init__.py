@@ -48,7 +48,7 @@ def create_app(config_name='default'):
     login_manager.init_app(app)
     csrf.init_app(app)
     migrate.init_app(app, db)
-    socketio.init_app(app, cors_allowed_origins="*", ping_timeout=20, ping_interval=10)  # 初始化SocketIO并允许跨域访问
+    socketio.init_app(app, cors_allowed_origins=["http://cotan.ggff.net", "https://cotan.ggff.net", "http://48.210.195.33", "*"], ping_timeout=20, ping_interval=10)  # 初始化SocketIO并允许特定域名访问
     limiter.init_app(app)  # 初始化速率限制器
     
     # 初始化WebSocket管理器
