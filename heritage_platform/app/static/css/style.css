@@ -29,7 +29,7 @@ body {
 /* 卡片样式 */
 .card {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     border: none;
     border-radius: 8px;
     overflow: hidden;
@@ -949,11 +949,6 @@ footer .list-unstyled li {
 @keyframes slideInRight {
     from { opacity: 0; transform: translateX(30px); }
     to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes zoomIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
 }
 
 .my-fade-in {
@@ -2141,5 +2136,433 @@ footer .list-unstyled li {
     /* 隐藏桌面端的返回顶部按钮，避免与底部导航重叠 */
     #back-to-top {
         display: none !important;
+    }
+}
+
+/* 新增样式美化 - 2024优化 */
+:root {
+    --primary-gradient: linear-gradient(135deg, #0d6efd 0%, #0099f7 100%);
+    --secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    --hover-shadow: 0 15px 30px rgba(0, 0, 0, 0.18);
+    --border-radius: 12px;
+    --transition-normal: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* 修复动画相关的样式冲突 */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.slide-in-left {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.slide-in-right {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* 删除可能产生冲突的动画关键帧 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* 卡片悬停效果增强 */
+.feature-card:hover, 
+.content-card:hover, 
+.media-grid .card:hover {
+    transform: translateY(-10px) scale(1.01);
+    box-shadow: var(--hover-shadow);
+}
+
+/* 图片缩放效果增强 */
+.card-img-top {
+    transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.08);
+}
+
+/* 徽章样式美化 */
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+    border-radius: 50px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: var(--transition-normal);
+}
+
+.badge-primary {
+    background: var(--primary-gradient);
+}
+
+.badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 按钮点击效果增强 */
+.btn:active {
+    transform: scale(0.95);
+}
+
+/* 页面滚动效果 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 卡片内容区域美化 */
+.card-body {
+    position: relative;
+    z-index: 1;
+}
+
+/* 精选项目卡片美化 */
+.feature-card .card-body::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30%;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent);
+    z-index: -1;
+}
+
+/* 导航栏下拉菜单项动画 */
+.dropdown-item {
+    transition: all 0.2s ease;
+    position: relative;
+    padding-left: 2rem;
+}
+
+.dropdown-item::before {
+    content: '';
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    width: 0;
+    height: 2px;
+    background: #0d6efd;
+    transform: translateY(-50%);
+    transition: width 0.3s ease;
+}
+
+.dropdown-item:hover::before {
+    width: 0.8rem;
+}
+
+/* 底部导航栏增强 */
+.bottom-nav {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bottom-nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    background: #0d6efd;
+    border-radius: 50%;
+}
+
+/* 页脚链接悬停效果 */
+footer a {
+    position: relative;
+    padding-left: 0;
+    transition: padding 0.3s ease;
+}
+
+footer a:hover {
+    padding-left: 5px;
+}
+
+/* 英雄区域渐变背景 */
+.p-5.bg-light::before {
+    animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 功能卡片图标动画效果 */
+.feature-icon-card i {
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.feature-icon-card:hover i {
+    transform: translateY(-10px) rotate(10deg);
+}
+
+/* 表单元素聚焦效果增强 */
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15), 0 5px 15px rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.5);
+}
+
+/* 按钮渐变效果增强 */
+.btn-primary {
+    background-size: 200% auto;
+    transition: 0.5s;
+}
+
+.btn-primary:hover {
+    background-position: right center;
+}
+
+/* 内容卡片标题悬停效果 */
+.content-card .card-title {
+    transition: color 0.3s ease;
+}
+
+.content-card:hover .card-title {
+    color: #0d6efd;
+}
+
+/* 图片画廊增强效果 */
+.gallery-item {
+    overflow: hidden;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.gallery-item:hover {
+    transform: translateY(-10px) scale(1.03);
+    z-index: 10;
+}
+
+/* 加载动画美化 */
+.spinner-border {
+    border-width: 0.15em;
+    animation: spinner-border 1s linear infinite;
+}
+
+@keyframes spinner-border {
+    to { transform: rotate(360deg); }
+}
+
+/* 搜索框聚焦动画增强 */
+.search-form .form-control:focus {
+    transform: translateY(-2px);
+}
+
+/* 返回顶部按钮增强 */
+#back-to-top {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+    transform: scale(0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+#back-to-top:hover {
+    transform: translateY(-5px) scale(1.1);
+}
+
+/* 自定义滚动条美化 */
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #0d6efd, #0099f7);
+    border-radius: 10px;
+    border: 3px solid #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #0b5ed7, #0077c2);
+}
+
+/* 内容专区文章卡片阴影效果 */
+.content-card {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* 媒体查询优化 - 不同设备尺寸响应式调整 */
+
+/* 小型手机设备 */
+@media (max-width: 375px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    h1, .h1 { font-size: 1.75rem; }
+    h2, .h2 { font-size: 1.5rem; }
+    
+    .p-5.bg-light {
+        padding: 1.5rem !important;
+    }
+    
+    .display-5 {
+        font-size: 1.75rem;
+    }
+    
+    .fs-4 {
+        font-size: 1rem !important;
+    }
+    
+    .feature-icon-card {
+        padding: 1.25rem 1rem;
+    }
+    
+    .feature-icon-card .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    footer {
+        padding-bottom: 80px; /* 为底部导航栏留出空间 */
+    }
+}
+
+/* 中型手机设备 */
+@media (min-width: 376px) and (max-width: 576px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    h1, .h1 { font-size: 2rem; }
+    
+    .p-5.bg-light {
+        padding: 2rem !important;
+    }
+    
+    .display-5 {
+        font-size: 2rem;
+    }
+    
+    footer {
+        padding-bottom: 80px; /* 为底部导航栏留出空间 */
+    }
+}
+
+/* 平板设备 */
+@media (min-width: 577px) and (max-width: 991px) {
+    .feature-icon-card {
+        height: 100%;
+    }
+    
+    .row-cols-md-2 > .col {
+        height: auto;
+    }
+    
+    .heritage-cover img {
+        height: 300px;
+    }
+    
+    .navbar .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    footer {
+        padding-bottom: 80px; /* 为底部导航栏留出空间 */
+    }
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+    
+    .heritage-cover img {
+        height: 500px;
+    }
+    
+    .p-5.bg-light {
+        padding: 4rem !important;
+    }
+    
+    .display-5 {
+        font-size: 3.5rem;
+    }
+    
+    .fs-4 {
+        font-size: 1.3rem !important;
+    }
+    
+    .feature-icon-card {
+        padding: 2.5rem;
+    }
+    
+    .card-body {
+        padding: 1.75rem;
+    }
+}
+
+/* 深色模式支持 - 只在用户系统设置为深色模式时启用 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --dark-bg: #212529;
+        --dark-card-bg: #2a2d31;
+        --dark-text: #e9ecef;
+        --dark-border: #495057;
+        --dark-hover: #343a40;
+    }
+    
+    /* 仅添加基本深色模式支持，避免与现有样式冲突 */
+    body.dark-mode-enabled.prefers-dark-mode {
+        background-color: var(--dark-bg);
+        color: var(--dark-text);
+    }
+    
+    body.dark-mode-enabled.prefers-dark-mode .card {
+        background-color: var(--dark-card-bg);
+        border-color: var(--dark-border);
+    }
+    
+    body.dark-mode-enabled.prefers-dark-mode .bg-light {
+        background-color: var(--dark-card-bg) !important;
+    }
+    
+    body.dark-mode-enabled.prefers-dark-mode .text-muted {
+        color: #adb5bd !important;
     }
 }

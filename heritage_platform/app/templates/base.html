@@ -385,8 +385,14 @@
                 backToTopButton.style.display = "flex";
                 backToTopButton.style.justifyContent = "center";
                 backToTopButton.style.alignItems = "center";
+                backToTopButton.classList.add("show"); // 添加show类以启用新的动画效果
             } else {
-                backToTopButton.style.display = "none";
+                backToTopButton.classList.remove("show"); // 移除show类
+                setTimeout(() => {
+                    if (!backToTopButton.classList.contains("show")) {
+                        backToTopButton.style.display = "none";
+                    }
+                }, 300); // 等待动画完成后隐藏
             }
         };
         
@@ -396,9 +402,88 @@
                 behavior: 'smooth'
             });
         });
+        
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加页面内容淡入效果
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right').forEach(el => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                });
+            }, 100);
+            
+            // 为卡片添加延迟动画
+            document.querySelectorAll('.card').forEach((card, index) => {
+                card.style.animationDelay = (index * 0.1) + 's';
+            });
+            
+            // 平滑滚动到锚点
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href');
+                    if(targetId !== '#') {
+                        const targetElement = document.querySelector(targetId);
+                        if(targetElement) {
+                            e.preventDefault();
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 100,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // 为下拉菜单添加动画
+            const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+            dropdownMenus.forEach(menu => {
+                menu.style.transition = 'all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)';
+                menu.style.transformOrigin = 'top center';
+            });
+            
+            // 改进导航栏响应式行为
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+            
+            if(navbarToggler && navbarCollapse) {
+                navbarToggler.addEventListener('click', function() {
+                    document.body.classList.toggle('navbar-open');
+                });
+            }
+        });
     </script>
     
     {% block scripts %}{% endblock %}
+
+    <!-- 深色模式检测脚本 -->
+    <script>
+        // 深色模式默认禁用
+        const darkModeEnabled = false;
+        
+        // 检测系统深色模式但不自动应用
+        function detectDarkMode() {
+            if (darkModeEnabled && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('prefers-dark-mode');
+            } else {
+                document.body.classList.remove('prefers-dark-mode');
+            }
+        }
+        
+        // 页面加载时检测
+        detectDarkMode();
+        
+        // 监听系统深色模式变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (darkModeEnabled) {
+                if (e.matches) {
+                    document.body.classList.add('prefers-dark-mode');
+                } else {
+                    document.body.classList.remove('prefers-dark-mode');
+                }
+            }
+        });
+    </script>
 
     <!-- 移动端底部导航栏 -->
     <nav class="bottom-nav d-lg-none">

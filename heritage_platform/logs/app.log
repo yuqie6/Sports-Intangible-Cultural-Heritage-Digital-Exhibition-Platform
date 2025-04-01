@@ -928,3 +928,22 @@ AttributeError: 'str' object has no attribute 'filename'
 2025-03-31 00:41:24,035 [INFO] [content:265] - 内容更新成功：ID=11, 标题=欢迎
 2025-03-31 17:35:31,849 [INFO] [content:36] - 处理搜索请求: '武术'
 2025-03-31 17:40:09,485 [INFO] [content:36] - 处理搜索请求: '武术'
+2025-03-31 22:13:19,822 [ERROR] [ai_assistant:177] - 获取会话列表失败: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.chat_sessions' doesn't exist")
+[SQL: SELECT chat_sessions.id AS chat_sessions_id, chat_sessions.user_id AS chat_sessions_user_id, chat_sessions.title AS chat_sessions_title, chat_sessions.created_at AS chat_sessions_created_at, chat_sessions.updated_at AS chat_sessions_updated_at 
+FROM chat_sessions 
+WHERE chat_sessions.user_id = %(user_id_1)s ORDER BY chat_sessions.updated_at DESC]
+[parameters: {'user_id_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-31 22:51:37,687 [ERROR] [ai_assistant:177] - 获取会话列表失败: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.chat_sessions' doesn't exist")
+[SQL: SELECT chat_sessions.id AS chat_sessions_id, chat_sessions.user_id AS chat_sessions_user_id, chat_sessions.title AS chat_sessions_title, chat_sessions.created_at AS chat_sessions_created_at, chat_sessions.updated_at AS chat_sessions_updated_at 
+FROM chat_sessions 
+WHERE chat_sessions.user_id = %(user_id_1)s ORDER BY chat_sessions.updated_at DESC]
+[parameters: {'user_id_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-31 22:52:17,634 [ERROR] [ai_assistant:177] - 获取会话列表失败: (pymysql.err.ProgrammingError) (1146, "Table 'heritage_platform.chat_sessions' doesn't exist")
+[SQL: SELECT chat_sessions.id AS chat_sessions_id, chat_sessions.user_id AS chat_sessions_user_id, chat_sessions.title AS chat_sessions_title, chat_sessions.created_at AS chat_sessions_created_at, chat_sessions.updated_at AS chat_sessions_updated_at 
+FROM chat_sessions 
+WHERE chat_sessions.user_id = %(user_id_1)s ORDER BY chat_sessions.updated_at DESC]
+[parameters: {'user_id_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-31 23:21:45,189 [ERROR] [ai_assistant:60] - 创建会话失败: 'coroutine' object has no attribute 'id'
