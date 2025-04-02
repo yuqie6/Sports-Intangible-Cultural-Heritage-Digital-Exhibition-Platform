@@ -4,10 +4,10 @@ from logging.handlers import RotatingFileHandler
 from datetime import datetime
 
 def setup_logging(app):
-    # 确保日志目录存在
-    log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs')
+    # 使用绝对路径指定日志目录
+    log_dir = '/var/www/heritage_platform/Sports-Intangible-Cultural-Heritage-Digital-Exhibition-Platform/heritage_platform/logs'
     if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+        os.makedirs(log_dir, exist_ok=True)
 
     # 配置基本日志格式
     log_format = logging.Formatter(

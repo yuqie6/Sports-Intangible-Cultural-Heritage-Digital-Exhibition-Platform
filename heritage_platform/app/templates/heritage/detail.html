@@ -33,9 +33,46 @@
                     <a href="{{ url_for('heritage.edit', id=item.id) }}" class="btn btn-outline-primary">
                         <i class="fas fa-edit me-1"></i> 编辑
                     </a>
-                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteHeritageModal">
+                    
+                    <!-- 删除所有模态框和按钮，改用JS直接跳转的链接样式的确认删除按钮 -->
+                    {% if not (articles or images or videos or multimedia) or current_user.is_admin %}
+                    <a href="javascript:void(0);" class="btn btn-danger" id="directDeleteBtn" 
+                       style="z-index:50000; position:relative;">
+                        <i class="fas fa-trash me-1"></i> 删除
+                    </a>
+                    
+                    <!-- 隐藏直接删除表单 -->
+                    <form id="directDeleteForm" method="POST" action="{{ url_for('heritage.delete', id=item.id) }}" style="display:none;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    </form>
+                    
+                    <script>
+                        // 直接绑定点击事件处理器，不使用模态框
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var deleteBtn = document.getElementById('directDeleteBtn');
+                            var deleteForm = document.getElementById('directDeleteForm');
+                            
+                            if (deleteBtn && deleteForm) {
+                                deleteBtn.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    
+                                    // 显示确认对话框
+                                    if (confirm('您确定要删除非遗项目 {{ item.name }} 吗？\n{% if articles or images or videos or multimedia %}警告: 此项目下有关联内容，删除项目将同时删除所有关联内容！{% else %}此操作不可恢复！{% endif %}')) {
+                                        // 用户确认后直接提交表单
+                                        console.log('提交删除表单');
+                                        deleteForm.submit();
+                                    }
+                                });
+                            }
+                        });
+                    </script>
+                    {% else %}
+                    <!-- 有关联内容且非管理员时显示禁用按钮 -->
+                    <button class="btn btn-danger" disabled>
                         <i class="fas fa-trash me-1"></i> 删除
                     </button>
+                    <small class="text-danger d-block mt-1">请先删除所有关联内容或联系管理员</small>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -116,7 +153,11 @@
                         <div class="col">
                             <div class="card h-100">
                                 <a href="{{ url_for('content.detail', id=image.id) }}">
+                                    {% if image.file_path %}
                                     <img src="{{ url_for('static', filename=image.file_path) }}" class="card-img-top" alt="{{ image.title }}">
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='img/default-image.jpg') }}" class="card-img-top" alt="{{ image.title }}">
+                                    {% endif %}
                                 </a>
                                 <div class="card-body">
                                     <h6 class="card-title">{{ image.title }}</h6>
@@ -213,48 +254,6 @@
             </div>
         </div>
         {% endif %}
-    </div>
-</div>
-
-<!-- 删除非遗项目确认模态框 -->
-<div class="modal fade" id="deleteHeritageModal" tabindex="-1" aria-labelledby="deleteHeritageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteHeritageModalLabel">确认删除项目</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>您确定要删除非遗项目 <strong>{{ item.name }}</strong> 吗？</p>
-                {% if articles or images or videos or multimedia %}
-                <div class="alert alert-warning">
-                    <p class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> 警告：此项目下有关联内容！</p>
-                    <ul class="mb-0 mt-2">
-                        {% if articles %}<li>{{ articles|length }} 篇文章</li>{% endif %}
-                        {% if images %}<li>{{ images|length }} 张图片</li>{% endif %}
-                        {% if videos %}<li>{{ videos|length }} 个视频</li>{% endif %}
-                        {% if multimedia %}<li>{{ multimedia|length }} 篇富文本</li>{% endif %}
-                    </ul>
-                    {% if not current_user.is_admin %}
-                    <p class="mt-2 mb-0">请先删除所有关联内容或联系管理员</p>
-                    {% else %}
-                    <p class="mt-2 mb-0 text-danger">作为管理员，删除项目将同时删除所有关联内容！</p>
-                    {% endif %}
-                </div>
-                {% else %}
-                <p class="text-danger">此操作不可恢复！</p>
-                {% endif %}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <form method="POST" action="{{ url_for('heritage.delete', id=item.id) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-danger" {% if (articles or images or videos or multimedia) and not current_user.is_admin %}disabled{% endif %}>
-                        确认删除
-                    </button>
-                </form>
-            </div>
-        </div>
     </div>
 </div>
 {% endblock %}

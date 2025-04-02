@@ -74,8 +74,10 @@ class ProductionConfig(Config):
         # 生产环境下的额外配置
         import logging
         from logging.handlers import RotatingFileHandler
+        # 使用绝对路径指定日志文件位置
+        log_file = '/var/www/heritage_platform/Sports-Intangible-Cultural-Heritage-Digital-Exhibition-Platform/heritage_platform/logs/heritage.log'
         file_handler = RotatingFileHandler(
-            os.path.join(basedir, 'logs/heritage.log'),
+            log_file,
             maxBytes=10*1024*1024, backupCount=10)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'

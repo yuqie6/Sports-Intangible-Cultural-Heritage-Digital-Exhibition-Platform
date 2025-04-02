@@ -15,6 +15,59 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block styles %}{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block additional_head %}{% endblock %}
+    
+    <style>
+        /* 修复模态框点击问题 - 全局高z-index版本 */
+        .modal-backdrop {
+            z-index: 9999 !important;
+        }
+        .modal {
+            z-index: 10000 !important;
+            pointer-events: auto !important;
+        }
+        .modal-dialog {
+            z-index: 10001 !important;
+            pointer-events: auto !important;
+            margin: 1.75rem auto;
+        }
+        .modal-content {
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 10002 !important;
+        }
+        .modal-footer .btn, 
+        .modal-footer form, 
+        .modal-footer button,
+        .modal-footer input {
+            position: relative;
+            z-index: 10005 !important;
+            pointer-events: auto !important;
+        }
+        /* 确保模态框上的所有元素可点击 */
+        .modal *, .modal-dialog *, .modal-content * {
+            pointer-events: auto !important;
+        }
+        /* 防止模态框被其他元素覆盖 */
+        body.modal-open .modal {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 高亮确认删除按钮 */
+        #confirmDeleteBtn, .btn-danger {
+            position: relative;
+            z-index: 10010 !important; 
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+        }
+        /* 修复iOS Safari上的点击问题 */
+        @media (pointer: coarse) {
+            .modal-footer .btn {
+                min-height: 44px;
+                padding: 10px 15px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- 导航栏 -->
@@ -454,7 +507,60 @@
         });
     </script>
     
+    <!-- 页面脚本 -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% block scripts %}{% endblock %}
+    
+    <!-- 确保模态框可点击的脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 确保所有模态框可点击
+            const fixModalClickability = function() {
+                // 查找所有模态框
+                document.querySelectorAll('.modal').forEach(function(modal) {
+                    // 提高z-index
+                    modal.style.zIndex = '10000';
+                    // 确保可点击
+                    modal.style.pointerEvents = 'auto';
+                    
+                    // 确保对话框可点击
+                    const dialog = modal.querySelector('.modal-dialog');
+                    if (dialog) {
+                        dialog.style.zIndex = '10001';
+                        dialog.style.pointerEvents = 'auto';
+                    }
+                    
+                    // 确保内容可点击
+                    const content = modal.querySelector('.modal-content');
+                    if (content) {
+                        content.style.zIndex = '10001';
+                        content.style.pointerEvents = 'auto';
+                    }
+                    
+                    // 确保按钮可点击
+                    const buttons = modal.querySelectorAll('.btn');
+                    buttons.forEach(function(btn) {
+                        btn.style.zIndex = '10002';
+                        btn.style.pointerEvents = 'auto';
+                    });
+                });
+                
+                // 定位所有模态框背景
+                document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+                    backdrop.style.zIndex = '9999';
+                });
+            };
+            
+            // 监听模态框打开事件
+            document.addEventListener('shown.bs.modal', fixModalClickability);
+            
+            // 初始执行一次
+            fixModalClickability();
+            
+            // 每秒检查一次，确保模态框可点击
+            setInterval(fixModalClickability, 1000);
+        });
+    </script>
 
     <!-- 深色模式检测脚本 -->
     <script>

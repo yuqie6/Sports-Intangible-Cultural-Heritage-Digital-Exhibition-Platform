@@ -298,7 +298,7 @@
     }
 </script>
 
-<!-- 修改内容列表中的删除按钮，使用新的删除模式 -->
+<!-- 为所有删除按钮添加点击事件 -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // 为所有删除按钮添加点击事件
@@ -328,6 +328,41 @@
 }
 .modal {
     z-index: 1050 !important;
+}
+</style>
+{% endblock %}
+
+{% block additional_content %}
+<style>
+/* 修复模态框点击问题 */
+.modal-backdrop {
+    z-index: 1999 !important;
+}
+.modal {
+    z-index: 2000 !important;
+    pointer-events: auto !important;
+}
+.modal-dialog {
+    z-index: 2001 !important;
+    pointer-events: auto !important;
+}
+.modal-content {
+    pointer-events: auto !important;
+}
+.modal-footer .btn {
+    position: relative;
+    z-index: 2002 !important;
+    pointer-events: auto !important;
+}
+/* 确保模态框上的所有元素可点击 */
+.modal *, .modal-dialog *, .modal-content * {
+    pointer-events: auto !important;
+}
+/* 防止模态框被其他元素覆盖 */
+body.modal-open .modal {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
 }
 </style>
 {% endblock %}

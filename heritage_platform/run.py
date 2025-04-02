@@ -1,8 +1,12 @@
 import os
 import click
+from dotenv import load_dotenv
 from app import create_app, db, socketio
 from flask_migrate import Migrate
 from app.models import User
+
+# 加载.env文件
+load_dotenv()
 
 # 通过环境变量设置配置类型，默认为开发环境
 config_name = os.environ.get('FLASK_CONFIG') or 'development'
