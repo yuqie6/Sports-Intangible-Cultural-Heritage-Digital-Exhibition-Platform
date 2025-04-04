@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request, jsonify
 from flask_login import login_required, current_user
 from app.models import Notification, User
 from app.forms.notification import AnnouncementForm
 from app.utils.decorators import admin_required, teacher_required, role_required
-from app import db
+from app import db, csrf
+from app.socket_events import emit_notification
+import datetime
 
 bp = Blueprint('notification', __name__)
 
@@ -92,8 +94,80 @@ def send_notification(user_id, content, notification_type, link=None, sender_id=
     db.session.add(notification)
     try:
         db.session.commit()
+        
+        # 添加WebSocket实时通知功能
+        try:
+            # 获取发送者用户名
+            sender_username = None
+            if sender_id:
+                sender = User.query.get(sender_id)
+                if sender:
+                    sender_username = sender.username
+            
+            # 准备通知数据
+            notification_data = {
+                'id': notification.id,
+                'type': notification_type,
+                'content': content,
+                'link': link,
+                'sender_id': sender_id,
+                'sender_username': sender_username,
+                'created_at': notification.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            }
+            
+            # 发送WebSocket通知
+            emit_notification(user_id, notification_data)
+            
+        except Exception as e:
+            current_app.logger.error(f"发送WebSocket实时通知失败: {str(e)}")
+            # 即使WebSocket通知失败，也不影响通知已经保存到数据库
+        
         return True
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"发送通知失败: {str(e)}")
         return False
+
+@bp.route('/read/<int:notification_id>', methods=['POST'])
+@login_required
+@csrf.exempt
+def mark_notification_read(notification_id):
+    """标记单个通知为已读"""
+    try:
+        notification = Notification.query.get_or_404(notification_id)
+        
+        # 确保当前用户是通知的接收者
+        if notification.user_id != current_user.id:
+            return jsonify({'success': False, 'message': '无权操作此通知'}), 403
+        
+        notification.is_read = True
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': '已标记为已读'})
+    except Exception as e:
+        current_app.logger.error(f"标记通知已读失败: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@bp.route('/read-all', methods=['POST'])
+@login_required
+@csrf.exempt
+def mark_all_notifications_read():
+    """标记当前用户的所有通知为已读"""
+    try:
+        # 查询当前用户的所有未读通知
+        notifications = Notification.query.filter_by(
+            user_id=current_user.id,
+            is_read=False
+        ).all()
+        
+        # 标记为已读
+        for notification in notifications:
+            notification.is_read = True
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': f'已标记 {len(notifications)} 条通知为已读'})
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"标记所有通知已读失败: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500

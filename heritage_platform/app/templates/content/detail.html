@@ -365,7 +365,7 @@
 {% endblock %}
 
 {% block scripts %}
-{{ super() }} {# 继承父模板的scripts块内容 #}
+{{ super() }}
 <!-- Lightbox2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 <script>
@@ -377,50 +377,60 @@
         'imageFadeDuration': 300
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // 图片显示模式切换
-    window.switchImageMode = function(mode) {
+    // 将函数定义移到 DOMContentLoaded 外部，确保全局可用
+    function switchImageMode(mode) {
         const image = document.getElementById('coverImage');
         const coverBtn = document.getElementById('coverBtn');
         const fitBtn = document.getElementById('fitBtn');
         
+        // 检查元素是否存在，增加健壮性
+        if (!image || !coverBtn || !fitBtn) {
+            console.error('Cover image or control buttons not found.');
+            return;
+        }
+        
+        // 移除所有模式类
+        image.classList.remove('cover-mode', 'fit-mode');
+        coverBtn.classList.remove('active');
+        fitBtn.classList.remove('active');
+        
+        // 添加新的模式类
         if (mode === 'cover') {
-            image.classList.remove('fit-mode');
             image.classList.add('cover-mode');
             coverBtn.classList.add('active');
-            fitBtn.classList.remove('active');
-        } else {
-            image.classList.remove('cover-mode');
+        } else if (mode === 'fit') { // 明确检查 'fit'
             image.classList.add('fit-mode');
             fitBtn.classList.add('active');
-            coverBtn.classList.remove('active');
         }
-    };
+    }
 
-    // 回复按钮点击事件
-    const replyButtons = document.querySelectorAll('.reply-btn');
-    replyButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const commentId = this.dataset.commentId;
-            const replyForm = document.getElementById(`reply-form-${commentId}`);
-            replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+    document.addEventListener('DOMContentLoaded', function() {
+        // DOMContentLoaded 后再执行需要访问 DOM 元素的操作
+
+        // 回复按钮点击事件
+        const replyButtons = document.querySelectorAll('.reply-btn');
+        replyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.dataset.commentId;
+                const replyForm = document.getElementById(`reply-form-${commentId}`);
+                replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+
+        // 取消回复按钮点击事件
+        const cancelButtons = document.querySelectorAll('.cancel-reply-btn');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.dataset.commentId;
+                document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+            });
         });
     });
-
-    // 取消回复按钮点击事件
-    const cancelButtons = document.querySelectorAll('.cancel-reply-btn');
-    cancelButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const commentId = this.dataset.commentId;
-            document.getElementById(`reply-form-${commentId}`).style.display = 'none';
-        });
-    });
-});
 </script>
 {% endblock %}
 
 {% block styles %}
-{{ super() }} {# 继承父模板的styles块内容 #}
+{{ super() }}
 <!-- Lightbox2 CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
 <style>

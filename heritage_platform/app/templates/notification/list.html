@@ -1,165 +1,255 @@
 {% extends "base.html" %}
 
+{% block title %}通知列表{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2>我的通知</h2>
+<div class="container my-4">
+    <h2>通知列表</h2>
+    
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">我的通知</h5>
+            <div>
+                <button id="mark-all-read-btn" class="btn btn-sm btn-outline-primary">全部标为已读</button>
+                <button id="refresh-btn" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-sync-alt"></i> 刷新
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div id="notification-list">
                 {% if notifications %}
-                <button type="button" class="btn btn-secondary" onclick="markAllAsRead(event)">全部标为已读</button>
+                    <ul class="list-group list-group-flush">
+                        {% for notification in notifications %}
+                        <li class="list-group-item notification-item {% if not notification.is_read %}unread{% endif %}" data-id="{{ notification.id }}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="notification-content">
+                                    <div class="mb-1">
+                                        {% if notification.sender %}
+                                            <strong>{{ notification.sender.username }}</strong>
+                                        {% else %}
+                                            <strong>系统通知</strong>
+                                        {% endif %}
+                                        {% if notification.type == 'reply' %}
+                                            <span class="badge bg-info">回复</span>
+                                        {% elif notification.type == 'like' %}
+                                            <span class="badge bg-danger">点赞</span>
+                                        {% elif notification.type == 'announcement' %}
+                                            <span class="badge bg-warning">公告</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ notification.type }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="mb-1">{{ notification.content }}</p>
+                                    <small class="text-muted">{{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </div>
+                                <div class="notification-actions">
+                                    {% if notification.link %}
+                                        <a href="{{ notification.link }}" class="btn btn-sm btn-link">查看</a>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-link mark-read-btn" data-id="{{ notification.id }}" 
+                                            {% if notification.is_read %}disabled{% endif %}>
+                                        {% if notification.is_read %}已读{% else %}标为已读{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="mb-0">暂无通知</p>
+                    </div>
                 {% endif %}
             </div>
-            
-            {% if notifications %}
-            <div class="list-group">
-                {% for notification in notifications %}
-                <div class="list-group-item {% if not notification.is_read %}list-group-item-primary{% endif %}"
-                     id="notification-{{ notification.id }}">
-                    <div class="d-flex w-100 justify-content-between">
-                        <div>
-                            {% if notification.type == 'reply' %}
-                                <i class="fas fa-comment text-primary"></i>
-                            {% elif notification.type == 'like' %}
-                                <i class="fas fa-heart text-danger"></i>
-                            {% elif notification.type == 'announcement' %}
-                                <i class="fas fa-bullhorn text-warning"></i>
-                            {% endif %}
-                            
-                            {{ notification.content }}
-                            
-                            {% if notification.link %}
-                            <a href="{{ notification.link }}" class="ml-2">查看详情</a>
-                            {% endif %}
-                        </div>
-                        <small class="text-muted">
-                            {{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}
-                            {% if not notification.is_read %}
-                            <button type="button" class="btn btn-sm btn-outline-primary ml-2" 
-                                    onclick="markAsRead({{ notification.id }}, event)">
-                                标为已读
-                            </button>
-                            {% endif %}
-                        </small>
-                    </div>
-                    {% if notification.sender %}
-                    <small class="text-muted">来自: {{ notification.sender.username }}</small>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="alert alert-info">
-                暂无通知
-            </div>
-            {% endif %}
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/websocket.js') }}"></script>
 <script>
-// 直接调试Content-Type问题
-function logHeaders(url, options) {
-    console.log('Fetch request to:', url);
-    console.log('Request options:', options);
-    // 返回原始options以继续fetch
-    return options;
+document.addEventListener('DOMContentLoaded', function() {
+    // 处理新通知事件
+    WebSocketClient.onEvent('new_notification', function(data) {
+        // 创建新通知元素
+        var newNotification = createNotificationElement(data);
+        
+        // 插入到列表顶部
+        var notificationList = document.getElementById('notification-list').querySelector('ul');
+        if (notificationList) {
+            // 如果列表存在，将新通知添加到顶部
+            notificationList.insertBefore(newNotification, notificationList.firstChild);
+        } else {
+            // 如果列表不存在（没有通知），创建列表并添加新通知
+            notificationList = document.createElement('ul');
+            notificationList.className = 'list-group list-group-flush';
+            notificationList.appendChild(newNotification);
+            
+            // 替换"暂无通知"提示
+            var emptyMessage = document.getElementById('notification-list').querySelector('.text-center');
+            if (emptyMessage) {
+                document.getElementById('notification-list').innerHTML = '';
+                document.getElementById('notification-list').appendChild(notificationList);
+            }
+        }
+        
+        // 显示通知提醒
+        showNotificationAlert(data.content);
+    });
+    
+    // 标记通知为已读
+    document.querySelectorAll('.mark-read-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var notificationId = this.getAttribute('data-id');
+            markNotificationAsRead(notificationId);
+        });
+    });
+    
+    // 全部标为已读按钮
+    document.getElementById('mark-all-read-btn').addEventListener('click', function() {
+        markAllNotificationsAsRead();
+    });
+    
+    // 刷新按钮
+    document.getElementById('refresh-btn').addEventListener('click', function() {
+        location.reload();
+    });
+});
+
+// 创建新通知元素
+function createNotificationElement(data) {
+    var li = document.createElement('li');
+    li.className = 'list-group-item notification-item unread';
+    li.setAttribute('data-id', data.id);
+    
+    var html = `
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="notification-content">
+                <div class="mb-1">
+                    ${data.sender_username ? 
+                        `<strong>${data.sender_username}</strong>` : 
+                        `<strong>系统通知</strong>`}
+                    ${getBadgeHtml(data.type)}
+                </div>
+                <p class="mb-1">${data.content}</p>
+                <small class="text-muted">${data.created_at}</small>
+            </div>
+            <div class="notification-actions">
+                ${data.link ? 
+                    `<a href="${data.link}" class="btn btn-sm btn-link">查看</a>` : 
+                    ''}
+                <button class="btn btn-sm btn-link mark-read-btn" data-id="${data.id}">
+                    标为已读
+                </button>
+            </div>
+        </div>
+    `;
+    
+    li.innerHTML = html;
+    
+    // 给新添加的标记已读按钮添加事件监听
+    li.querySelector('.mark-read-btn').addEventListener('click', function() {
+        var notificationId = this.getAttribute('data-id');
+        markNotificationAsRead(notificationId);
+    });
+    
+    return li;
 }
 
-function markAsRead(notificationId, event) {
-    if (event) {
-        event.preventDefault();  // 阻止默认的表单提交行为
+// 获取通知类型对应的徽章HTML
+function getBadgeHtml(type) {
+    switch (type) {
+        case 'reply':
+            return '<span class="badge bg-info">回复</span>';
+        case 'like':
+            return '<span class="badge bg-danger">点赞</span>';
+        case 'announcement':
+            return '<span class="badge bg-warning">公告</span>';
+        default:
+            return `<span class="badge bg-secondary">${type}</span>`;
     }
-    
-    const options = {
+}
+
+// 标记通知为已读
+function markNotificationAsRead(notificationId) {
+    fetch(`/notification/read/${notificationId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            notification_id: notificationId
-        })
-    };
-    
-    // 调试请求头信息
-    logHeaders('/api/notifications/mark-read', options);
-    
-    fetch('/api/notifications/mark-read', options)
-    .then(response => {
-        console.log('Response status:', response.status);
-        return response.json();
+            'X-CSRFToken': getCsrfToken()
+        }
     })
+    .then(response => response.json())
     .then(data => {
-        console.log('Response data:', data);
-        if (data.message) {
+        if (data.success) {
             // 更新UI
-            const notification = document.getElementById(`notification-${notificationId}`);
-            notification.classList.remove('list-group-item-primary');
-            // 隐藏"标为已读"按钮
-            const button = notification.querySelector('button');
-            if (button) button.remove();
-            // 更新未读计数
-            updateUnreadCount();
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-function markAllAsRead(event) {
-    if (event) {
-        event.preventDefault();  // 阻止默认的表单提交行为
-    }
-    
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    };
-    
-    // 调试请求头信息
-    logHeaders('/api/notifications/mark-all-read', options);
-    
-    fetch('/api/notifications/mark-all-read', options)
-    .then(response => {
-        console.log('Response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Response data:', data);
-        if (data.message) {
-            // 更新所有通知的UI
-            document.querySelectorAll('.list-group-item').forEach(item => {
-                item.classList.remove('list-group-item-primary');
-                const button = item.querySelector('button');
-                if (button) button.remove();
-            });
-            // 更新未读计数
-            updateUnreadCount();
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-// 更新顶部导航栏的未读计数
-function updateUnreadCount() {
-    fetch('/api/notifications/unread-count')
-        .then(response => response.json())
-        .then(data => {
-            const badge = document.getElementById('notification-badge');
-            if (badge) {
-                if (data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'inline';
-                } else {
-                    badge.style.display = 'none';
+            var item = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+            if (item) {
+                item.classList.remove('unread');
+                var button = item.querySelector('.mark-read-btn');
+                if (button) {
+                    button.textContent = '已读';
+                    button.disabled = true;
                 }
             }
-        })
-        .catch(error => console.error('Error:', error));
+        }
+    })
+    .catch(error => {
+        console.error('标记通知已读失败:', error);
+    });
+}
+
+// 标记所有通知为已读
+function markAllNotificationsAsRead() {
+    fetch('/notification/read-all', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // 更新所有未读通知的UI
+            document.querySelectorAll('.notification-item.unread').forEach(function(item) {
+                item.classList.remove('unread');
+                var button = item.querySelector('.mark-read-btn');
+                if (button) {
+                    button.textContent = '已读';
+                    button.disabled = true;
+                }
+            });
+        }
+    })
+    .catch(error => {
+        console.error('标记所有通知已读失败:', error);
+    });
+}
+
+// 显示通知提醒
+function showNotificationAlert(content) {
+    // 如果页面有通知组件，则显示提醒
+    if (typeof showToast === 'function') {
+        showToast('新通知', content, 'info');
+    }
+}
+
+// 获取CSRF令牌
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 }
 </script>
+
+<style>
+.notification-item {
+    transition: background-color 0.3s;
+}
+.notification-item.unread {
+    background-color: rgba(13, 110, 253, 0.05);
+    border-left: 3px solid #0d6efd;
+}
+</style>
 {% endblock %}

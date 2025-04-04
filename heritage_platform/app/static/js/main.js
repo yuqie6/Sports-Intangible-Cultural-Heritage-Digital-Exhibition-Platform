@@ -2,6 +2,47 @@
  * 通用的通知相关函数
  */
 
+// 固定元素检测与调整
+document.addEventListener('DOMContentLoaded', function() {
+    // 检查页面上的固定计时器等元素
+    function checkFixedElements() {
+        // 寻找页面上可能的计时器元素
+        const timeElements = document.querySelectorAll('.time-display, .countdown-timer, .auto-save-timer, [id*="timer"], [class*="timer"]');
+        
+        if (timeElements.length > 0) {
+            console.log('检测到计时器元素：', timeElements.length, '个');
+            
+            // 调整每个检测到的计时器元素
+            timeElements.forEach(element => {
+                // 获取计算样式
+                const style = window.getComputedStyle(element);
+                
+                // 检查是否为固定定位或绝对定位
+                if (style.position === 'fixed' || style.position === 'absolute') {
+                    console.log('处理固定位置元素:', element);
+                    
+                    // 调整z-index确保不会覆盖通知栏
+                    if (!element.style.zIndex || parseInt(element.style.zIndex) >= 9000) {
+                        element.style.zIndex = '1000';
+                    }
+                    
+                    // 如果元素在右下角，移动它以避免与通知区域重叠
+                    if ((style.bottom === '0px' || parseInt(style.bottom) < 100) && 
+                        (style.right === '0px' || parseInt(style.right) < 100)) {
+                        element.style.bottom = '120px';
+                    }
+                }
+            });
+        }
+    }
+    
+    // 页面加载时运行一次
+    checkFixedElements();
+    
+    // 每10秒检查一次，捕获可能动态添加的元素
+    setInterval(checkFixedElements, 10000);
+});
+
 // 更新未读通知数量的函数
 function updateNotificationCount() {
     fetch('/api/notifications/unread-count')

@@ -142,6 +142,31 @@ def topic(id):
                 )
             
             db.session.commit()
+            
+            # 添加WebSocket实时更新功能
+            try:
+                from app.socket_events import socketio
+                
+                # 准备评论数据
+                post_data = {
+                    'id': post.id,
+                    'content': post.content,
+                    'user_id': post.user_id,
+                    'user_username': current_user.username,
+                    'user_avatar': current_user.avatar if hasattr(current_user, 'avatar') else None,
+                    'parent_id': post.parent_id,
+                    'reply_to_user_id': post.reply_to_user_id,
+                    'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                }
+                
+                # 发送到主题房间
+                room_name = f"topic_{id}"
+                socketio.emit('new_forum_post', post_data, to=room_name)
+                
+            except Exception as e:
+                current_app.logger.error(f"发送WebSocket实时评论更新失败: {str(e)}")
+                # 即使WebSocket发送失败，也不影响评论已保存到数据库
+            
             flash('回复成功', 'success')
             return redirect(url_for('forum.topic', id=id))
             
@@ -337,71 +362,98 @@ def delete_topic(id):
 @forum_bp.route('/topic/<int:topic_id>/reply/<int:post_id>', methods=['POST'])
 @login_required
 def reply_post(topic_id, post_id):
-    """处理嵌套回复"""
+    """回复特定评论"""
+    # 验证主题和评论是否存在
     topic = ForumTopic.query.get_or_404(topic_id)
-    parent_post = ForumPost.query.get_or_404(post_id)
+    post = ForumPost.query.get_or_404(post_id)
     
-    # 验证父帖子属于当前主题
-    if parent_post.topic_id != topic_id:
-        flash('无效的回复请求', 'danger')
+    # 确保评论属于该主题
+    if post.topic_id != topic_id:
+        flash('评论不属于该主题', 'danger')
         return redirect(url_for('forum.topic', id=topic_id))
     
-    form = PostForm()
-    if form.validate_on_submit():
-        try:
-            if topic.is_closed and not current_user.is_admin:
-                flash('该主题已关闭，无法回复', 'warning')
-                return redirect(url_for('forum.topic', id=topic_id))
-                
-            post = ForumPost(
-                topic_id=topic_id,
-                user_id=current_user.id,
-                content=form.content.data,
-                parent_id=post_id
-            )
-            
-            # 如果提供了回复目标用户ID
-            if form.reply_to_user_id.data and form.reply_to_user_id.data.isdigit():
-                reply_to_user_id = int(form.reply_to_user_id.data)
-                user = User.query.get(reply_to_user_id)
-                if user:
-                    post.reply_to_user_id = reply_to_user_id
-            
-            db.session.add(post)
-            topic.last_activity = post.created_at
-            
-            # 发送通知
+    # 检查主题是否已关闭
+    if topic.is_closed and not current_user.is_admin:
+        flash('该主题已关闭，无法回复', 'warning')
+        return redirect(url_for('forum.topic', id=topic_id))
+    
+    content = request.form.get('content')
+    
+    if not content or len(content.strip()) == 0:
+        flash('回复内容不能为空', 'warning')
+        return redirect(url_for('forum.topic', id=topic_id))
+    
+    try:
+        # 创建回复
+        new_post = ForumPost(
+            topic_id=topic_id,
+            user_id=current_user.id,
+            content=content,
+            parent_id=post_id,  # 设置父评论ID
+            reply_to_user_id=post.user_id  # 回复的是评论作者
+        )
+        
+        db.session.add(new_post)
+        
+        # 更新主题最后活动时间
+        topic.last_activity = new_post.created_at
+        
+        # 如果回复的不是自己的评论，发送通知
+        if post.user_id != current_user.id:
             from app.routes.notification import send_notification
             
-            # 如果是回复其他用户的评论
-            if form.reply_to_user_id.data and form.reply_to_user_id.data.isdigit():
-                reply_to_user_id = int(form.reply_to_user_id.data)
-                if reply_to_user_id != current_user.id:  # 不给自己发通知
-                    content = f"{current_user.username} 回复了你在主题 \"{topic.title}\" 中的评论"
-                    send_notification(
-                        user_id=reply_to_user_id,
-                        content=content,
-                        notification_type='reply',
-                        link=url_for('forum.topic', id=topic_id),
-                        sender_id=current_user.id
-                    )
-            # 如果是回复主贴（且不是回复自己的主贴）
-            elif parent_post.user_id != current_user.id:
-                content = f"{current_user.username} 回复了你在主题 \"{topic.title}\" 中的评论"
-                send_notification(
-                    user_id=parent_post.user_id,
-                    content=content,
-                    notification_type='reply',
-                    link=url_for('forum.topic', id=topic_id),
-                    sender_id=current_user.id
-                )
+            # 获取主题标题，并限制长度
+            topic_title = topic.title
+            if len(topic_title) > 30:
+                topic_title = topic_title[:30] + '...'
+                
+            # 获取评论内容预览
+            reply_preview = content
+            if len(reply_preview) > 30:
+                reply_preview = reply_preview[:30] + '...'
+                
+            notification_content = f"{current_user.username} 回复了你在 \"{topic_title}\" 中的评论：{reply_preview}"
             
-            db.session.commit()
-            flash('回复成功', 'success')
+            send_notification(
+                user_id=post.user_id,
+                content=notification_content,
+                notification_type='reply',
+                link=url_for('forum.topic', id=topic_id),
+                sender_id=current_user.id
+            )
+        
+        db.session.commit()
+        
+        # 添加WebSocket实时更新功能
+        try:
+            from app.socket_events import socketio
+            
+            # 准备评论数据
+            reply_data = {
+                'id': new_post.id,
+                'content': new_post.content,
+                'user_id': new_post.user_id,
+                'user_username': current_user.username,
+                'user_avatar': current_user.avatar if hasattr(current_user, 'avatar') else None,
+                'parent_id': new_post.parent_id,
+                'reply_to_user_id': new_post.reply_to_user_id,
+                'created_at': new_post.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            }
+            
+            # 发送到主题房间
+            room_name = f"topic_{topic_id}"
+            socketio.emit('new_forum_post', reply_data, to=room_name)
+            
         except Exception as e:
-            db.session.rollback()
-            current_app.logger.error(f"发表回复失败: {str(e)}")
-            flash('发表回复失败，请稍后重试', 'danger')
+            current_app.logger.error(f"发送WebSocket实时评论回复更新失败: {str(e)}")
+            # 即使WebSocket发送失败，也不影响评论已保存到数据库
+        
+        flash('回复成功', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"回复评论失败: {str(e)}")
+        flash('回复失败，请稍后重试', 'danger')
     
     return redirect(url_for('forum.topic', id=topic_id))
 

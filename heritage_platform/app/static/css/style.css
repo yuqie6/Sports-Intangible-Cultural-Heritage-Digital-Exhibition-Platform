@@ -982,6 +982,7 @@ footer .list-unstyled li {
     padding-top: 56.25%; /* 16:9 宽高比 */
     border-radius: 8px;
     overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.03);
 }
 
 .content-cover {
@@ -989,22 +990,18 @@ footer .list-unstyled li {
     top: 0;
     left: 0;
     width: 100%;
-    transition: all 0.6s ease;
+    height: 100%;
+    transition: all 0.3s ease-in-out;
     border-radius: 8px;
 }
 
 /* 填充模式 */
 .content-cover.cover-mode {
-    height: 100%;
     object-fit: cover;
 }
 
 /* 完整显示模式 */
 .content-cover.fit-mode {
-    height: auto;
-    max-height: 100%;
-    top: 50%;
-    transform: translateY(-50%);
     object-fit: contain;
 }
 
@@ -1013,7 +1010,7 @@ footer .list-unstyled li {
 }
 
 .content-cover-image:hover .content-cover.fit-mode {
-    transform: translateY(-50%) scale(1.05);
+    transform: scale(1.05); /* 移除了 translateY(-50%) */
 }
 
 /* 管理控制台样式 */
@@ -1107,7 +1104,7 @@ footer .list-unstyled li {
 }
 
 .cover-controls .btn:hover {
-    background: white;
+    background: #f8f9fa;
     transform: translateY(-2px);
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
@@ -1769,22 +1766,6 @@ footer .list-unstyled li {
     transform: scale(1.1);
 }
 
-/* 删除确认模态框样式 */
-.modal-content {
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-    background: linear-gradient(90deg, rgba(13, 110, 253, 0.1), rgba(44, 62, 80, 0.05));
-    border-bottom: none;
-}
-
-.modal-footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
 /* 区块动画效果 */
 .fade-in {
     animation: fadeIn 1s ease-out;
@@ -1947,4 +1928,78 @@ footer .list-unstyled li {
     body.dark-mode-enabled.prefers-dark-mode .text-muted {
         color: #adb5bd !important;
     }
+}
+
+/* 修复Toast通知被遮挡问题 */
+.toast-container {
+    position: fixed !important;
+    bottom: 80px !important; /* 调整为80px，确保在移动设备上不被底部导航栏遮挡 */
+    right: 20px !important;
+    z-index: 10000 !important; /* 确保弹出通知层级高于其他元素 */
+    max-width: 350px;
+}
+
+.toast {
+    background: #fff !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    opacity: 1 !important;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.toast-header {
+    border-bottom: none !important;
+    padding: 0.75rem 1rem !important;
+}
+
+.toast-body {
+    padding: 0.75rem 1rem 1rem !important;
+    word-break: break-word;
+}
+
+/* 确保挂载在body下的对话框和提示不被遮挡 */
+.modal-backdrop, 
+.modal,
+.popover,
+.tooltip {
+    z-index: 9000 !important;
+}
+
+/* 移动端底部导航栏样式 */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    z-index: 9999;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.8rem;
+    padding: 5px 0;
+}
+
+.bottom-nav-item i {
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+}
+
+.bottom-nav-item.active {
+    color: #0d6efd;
+}
+
+.bottom-nav-item:hover {
+    color: #0d6efd;
 }

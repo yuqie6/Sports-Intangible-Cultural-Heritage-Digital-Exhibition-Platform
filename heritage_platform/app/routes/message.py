@@ -100,6 +100,30 @@ def compose():
         try:
             db.session.add(message)
             db.session.commit()
+            
+            # 添加WebSocket实时通知功能
+            try:
+                from app.socket_events import socketio
+                
+                # 准备消息数据
+                message_data = {
+                    'id': message.id,
+                    'content': message.content,
+                    'sender_id': message.sender_id,
+                    'sender_username': current_user.username,
+                    'sender_avatar': current_user.avatar if hasattr(current_user, 'avatar') else None,
+                    'receiver_id': message.receiver_id,
+                    'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                }
+                
+                # 发送到接收者的WebSocket
+                receiver_room = f"user_{receiver.id}"
+                socketio.emit('new_private_message', message_data, to=receiver_room)
+                
+            except Exception as e:
+                current_app.logger.error(f"发送WebSocket实时私信失败: {str(e)}")
+                # 即使WebSocket发送失败，也不影响私信已保存到数据库
+            
             flash('私信已发送', 'success')
             return redirect(url_for('message.message_list'))
         except Exception as e:
@@ -185,6 +209,30 @@ def reply():
         try:
             db.session.add(message)
             db.session.commit()
+            
+            # 添加WebSocket实时通知功能
+            try:
+                from app.socket_events import socketio
+                
+                # 准备消息数据
+                message_data = {
+                    'id': message.id,
+                    'content': message.content,
+                    'sender_id': message.sender_id,
+                    'sender_username': current_user.username,
+                    'sender_avatar': current_user.avatar if hasattr(current_user, 'avatar') else None,
+                    'receiver_id': message.receiver_id,
+                    'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                }
+                
+                # 发送到接收者的WebSocket
+                receiver_room = f"user_{receiver_id}"
+                socketio.emit('new_private_message', message_data, to=receiver_room)
+                
+            except Exception as e:
+                current_app.logger.error(f"发送WebSocket实时私信回复失败: {str(e)}")
+                # 即使WebSocket发送失败，也不影响私信已保存到数据库
+            
             flash('回复已发送', 'success')
         except Exception as e:
             db.session.rollback()

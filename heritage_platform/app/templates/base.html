@@ -17,57 +17,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block additional_head %}{% endblock %}
     
-    <style>
-        /* 修复模态框点击问题 - 全局高z-index版本 */
-        .modal-backdrop {
-            z-index: 9999 !important;
-        }
-        .modal {
-            z-index: 10000 !important;
-            pointer-events: auto !important;
-        }
-        .modal-dialog {
-            z-index: 10001 !important;
-            pointer-events: auto !important;
-            margin: 1.75rem auto;
-        }
-        .modal-content {
-            pointer-events: auto !important;
-            position: relative;
-            z-index: 10002 !important;
-        }
-        .modal-footer .btn, 
-        .modal-footer form, 
-        .modal-footer button,
-        .modal-footer input {
-            position: relative;
-            z-index: 10005 !important;
-            pointer-events: auto !important;
-        }
-        /* 确保模态框上的所有元素可点击 */
-        .modal *, .modal-dialog *, .modal-content * {
-            pointer-events: auto !important;
-        }
-        /* 防止模态框被其他元素覆盖 */
-        body.modal-open .modal {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-        }
-        /* 高亮确认删除按钮 */
-        #confirmDeleteBtn, .btn-danger {
-            position: relative;
-            z-index: 10010 !important; 
-            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
-        }
-        /* 修复iOS Safari上的点击问题 */
-        @media (pointer: coarse) {
-            .modal-footer .btn {
-                min-height: 44px;
-                padding: 10px 15px;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- 导航栏 -->
@@ -249,9 +198,14 @@
                 <i class="fas fa-info-circle me-2"></i>
             {% endif %}
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         {% endfor %}
+    </div>
+    
+    <!-- 实时通知浮动提示区域 -->
+    <div class="toast-container position-fixed p-3" id="toast-container" style="bottom: 80px; right: 20px; z-index: 10000;">
+        <!-- 通知将会动态添加到这里 -->
     </div>
 
     <!-- 主内容区 -->
@@ -362,72 +316,277 @@
     <!-- 自定义JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     
-    {% if current_user.is_authenticated %}
+    <!-- Socket.IO 库 -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI" crossorigin="anonymous"></script>
+    
+    <!-- WebSocket 客户端 -->
+    <script src="{{ url_for('static', filename='js/websocket.js') }}"></script>
+    
+    <!-- WebSocket初始化和调试 -->
     <script>
-        // 检查未读通知和私信
-        function checkUnreadNotifications() {
-            // 检查未读通知
-            fetch('/api/notifications/unread-count')
-                .then(response => response.json())
-                .then(data => {
-                    // 更新桌面端角标
-                    const desktopNotificationBadge = document.getElementById('notification-badge');
-                    if (desktopNotificationBadge) {
-                        if (data.count > 0) {
-                            desktopNotificationBadge.textContent = data.count;
-                            desktopNotificationBadge.style.display = 'inline';
-                        } else {
-                            desktopNotificationBadge.style.display = 'none';
-                        }
-                    }
-                    // 更新移动端角标
-                    const mobileNotificationBadge = document.getElementById('mobile-notification-badge');
-                    if (mobileNotificationBadge) {
-                         if (data.count > 0) {
-                            mobileNotificationBadge.textContent = data.count;
-                            mobileNotificationBadge.style.display = 'inline';
-                        } else {
-                            mobileNotificationBadge.style.display = 'none';
-                        }
-                    }
-                })
-                .catch(error => console.error('Error fetching notification count:', error));
-                
-            // 检查未读私信
-            fetch('/api/messages/unread-count')
-                .then(response => response.json())
-                .then(data => {
-                    // 更新桌面端角标
-                    const desktopMessageBadge = document.getElementById('message-badge');
-                    if (desktopMessageBadge) {
-                        if (data.count > 0) {
-                            desktopMessageBadge.textContent = data.count;
-                            desktopMessageBadge.style.display = 'inline';
-                        } else {
-                            desktopMessageBadge.style.display = 'none';
-                        }
-                    }
-                     // 更新移动端角标
-                    const mobileMessageBadge = document.getElementById('mobile-message-badge');
-                    if (mobileMessageBadge) {
-                         if (data.count > 0) {
-                            mobileMessageBadge.textContent = data.count;
-                            mobileMessageBadge.style.display = 'inline';
-                        } else {
-                            mobileMessageBadge.style.display = 'none';
-                        }
-                    }
-                })
-                .catch(error => console.error('Error fetching message count:', error));
+    document.addEventListener('DOMContentLoaded', function() {
+        // 清除可能存在的旧会话
+        if (typeof WebSocketClient !== 'undefined') {
+            console.log('加载页面时检测到WebSocketClient，等待其自动初始化');
+            // WebSocketClient.init() 调用已移除，避免重复初始化
+        } else {
+            console.error('WebSocketClient未定义，可能无法接收实时通知');
         }
-
-        // 页面加载时检查
-        checkUnreadNotifications();
         
-        // 每30秒检查一次
-        setInterval(checkUnreadNotifications, 30000);
+        // 监听可能的Socket.IO错误并记录在控制台
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('未处理的Promise拒绝:', event.reason);
+        });
+        
+        // 调试可能的Socket.IO问题
+        console.info('Socket.IO调试信息:');
+        console.info('- 当前页面URL:', window.location.href);
+        console.info('- 页面协议:', window.location.protocol);
+        console.info('- Socket.IO库版本:', typeof io !== 'undefined' ? '已加载' : '未加载');
+        console.info('- CSRF令牌:', document.querySelector('meta[name="csrf-token"]')?.content ? '存在' : '不存在');
+    });
     </script>
-    {% endif %}
+    
+    <!-- 通用通知脚本 -->
+    <script>
+    // 显示Toast通知
+    function showToast(title, message, type = 'primary', delay = 5000) {
+        const toastId = 'toast-' + Math.random().toString(36).substr(2, 9);
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.id = toastId;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.setAttribute('data-bs-delay', delay);
+        
+        // 设置样式
+        let bgClass = 'bg-primary';
+        if (type === 'success') bgClass = 'bg-success';
+        if (type === 'danger') bgClass = 'bg-danger';
+        if (type === 'warning') bgClass = 'bg-warning';
+        if (type === 'info') bgClass = 'bg-info';
+        
+        // 生成Toast HTML
+        toast.innerHTML = `
+            <div class="toast-header ${bgClass} text-white">
+                <strong class="me-auto">${title}</strong>
+                <small>${new Date().toLocaleTimeString()}</small>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+        
+        // 添加到容器
+        const container = document.getElementById('toast-container');
+        container.appendChild(toast);
+        
+        // 初始化Toast
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // 自动移除DOM元素
+        toast.addEventListener('hidden.bs.toast', function () {
+            container.removeChild(toast);
+        });
+        
+        return bsToast;
+    }
+
+    // 显示徽章函数
+    function showBadge(badgeId, count) {
+        const badge = document.getElementById(badgeId);
+        if (badge) {
+            // 强制设置文本内容、显示样式和其他属性
+            badge.textContent = count;
+            badge.style.display = 'inline-block';
+            badge.style.visibility = 'visible';
+            badge.style.opacity = '1';
+            // 确保徽章在 z-index 上可见
+            badge.style.zIndex = '1000';
+            console.log(`显示徽章 ${badgeId}:`, count);
+        } else {
+            console.error(`徽章元素不存在: ${badgeId}`);
+        }
+    }
+
+    // 处理未读通知
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM加载完成，初始化通知系统');
+        
+        // 页面加载时检查徽章元素是否存在及其初始显示状态
+        function checkBadges() {
+            // 检查桌面端通知徽章
+            const badge = document.getElementById('notification-badge');
+            if (badge) {
+                // 确保初始状态设置，如果有未读通知则显示
+                const count = parseInt(badge.textContent || '0');
+                if (count > 0) {
+                    showBadge('notification-badge', count);
+                } else {
+                    badge.style.display = 'none';
+                }
+            } else {
+                console.error('通知徽章元素不存在');
+            }
+            
+            // 同样处理移动端通知徽章
+            const mobileBadge = document.getElementById('mobile-notification-badge');
+            if (mobileBadge) {
+                const count = parseInt(mobileBadge.textContent || '0');
+                if (count > 0) {
+                    showBadge('mobile-notification-badge', count);
+                } else {
+                    mobileBadge.style.display = 'none';
+                }
+            }
+            
+            // 检查消息徽章
+            const msgBadge = document.getElementById('message-badge');
+            if (msgBadge) {
+                const count = parseInt(msgBadge.textContent || '0');
+                if (count > 0) {
+                    showBadge('message-badge', count);
+                } else {
+                    msgBadge.style.display = 'none';
+                }
+            } else {
+                console.error('消息徽章元素不存在');
+            }
+            
+            // 同样处理移动端消息徽章
+            const mobileMsgBadge = document.getElementById('mobile-message-badge');
+            if (mobileMsgBadge) {
+                const count = parseInt(mobileMsgBadge.textContent || '0');
+                if (count > 0) {
+                    showBadge('mobile-message-badge', count);
+                } else {
+                    mobileMsgBadge.style.display = 'none';
+                }
+            }
+        }
+        
+        // 页面加载时立即检查
+        checkBadges();
+        
+        // 确保WebSocketClient存在并正确初始化
+        if (typeof WebSocketClient !== 'undefined') {
+            console.log('WebSocketClient已定义，设置事件监听器');
+            
+            // 通知事件处理
+            WebSocketClient.onEvent('new_notification', function(data) {
+                console.log('收到新通知事件:', data);
+                showToast('新通知', data.content, 'info');
+                
+                // 更新顶部导航栏的通知徽章
+                const badge = document.getElementById('notification-badge');
+                if (badge) {
+                    let count = parseInt(badge.textContent || '0');
+                    count += 1;
+                    showBadge('notification-badge', count);
+                }
+                
+                // 同时更新移动端通知徽章
+                const mobileBadge = document.getElementById('mobile-notification-badge');
+                if (mobileBadge) {
+                    let count = parseInt(mobileBadge.textContent || '0');
+                    count += 1;
+                    showBadge('mobile-notification-badge', count);
+                }
+            });
+
+            // 私信事件处理
+            WebSocketClient.onEvent('new_private_message', function(data) {
+                showToast('新私信', `来自 ${data.sender_username} 的新消息`, 'primary');
+                
+                // 立即检查徽章元素状态
+                const desktopBadge = document.getElementById('message-badge');
+                const mobileBadge = document.getElementById('mobile-message-badge');
+                
+                console.log('桌面端私信徽章元素:', desktopBadge);
+                console.log('移动端私信徽章元素:', mobileBadge);
+                
+                // 更新顶部导航栏的消息徽章
+                if (desktopBadge) {
+                    let count = parseInt(desktopBadge.textContent || '0');
+                    count += 1;
+                    showBadge('message-badge', count);
+                    
+                    // 额外的 DOM 操作确保显示
+                    setTimeout(() => {
+                        desktopBadge.classList.add('visible');
+                        console.log('强制更新桌面端私信徽章可见性');
+                    }, 100);
+                } else {
+                    console.error('桌面端私信徽章元素不存在!');
+                }
+                
+                // 同时更新移动端消息徽章
+                if (mobileBadge) {
+                    let count = parseInt(mobileBadge.textContent || '0');
+                    count += 1;
+                    showBadge('mobile-message-badge', count);
+                    
+                    // 额外的 DOM 操作确保显示
+                    setTimeout(() => {
+                        mobileBadge.classList.add('visible');
+                        console.log('强制更新移动端私信徽章可见性');
+                    }, 100);
+                } else {
+                    console.error('移动端私信徽章元素不存在!');
+                }
+            });
+        } else {
+            console.error('WebSocketClient未定义，无法接收实时通知');
+        }
+        
+        // 添加CSS规则确保徽章可见
+        const style = document.createElement('style');
+        style.textContent = `
+            .badge.visible, 
+            #notification-badge.visible, 
+            #mobile-notification-badge.visible,
+            #message-badge.visible, 
+            #mobile-message-badge.visible {
+                display: inline-block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // 检查徽章是否被CSS规则隐藏
+        setTimeout(checkBadgesVisibility, 500);
+        
+        function checkBadgesVisibility() {
+            const badges = [
+                'notification-badge', 
+                'mobile-notification-badge',
+                'message-badge', 
+                'mobile-message-badge'
+            ];
+            
+            badges.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    const styles = window.getComputedStyle(element);
+                    console.log(`徽章 ${id} 计算样式:`, {
+                        display: styles.display,
+                        visibility: styles.visibility,
+                        opacity: styles.opacity,
+                        position: styles.position,
+                        zIndex: styles.zIndex
+                    });
+                }
+            });
+        }
+    });
+    </script>
+    
+    {% block scripts %}{% endblock %}
 
     <script>
         // 返回顶部按钮
@@ -508,60 +667,9 @@
     </script>
     
     <!-- 页面脚本 -->
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    {% block scripts %}{% endblock %}
-    
-    <!-- 确保模态框可点击的脚本 -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 确保所有模态框可点击
-            const fixModalClickability = function() {
-                // 查找所有模态框
-                document.querySelectorAll('.modal').forEach(function(modal) {
-                    // 提高z-index
-                    modal.style.zIndex = '10000';
-                    // 确保可点击
-                    modal.style.pointerEvents = 'auto';
-                    
-                    // 确保对话框可点击
-                    const dialog = modal.querySelector('.modal-dialog');
-                    if (dialog) {
-                        dialog.style.zIndex = '10001';
-                        dialog.style.pointerEvents = 'auto';
-                    }
-                    
-                    // 确保内容可点击
-                    const content = modal.querySelector('.modal-content');
-                    if (content) {
-                        content.style.zIndex = '10001';
-                        content.style.pointerEvents = 'auto';
-                    }
-                    
-                    // 确保按钮可点击
-                    const buttons = modal.querySelectorAll('.btn');
-                    buttons.forEach(function(btn) {
-                        btn.style.zIndex = '10002';
-                        btn.style.pointerEvents = 'auto';
-                    });
-                });
-                
-                // 定位所有模态框背景
-                document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
-                    backdrop.style.zIndex = '9999';
-                });
-            };
-            
-            // 监听模态框打开事件
-            document.addEventListener('shown.bs.modal', fixModalClickability);
-            
-            // 初始执行一次
-            fixModalClickability();
-            
-            // 每秒检查一次，确保模态框可点击
-            setInterval(fixModalClickability, 1000);
-        });
-    </script>
-
+    {# 注意：这里之前错误地引用了 script.js，已更正为 main.js #}
+    {# <script src="{{ url_for('static', filename='js/script.js') }}"></script> #}
+    {# 正确的 main.js 已在上方通过 Bootstrap Bundle 引入或在下方 block scripts 中单独引入 #}
     <!-- 深色模式检测脚本 -->
     <script>
         // 深色模式默认禁用
