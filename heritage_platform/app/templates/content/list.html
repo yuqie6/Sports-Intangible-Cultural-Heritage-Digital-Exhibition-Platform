@@ -110,7 +110,7 @@
                         {% if current_user.is_authenticated and (current_user.id == content.user_id or current_user.is_admin) %}
                         <form method="post" action="{{ url_for('content.delete', id=content.id) }}" class="d-inline" onsubmit="return confirm('确定要删除此内容吗？删除后无法恢复！');">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1">
+                            <button type="submit" class="btn btn-sm btn-outline-danger ms-1" aria-label="删除内容">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </form>

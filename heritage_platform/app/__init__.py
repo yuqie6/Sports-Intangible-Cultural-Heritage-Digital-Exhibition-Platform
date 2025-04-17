@@ -10,6 +10,7 @@ from flask_limiter.util import get_remote_address
 from flask_cors import CORS
 from .utils.logging_config import setup_logging, log_access
 from .utils.security_config import setup_security
+from flask import Response, request # 导入 Response 和 request
 import os
 import markdown
 
@@ -60,7 +61,46 @@ def create_app(config_name='default'):
     
     # 注册访问日志中间件，记录每个请求的详细信息
     app.after_request(log_access)
-    
+
+    # 注册 after_request 钩子来设置安全和缓存相关的响应头
+    @app.after_request
+    def add_security_headers(response: Response):
+        # 安全响应头设置
+        response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+        response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
+        response.headers.setdefault('X-XSS-Protection', '1; mode=block')
+        
+        # 优先使用 Cache-Control，移除 Expires
+        if 'Expires' in response.headers:
+            del response.headers['Expires']
+            
+        # 缓存策略设置
+        if request.path.startswith('/static/'):
+            # 静态资源使用强缓存策略
+            cache_max_age = 31536000  # 1年，符合推荐的长期缓存
+            response.headers.setdefault('Cache-Control', f'public, max-age={cache_max_age}, immutable')
+        else:
+            # 动态内容不缓存
+            response.headers.setdefault('Cache-Control', 'no-cache, no-store, must-revalidate')
+            response.headers.setdefault('Pragma', 'no-cache')  # 兼容旧版 HTTP/1.0 客户端
+
+        # 修正 Content-Type 和 charset 设置
+        content_type = response.headers.get('Content-Type', '').lower()
+        
+        # 文本类型内容确保设置正确的 charset
+        if (response.mimetype.startswith('text/') or 
+            response.mimetype in ['application/javascript', 'application/json']):
+            if 'charset' not in content_type:
+                response.headers['Content-Type'] = f"{response.mimetype}; charset=utf-8"
+        # 字体文件使用正确的 MIME 类型
+        elif response.mimetype == 'application/octet-stream' and request.path.endswith('.woff2'):
+            response.headers['Content-Type'] = 'font/woff2'
+        # 非文本类型移除不必要的 charset
+        elif 'charset' in content_type and not response.mimetype.startswith('text/'):
+            response.headers['Content-Type'] = response.mimetype
+
+        return response
+
     # 初始化各种Flask扩展
     db.init_app(app)  # 初始化数据库
     login_manager.init_app(app)  # 初始化登录管理器

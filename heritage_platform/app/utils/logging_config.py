@@ -23,9 +23,11 @@ def setup_logging(app):
         encoding='utf-8'
     )
     app_handler.setFormatter(log_format)
-    app_handler.setLevel(logging.INFO)
+    # 将应用日志级别调整为 WARNING，减少不必要的 INFO 日志
+    app_handler.setLevel(logging.WARNING)
     app.logger.addHandler(app_handler)
-    app.logger.setLevel(logging.INFO)
+    # 将应用日志记录器的级别也调整为 WARNING
+    app.logger.setLevel(logging.WARNING)
 
     # 错误日志配置
     error_log_file = os.path.join(log_dir, 'error.log')

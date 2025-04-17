@@ -6,6 +6,28 @@ body {
     line-height: 1.6;
 }
 
+/* 兼容性样式 - 修复浏览器兼容问题 */
+* {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* 允许输入框和文本区域选择文本 */
+input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
 /* 定制滚动条 */
 ::-webkit-scrollbar {
     width: 8px;
@@ -139,13 +161,56 @@ body {
 
 /* 导航栏角标样式 (桌面端) */
 #notification-badge,
-#message-badge {
+#message-badge,
+#mobile-notification-badge,
+#mobile-message-badge {
     font-size: 0.65em; /* 调整角标字体大小 */
-    padding: 0.25em 0.5em; /* 调整角标内边距 */
-    /* 微调位置，如果Bootstrap类不够精确 */
-    /* transform: translate(50%, -50%); */
-    /* 确保角标在图标上方 */
-    z-index: 1;
+    padding: 0.25rem 0.4rem; /* 调整角标内边距 */
+    min-width: 1.2em;
+    min-height: 1.2em;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50% !important; /* 确保红点是圆形 */
+    transform: translate(-50%, -50%) !important;
+    margin-left: 0;
+    margin-top: -2px;
+    z-index: 1000;
+    /* 添加平滑过渡，防止刷新时的弹出动画 */
+    transition: opacity 0.2s ease-in-out;
+    opacity: 0;
+}
+
+/* 显示徽章时平滑显示 */
+#notification-badge.show,
+#message-badge.show,
+#mobile-notification-badge.show,
+#mobile-message-badge.show {
+    opacity: 1;
+}
+
+/* 徽章样式统一定义 */
+.badge.position-absolute.top-0.start-100.translate-middle {
+    padding: 0.25rem 0.4rem;
+    min-width: 1.2em;
+    min-height: 1.2em;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.65rem;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    margin-left: 0;
+    margin-top: -2px;
+}
+
+/* 徽章样式增强 */
+.badge.bg-danger.rounded-pill.position-absolute {
+    padding: 0.25rem 0.4rem;
+    min-width: 1.2em;
+    min-height: 1.2em;
+    border-radius: 50% !important;
+    transform: translate(-50%, -50%) !important;
 }
 
 /* 移动端导航栏图标和用户菜单调整 */
@@ -383,6 +448,54 @@ body {
     }
 }
 
+/* 搜索框增强 */
+.search-form {
+    margin-right: 1.5rem; /* 增加右边距 */
+    position: relative; /* 添加相对定位作为绝对定位子元素的参考 */
+    display: flex; /* 使用flex布局确保表单元素正确对齐 */
+    align-items: center;
+}
+
+.search-form .form-control {
+    width: 250px;
+    padding: 0.6rem 2.5rem 0.6rem 1rem;
+    border-radius: 50px;
+    border: 2px solid transparent;
+    background: rgba(13, 110, 253, 0.05);
+    transition: all 0.3s ease;
+}
+
+.search-form .form-control:focus {
+    border-color: #0d6efd;
+    background: white;
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1);
+    width: 300px;
+}
+
+.search-form .btn {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: linear-gradient(45deg, #0d6efd, #0099f7);
+    border: none;
+    box-shadow: 0 3px 10px rgba(13, 110, 253, 0.2);
+    transition: all 0.3s ease;
+    z-index: 5; /* 确保按钮在输入框上方 */
+}
+
+.search-form .btn:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+}
+
 /* 响应式布局和字体调整 */
 @media (max-width: 767.98px) {
     /* 减小主容器内边距 */
@@ -470,50 +583,6 @@ body {
     100% {
         transform: scale(1);
     }
-}
-
-/* 搜索框增强 */
-.search-form {
-    margin-right: 1.5rem; /* 增加右边距 */
-}
-
-.search-form .form-control {
-    width: 250px;
-    padding: 0.6rem 2.5rem 0.6rem 1rem;
-    border-radius: 50px;
-    border: 2px solid transparent;
-    background: rgba(13, 110, 253, 0.05);
-    transition: all 0.3s ease;
-}
-
-.search-form .form-control:focus {
-    border-color: #0d6efd;
-    background: white;
-    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1);
-    width: 300px;
-}
-
-.search-form .btn {
-    width: 35px;
-    height: 35px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    border-radius: 50%;
-    background: linear-gradient(45deg, #0d6efd, #0099f7);
-    border: none;
-    box-shadow: 0 3px 10px rgba(13, 110, 253, 0.2);
-    transition: all 0.3s ease;
-}
-
-.search-form .btn:hover {
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
 }
 
 /* 英雄区样式增强 */
@@ -2002,4 +2071,31 @@ footer .list-unstyled li {
 
 .bottom-nav-item:hover {
     color: #0d6efd;
+}
+
+/* 返回顶部按钮样式 */
+#back-to-top {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: fadeIn 0.3s ease-out;
+}
+
+#back-to-top.show {
+    display: flex;
+    opacity: 1;
+}
+
+#back-to-top:not(.show) {
+    opacity: 0;
+    transform: translateY(20px);
 }

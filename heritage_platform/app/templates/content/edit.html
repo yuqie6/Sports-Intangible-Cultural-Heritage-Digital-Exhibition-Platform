@@ -264,10 +264,10 @@
                         
                         <div class="d-flex justify-content-between">
                             <a href="{{ url_for('content.detail', id=content.id) }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-times me-1"></i>取消
+                                <i class="fas fa-times me-1"></i><span class="visually-hidden">取消</span>取消
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i>保存更改
+                                <i class="fas fa-save me-1"></i><span class="visually-hidden">保存更改</span>保存更改
                             </button>
                         </div>
                     </form>
@@ -792,3 +792,5 @@
     })();
 </script>
 {% endblock %}
+```
+</copilot-edited-file>

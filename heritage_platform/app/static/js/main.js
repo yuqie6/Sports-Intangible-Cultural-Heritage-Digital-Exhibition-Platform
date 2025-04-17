@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkFixedElements() {
         // 寻找页面上可能的计时器元素
         const timeElements = document.querySelectorAll('.time-display, .countdown-timer, .auto-save-timer, [id*="timer"], [class*="timer"]');
-        
+
         if (timeElements.length > 0) {
-            console.log('检测到计时器元素：', timeElements.length, '个');
-            
+            // console.log('检测到计时器元素：', timeElements.length, '个'); // 注释掉检测日志
+
             // 调整每个检测到的计时器元素
             timeElements.forEach(element => {
                 // 获取计算样式
@@ -19,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // 检查是否为固定定位或绝对定位
                 if (style.position === 'fixed' || style.position === 'absolute') {
-                    console.log('处理固定位置元素:', element);
-                    
+                    // console.log('处理固定位置元素:', element); // 注释掉处理日志
+
                     // 调整z-index确保不会覆盖通知栏
                     if (!element.style.zIndex || parseInt(element.style.zIndex) >= 9000) {
                         element.style.zIndex = '1000';
@@ -50,7 +50,7 @@ function updateNotificationCount() {
             if (!response.ok) {
                 if (response.status === 429) {
                     // 如果遇到频率限制,延迟重试
-                    console.log('Rate limited, retrying in 5 seconds...');
+                    // console.log('Rate limited, retrying in 5 seconds...'); // 注释掉频率限制日志
                     setTimeout(updateNotificationCount, 5000);
                     return;
                 }

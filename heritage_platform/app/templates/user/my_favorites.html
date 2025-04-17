@@ -55,8 +55,8 @@
                                 <a href="{{ url_for('content.detail', id=content.id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-eye me-1"></i> 查看
                                 </a>
-                                <button class="btn btn-sm btn-outline-danger btn-unfavorite" data-id="{{ content.id }}">
-                                    <i class="fas fa-heart-broken me-1"></i> 取消收藏
+                                <button type="button" class="btn btn-sm btn-outline-warning btn-unfavorite" data-id="{{ content.id }}" aria-label="取消收藏">
+                                    <i class="fas fa-star"></i> 取消收藏
                                 </button>
                             </div>
                         </div>

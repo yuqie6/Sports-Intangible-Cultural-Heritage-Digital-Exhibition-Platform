@@ -13,10 +13,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- 自定义CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- 兼容性修复CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/compatibility-fixes.css') }}">
     {% block styles %}{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block additional_head %}{% endblock %}
-    
 </head>
 <body>
     <!-- 导航栏 -->
@@ -30,8 +31,8 @@
             <!-- 移动端顶部搜索框 -->
             <form class="d-lg-none flex-grow-1 mx-2" action="{{ url_for('content.list') }}" method="GET"> <!-- flex-grow-1 让其填充空间, mx-2 增加左右边距 -->
                 <div class="input-group input-group-sm"> <!-- 使用小尺寸输入组 -->
-                    <input class="form-control" type="search" name="q" placeholder="搜索非遗内容文章" aria-label="Search">
-                    <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
+                    <input class="form-control" type="search" name="q" placeholder="搜索非遗内容文章" aria-label="搜索">
+                    <button class="btn btn-outline-secondary" type="submit" aria-label="搜索"><i class="fas fa-search" aria-hidden="true"></i> <span class="visually-hidden">搜索</span></button>
                 </div>
             </form>
 
@@ -39,14 +40,18 @@
             <div class="d-lg-none d-flex align-items-center ms-auto order-lg-1"> <!-- order-lg-1 确保在桌面端不影响布局 -->
                 {% if current_user.is_authenticated %}
                 <!-- 通知图标 (仅移动端顶部) -->
-                <a class="nav-link position-relative px-2" href="{{ url_for('notification.list_notifications') }}" title="通知中心"> <!-- 调整内边距 -->
+                <a class="nav-link position-relative px-2" href="{{ url_for('notification.list_notifications') }}" title="通知中心" aria-label="通知"> <!-- 调整内边距 -->
                     <i class="fas fa-bell fs-5 text-warning"></i>
-                    <span id="mobile-notification-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 0.6em; padding: 0.2em 0.4em;"></span>
+                    <span id="mobile-notification-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
+                        <span class="visually-hidden">未读通知</span>
+                    </span>
                 </a>
                 <!-- 私信图标 (仅移动端顶部) -->
-                <a class="nav-link position-relative px-2" href="{{ url_for('message.message_list') }}" title="私信消息"> <!-- 调整内边距 -->
+                <a class="nav-link position-relative px-2" href="{{ url_for('message.message_list') }}" title="私信消息" aria-label="私信"> <!-- 调整内边距 -->
                     <i class="fas fa-envelope fs-5 text-info"></i>
-                    <span id="mobile-message-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 0.6em; padding: 0.2em 0.4em;"></span>
+                    <span id="mobile-message-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
+                        <span class="visually-hidden">未读私信</span>
+                    </span>
                 </a>
                 {% endif %}
             </div>
@@ -86,8 +91,8 @@
 
                 <!-- 搜索框 (仅桌面) -->
                 <form class="search-form d-none d-lg-flex me-3" action="{{ url_for('content.list') }}" method="GET">
-                    <input class="form-control" type="search" name="q" placeholder="搜索非遗内容文章" aria-label="Search">
-                    <button class="btn btn-sm btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                    <input class="form-control" type="search" name="q" placeholder="搜索非遗内容文章" aria-label="搜索">
+                    <button class="btn btn-sm btn-primary" type="submit" aria-label="搜索"><i class="fas fa-search" aria-hidden="true"></i> <span class="visually-hidden">搜索</span></button>
                 </form>
 
                 <!-- 用户区域 -->
@@ -95,16 +100,20 @@
                     {% if current_user.is_authenticated %}
                         <!-- 通知图标 (仅桌面端) -->
                         <li class="nav-item d-none d-lg-block order-lg-1"> <!-- 添加 d-none d-lg-block -->
-                            <a class="nav-link position-relative mx-lg-2" href="{{ url_for('notification.list_notifications') }}" title="通知中心">
+                            <a class="nav-link position-relative mx-lg-2" href="{{ url_for('notification.list_notifications') }}" title="通知中心" aria-label="通知">
                                 <i class="fas fa-bell fs-5 text-warning"></i>
-                                <span id="notification-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 0.6em; padding: 0.2em 0.4em;"></span>
+                                <span id="notification-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
+                                    <span class="visually-hidden">未读通知</span>
+                                </span>
                             </a>
                         </li>
                         <!-- 私信图标 (仅桌面端) -->
                          <li class="nav-item d-none d-lg-block order-lg-2"> <!-- 添加 d-none d-lg-block -->
-                            <a class="nav-link position-relative me-lg-3 mx-lg-0 mx-2" href="{{ url_for('message.message_list') }}" title="私信消息">
+                            <a class="nav-link position-relative me-lg-3 mx-lg-0 mx-2" href="{{ url_for('message.message_list') }}" title="私信消息" aria-label="私信">
                                 <i class="fas fa-envelope fs-5 text-info"></i>
-                                <span id="message-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 0.6em; padding: 0.2em 0.4em;"></span>
+                                <span id="message-badge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
+                                    <span class="visually-hidden">未读私信</span>
+                                </span>
                             </a>
                         </li>
 
@@ -159,18 +168,6 @@
                          <li class="nav-item d-lg-none w-100 order-12"> <hr class="dropdown-divider"> </li>
                          <li class="nav-item d-lg-none order-13"> <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>退出登录</a> </li>
 
-                    {% else %}
-                        <!-- 未登录状态按钮 -->
-                         <li class="nav-item">
-                            <a class="nav-link btn btn-outline-primary me-2" href="{{ url_for('auth.login') }}">
-                                <i class="fas fa-sign-in-alt me-1"></i>登录
-                            </a>
-                         </li>
-                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary" href="{{ url_for('auth.register') }}">
-                                <i class="fas fa-user-plus me-1"></i>注册
-                            </a>
-                         </li>
                     {% endif %}
                      <!-- 关于我们链接 (移动端显示在用户菜单后) -->
                      <li class="nav-item d-lg-none w-100 order-14"> <hr class="dropdown-divider"> </li>
@@ -307,8 +304,8 @@
     </footer>
 
     <!-- 返回顶部按钮 -->
-    <button id="back-to-top" class="btn btn-primary rounded-circle position-fixed" style="bottom: 30px; right: 30px; width: 50px; height: 50px; display: none;">
-        <i class="fas fa-arrow-up"></i>
+    <button id="back-to-top" class="btn btn-primary rounded-circle position-fixed" style="bottom: 30px; right: 30px; width: 50px; height: 50px; display: none;" aria-label="返回顶部">
+        <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
 
     <!-- Bootstrap 5 JS Bundle -->
@@ -325,25 +322,24 @@
     <!-- WebSocket初始化和调试 -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // 清除可能存在的旧会话
-        if (typeof WebSocketClient !== 'undefined') {
-            console.log('加载页面时检测到WebSocketClient，等待其自动初始化');
-            // WebSocketClient.init() 调用已移除，避免重复初始化
-        } else {
-            console.error('WebSocketClient未定义，可能无法接收实时通知');
-        }
-        
+        // 移除对 WebSocketClient 的检查和初始化逻辑，因为它在 websocket.js 内部处理
+        // if (typeof WebSocketClient !== 'undefined') {
+        //     // console.log('加载页面时检测到WebSocketClient，等待其自动初始化');
+        // } else {
+        //     console.error('WebSocketClient未定义，可能无法接收实时通知');
+        // }
+
         // 监听可能的Socket.IO错误并记录在控制台
         window.addEventListener('unhandledrejection', function(event) {
             console.error('未处理的Promise拒绝:', event.reason);
         });
         
         // 调试可能的Socket.IO问题
-        console.info('Socket.IO调试信息:');
-        console.info('- 当前页面URL:', window.location.href);
-        console.info('- 页面协议:', window.location.protocol);
-        console.info('- Socket.IO库版本:', typeof io !== 'undefined' ? '已加载' : '未加载');
-        console.info('- CSRF令牌:', document.querySelector('meta[name="csrf-token"]')?.content ? '存在' : '不存在');
+        // console.info('Socket.IO调试信息:'); // 注释掉调试信息
+        // console.info('- 当前页面URL:', window.location.href); // 注释掉调试信息
+        // console.info('- 页面协议:', window.location.protocol); // 注释掉调试信息
+        // console.info('- Socket.IO库版本:', typeof io !== 'undefined' ? '已加载' : '未加载'); // 注释掉调试信息
+        // console.info('- CSRF令牌:', document.querySelector('meta[name="csrf-token"]')?.content ? '存在' : '不存在'); // 注释掉调试信息
     });
     </script>
     
@@ -373,7 +369,7 @@
             <div class="toast-header ${bgClass} text-white">
                 <strong class="me-auto">${title}</strong>
                 <small>${new Date().toLocaleTimeString()}</small>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="关闭"></button>
             </div>
             <div class="toast-body">
                 ${message}
@@ -400,22 +396,48 @@
     function showBadge(badgeId, count) {
         const badge = document.getElementById(badgeId);
         if (badge) {
-            // 强制设置文本内容、显示样式和其他属性
-            badge.textContent = count;
-            badge.style.display = 'inline-block';
-            badge.style.visibility = 'visible';
-            badge.style.opacity = '1';
-            // 确保徽章在 z-index 上可见
-            badge.style.zIndex = '1000';
-            console.log(`显示徽章 ${badgeId}:`, count);
+            if (count > 0) {
+                // 有未读消息时显示
+                badge.textContent = count;
+                badge.style.display = 'flex';  
+                badge.style.visibility = 'visible';
+                // 添加show类以触发平滑过渡
+                setTimeout(() => {
+                    badge.classList.add('show');
+                }, 10);
+                // console.log(`显示徽章 ${badgeId}:`, count); // 注释掉显示徽章日志
+            } else {
+                // 没有未读消息时隐藏
+                badge.classList.remove('show');
+                // 等待过渡效果完成后隐藏元素
+                setTimeout(() => {
+                    badge.style.display = 'none';
+                    badge.style.visibility = 'hidden';
+                }, 200); // 与CSS过渡时间匹配
+                // console.log(`隐藏徽章 ${badgeId}`); // 注释掉隐藏徽章日志
+            }
         } else {
             console.error(`徽章元素不存在: ${badgeId}`);
         }
     }
 
+    // 隐藏徽章函数
+    function hideBadge(badgeId) {
+        const badge = document.getElementById(badgeId);
+        if (badge) {
+            badge.classList.remove('show');
+            // 等待过渡效果完成后隐藏元素
+            setTimeout(() => {
+                badge.style.display = 'none';
+                badge.style.visibility = 'hidden';
+            }, 200); // 与CSS过渡时间匹配
+            // console.log(`隐藏徽章 ${badgeId}`); // 注释掉隐藏徽章日志
+        }
+    }
+
     // 处理未读通知
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM加载完成，初始化通知系统');
+        // console.log('DOM加载完成，初始化通知系统'); // 注释掉初始化日志
         
         // 页面加载时检查徽章元素是否存在及其初始显示状态
         function checkBadges() {
@@ -427,7 +449,7 @@
                 if (count > 0) {
                     showBadge('notification-badge', count);
                 } else {
-                    badge.style.display = 'none';
+                    hideBadge('notification-badge');
                 }
             } else {
                 console.error('通知徽章元素不存在');
@@ -440,7 +462,7 @@
                 if (count > 0) {
                     showBadge('mobile-notification-badge', count);
                 } else {
-                    mobileBadge.style.display = 'none';
+                    hideBadge('mobile-notification-badge');
                 }
             }
             
@@ -451,7 +473,7 @@
                 if (count > 0) {
                     showBadge('message-badge', count);
                 } else {
-                    msgBadge.style.display = 'none';
+                    hideBadge('message-badge');
                 }
             } else {
                 console.error('消息徽章元素不存在');
@@ -464,7 +486,7 @@
                 if (count > 0) {
                     showBadge('mobile-message-badge', count);
                 } else {
-                    mobileMsgBadge.style.display = 'none';
+                    hideBadge('mobile-message-badge');
                 }
             }
         }
@@ -474,11 +496,11 @@
         
         // 确保WebSocketClient存在并正确初始化
         if (typeof WebSocketClient !== 'undefined') {
-            console.log('WebSocketClient已定义，设置事件监听器');
+            // console.log('WebSocketClient已定义，设置事件监听器'); // 注释掉事件监听器设置日志
             
             // 通知事件处理
             WebSocketClient.onEvent('new_notification', function(data) {
-                console.log('收到新通知事件:', data);
+                // console.log('收到新通知事件:', data); // 注释掉收到新通知事件日志
                 showToast('新通知', data.content, 'info');
                 
                 // 更新顶部导航栏的通知徽章
@@ -506,20 +528,14 @@
                 const desktopBadge = document.getElementById('message-badge');
                 const mobileBadge = document.getElementById('mobile-message-badge');
                 
-                console.log('桌面端私信徽章元素:', desktopBadge);
-                console.log('移动端私信徽章元素:', mobileBadge);
+                // console.log('桌面端私信徽章元素:', desktopBadge); // 注释掉私信徽章检查日志
+                // console.log('移动端私信徽章元素:', mobileBadge); // 注释掉私信徽章检查日志
                 
                 // 更新顶部导航栏的消息徽章
                 if (desktopBadge) {
                     let count = parseInt(desktopBadge.textContent || '0');
                     count += 1;
                     showBadge('message-badge', count);
-                    
-                    // 额外的 DOM 操作确保显示
-                    setTimeout(() => {
-                        desktopBadge.classList.add('visible');
-                        console.log('强制更新桌面端私信徽章可见性');
-                    }, 100);
                 } else {
                     console.error('桌面端私信徽章元素不存在!');
                 }
@@ -529,34 +545,57 @@
                     let count = parseInt(mobileBadge.textContent || '0');
                     count += 1;
                     showBadge('mobile-message-badge', count);
-                    
-                    // 额外的 DOM 操作确保显示
-                    setTimeout(() => {
-                        mobileBadge.classList.add('visible');
-                        console.log('强制更新移动端私信徽章可见性');
-                    }, 100);
                 } else {
                     console.error('移动端私信徽章元素不存在!');
                 }
             });
+            
+            // 修复：改为监听通知已读事件或者定期检查更新数量
+            // 使用更通用的事件名称或检查机制
+            function checkForNotificationUpdates() {
+                // 每30秒检查一次通知状态
+                updateBadgeCount();
+                setTimeout(checkForNotificationUpdates, 30000);
+            }
+            
+            // 启动周期性检查
+            checkForNotificationUpdates();
+
+            // 移除对已弃用/未定义事件 'notifications_updated' 的监听
+            // WebSocketClient.onEvent('notifications_updated', function(data) {
+            //     updateBadgeCount();
+            // });
         } else {
             console.error('WebSocketClient未定义，无法接收实时通知');
         }
         
-        // 添加CSS规则确保徽章可见
-        const style = document.createElement('style');
-        style.textContent = `
-            .badge.visible, 
-            #notification-badge.visible, 
-            #mobile-notification-badge.visible,
-            #message-badge.visible, 
-            #mobile-message-badge.visible {
-                display: inline-block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-            }
-        `;
-        document.head.appendChild(style);
+        // 从服务器获取最新的未读通知和消息数量
+        function updateBadgeCount() {
+            fetch('/api/notifications/unread-count')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.hasOwnProperty('count')) {
+                        // 更新通知徽章
+                        showBadge('notification-badge', data.count);
+                        showBadge('mobile-notification-badge', data.count);
+                    }
+                })
+                .catch(error => console.error('获取未读通知数量失败:', error));
+                
+            fetch('/api/messages/unread-count')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.hasOwnProperty('count')) {
+                        // 更新消息徽章
+                        showBadge('message-badge', data.count);
+                        showBadge('mobile-message-badge', data.count);
+                    }
+                })
+                .catch(error => console.error('获取未读消息数量失败:', error));
+        }
+        
+        // 页面加载时获取最新数量
+        updateBadgeCount();
         
         // 检查徽章是否被CSS规则隐藏
         setTimeout(checkBadgesVisibility, 500);
@@ -573,13 +612,13 @@
                 const element = document.getElementById(id);
                 if (element) {
                     const styles = window.getComputedStyle(element);
-                    console.log(`徽章 ${id} 计算样式:`, {
-                        display: styles.display,
-                        visibility: styles.visibility,
-                        opacity: styles.opacity,
-                        position: styles.position,
-                        zIndex: styles.zIndex
-                    });
+                    // console.log(`徽章 ${id} 计算样式:`, { // 注释掉徽章样式检查日志
+                    //     display: styles.display,
+                    //     visibility: styles.visibility,
+                    //     opacity: styles.opacity,
+                    //     position: styles.position,
+                    //     zIndex: styles.zIndex
+                    // });
                 }
             });
         }
@@ -594,9 +633,6 @@
         
         window.onscroll = function() {
             if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-                backToTopButton.style.display = "flex";
-                backToTopButton.style.justifyContent = "center";
-                backToTopButton.style.alignItems = "center";
                 backToTopButton.classList.add("show"); // 添加show类以启用新的动画效果
             } else {
                 backToTopButton.classList.remove("show"); // 移除show类
@@ -666,10 +702,6 @@
         });
     </script>
     
-    <!-- 页面脚本 -->
-    {# 注意：这里之前错误地引用了 script.js，已更正为 main.js #}
-    {# <script src="{{ url_for('static', filename='js/script.js') }}"></script> #}
-    {# 正确的 main.js 已在上方通过 Bootstrap Bundle 引入或在下方 block scripts 中单独引入 #}
     <!-- 深色模式检测脚本 -->
     <script>
         // 深色模式默认禁用
@@ -701,30 +733,30 @@
 
     <!-- 移动端底部导航栏 -->
     <nav class="bottom-nav d-lg-none">
-        <a href="{{ url_for('main.index') }}" class="bottom-nav-item {% if request.path == url_for('main.index') %}active{% endif %}">
-            <i class="fas fa-home"></i>
+        <a href="{{ url_for('main.index') }}" class="bottom-nav-item {% if request.path == url_for('main.index') %}active{% endif %}" aria-label="首页">
+            <i class="fas fa-home" aria-hidden="true"></i>
             <span>首页</span>
         </a>
-        <a href="{{ url_for('heritage.list') }}" class="bottom-nav-item {% if request.path.startswith('/heritage') %}active{% endif %}">
-            <i class="fas fa-landmark"></i>
+        <a href="{{ url_for('heritage.list') }}" class="bottom-nav-item {% if request.path.startswith('/heritage') %}active{% endif %}" aria-label="非遗项目">
+            <i class="fas fa-landmark" aria-hidden="true"></i>
             <span>非遗项目</span>
         </a>
-        <a href="{{ url_for('content.list') }}" class="bottom-nav-item {% if request.path.startswith('/content') %}active{% endif %}">
-            <i class="fas fa-book-open"></i>
+        <a href="{{ url_for('content.list') }}" class="bottom-nav-item {% if request.path.startswith('/content') %}active{% endif %}" aria-label="内容专区">
+            <i class="fas fa-book-open" aria-hidden="true"></i>
             <span>内容专区</span>
         </a>
-        <a href="{{ url_for('forum.index') }}" class="bottom-nav-item {% if request.path.startswith('/forum') %}active{% endif %}">
-            <i class="fas fa-comments"></i>
+        <a href="{{ url_for('forum.index') }}" class="bottom-nav-item {% if request.path.startswith('/forum') %}active{% endif %}" aria-label="论坛">
+            <i class="fas fa-comments" aria-hidden="true"></i>
             <span>论坛</span>
         </a>
         {% if current_user.is_authenticated %}
-        <a href="{{ url_for('user.profile') }}" class="bottom-nav-item {% if request.path.startswith('/user') or request.path.startswith('/message') or request.path.startswith('/notification') %}active{% endif %}">
-            <i class="fas fa-user"></i>
+        <a href="{{ url_for('user.profile') }}" class="bottom-nav-item {% if request.path.startswith('/user') or request.path.startswith('/message') or request.path.startswith('/notification') %}active{% endif %}" aria-label="个人中心">
+            <i class="fas fa-user" aria-hidden="true"></i>
             <span>我的</span>
         </a>
         {% else %}
-        <a href="{{ url_for('auth.login') }}" class="bottom-nav-item">
-            <i class="fas fa-sign-in-alt"></i>
+        <a href="{{ url_for('auth.login') }}" class="bottom-nav-item" aria-label="登录">
+            <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
             <span>登录</span>
         </a>
         {% endif %}

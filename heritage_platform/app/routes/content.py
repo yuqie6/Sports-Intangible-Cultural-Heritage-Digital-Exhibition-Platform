@@ -324,9 +324,9 @@ def create():
                 db.session.add(content)
                 db.session.flush()
                 
-                # 处理多图片上传
+                # 首先检查是否使用multiple_images字段
                 if form.multiple_images.data:
-                    current_app.logger.info("处理多图片上传")
+                    current_app.logger.info("处理多图片上传 (multiple_images字段)")
                     files = request.files.getlist('multiple_images')
                     for file in files:
                         if hasattr(file, 'filename') and file.filename:
@@ -344,6 +344,31 @@ def create():
                             else:
                                 current_app.logger.error(f"图片上传失败: {file.filename}")
                                 db.session.rollback()
+                                flash(f'图片上传失败: {file.filename}', 'danger')
+                # 检查是否使用file字段进行多图片上传
+                elif form.file.data:
+                    current_app.logger.info("处理多图片上传 (file字段)")
+                    # 获取file字段上传的所有文件
+                    files = request.files.getlist('file')
+                    for file in files:
+                        if hasattr(file, 'filename') and file.filename:
+                            current_app.logger.info(f"处理图片上传: {file.filename}")
+                            file_path = save_file(file, 'image')
+                            if file_path:
+                                current_app.logger.info(f"图片上传成功，路径: {file_path}")
+                                # 如果是第一张图片，设置为内容的主图
+                                if not content.file_path:
+                                    content.file_path = file_path
+                                # 创建其他图片记录
+                                else:
+                                    image = ContentImage(
+                                        content_id=content.id,
+                                        file_path=file_path,
+                                        caption=''
+                                    )
+                                    db.session.add(image)
+                            else:
+                                current_app.logger.error(f"图片上传失败: {file.filename}")
                                 flash(f'图片上传失败: {file.filename}', 'danger')
                                 # 不要在这里返回，让用户可以继续保存其他内容
                 elif not form.file.data or not hasattr(form.file.data, 'filename') or not form.file.data.filename:

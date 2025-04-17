@@ -64,7 +64,7 @@ function initWebSocket() {
 
         // 连接建立事件
         socket.on('connect', function() {
-            console.log('WebSocket连接已建立');
+            // console.log('WebSocket连接已建立'); // 注释掉连接成功日志
             isConnected = true;
             reconnectAttempts = 0;
             
@@ -89,9 +89,9 @@ function initWebSocket() {
 
         // 断开连接事件
         socket.on('disconnect', function(reason) {
-            console.log('WebSocket连接已断开:', reason);
+            // console.log('WebSocket连接已断开:', reason); // 注释掉断开连接日志
             isConnected = false;
-            
+
             // 触发所有断开连接事件的回调
             triggerEventHandlers('disconnect', reason);
             
@@ -103,37 +103,37 @@ function initWebSocket() {
 
         // 收到新通知事件
         socket.on('new_notification', function(data) {
-            console.log('收到新通知:', data);
+            // console.log('收到新通知:', data); // 注释掉收到新通知日志
             triggerEventHandlers('new_notification', data);
         });
 
         // 收到新私信事件
         socket.on('new_private_message', function(data) {
-            console.log('收到新私信:', data);
+            // console.log('收到新私信:', data); // 注释掉收到新私信日志
             triggerEventHandlers('new_private_message', data);
         });
 
         // 发送私信成功事件
         socket.on('sent_private_message', function(data) {
-            console.log('私信发送成功:', data);
+            // console.log('私信发送成功:', data); // 注释掉发送私信成功日志
             triggerEventHandlers('sent_private_message', data);
         });
 
         // 收到新群组消息事件
         socket.on('new_group_message', function(data) {
-            console.log('收到新群组消息:', data);
+            // console.log('收到新群组消息:', data); // 注释掉收到新群组消息日志
             triggerEventHandlers('new_group_message', data);
         });
 
         // 收到新论坛帖子事件
         socket.on('new_forum_post', function(data) {
-            console.log('收到新论坛帖子:', data);
+            // console.log('收到新论坛帖子:', data); // 注释掉收到新论坛帖子日志
             triggerEventHandlers('new_forum_post', data);
         });
 
         // 消息被删除事件
         socket.on('message_deleted', function(data) {
-            console.log('消息已被删除:', data);
+            // console.log('消息已被删除:', data); // 注释掉消息被删除日志
             triggerEventHandlers('message_deleted', data);
         });
 
@@ -145,11 +145,11 @@ function initWebSocket() {
 
         // 处理重连事件
         socket.io.on("reconnect_attempt", (attempt) => {
-            console.log(`Socket.IO尝试重连 (${attempt})`);
+            // console.log(`Socket.IO尝试重连 (${attempt})`); // 注释掉重连尝试日志
         });
 
         socket.io.on("reconnect", (attempt) => {
-            console.log(`Socket.IO重连成功，尝试次数: ${attempt}`);
+            // console.log(`Socket.IO重连成功，尝试次数: ${attempt}`); // 注释掉重连成功日志
             triggerEventHandlers('reconnect', attempt);
         });
 
@@ -178,8 +178,8 @@ function attemptReconnect() {
     }
 
     reconnectAttempts++;
-    console.log(`尝试重连 (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
-    
+    // console.log(`尝试重连 (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`); // 注释掉尝试重连日志
+
     // 触发重连事件
     triggerEventHandlers('reconnect', reconnectAttempts);
     
@@ -203,9 +203,9 @@ function joinGroup(groupId) {
 
     socket.emit('join_group', { group_id: groupId }, function(response) {
         if (response && response.status === 'success') {
-            console.log('成功加入群组:', groupId);
+            // console.log('成功加入群组:', groupId); // 注释掉成功加入群组日志
         } else {
-            console.error('加入群组失败:', response ? response.message : '未知错误');
+            console.error('加入群组失败:', response ? response.message : '未知错误'); // 保留错误日志
         }
     });
 }
@@ -222,9 +222,9 @@ function leaveGroup(groupId) {
 
     socket.emit('leave_group', { group_id: groupId }, function(response) {
         if (response && response.status === 'success') {
-            console.log('成功离开群组:', groupId);
+            // console.log('成功离开群组:', groupId); // 注释掉成功离开群组日志
         } else {
-            console.error('离开群组失败:', response ? response.message : '未知错误');
+            console.error('离开群组失败:', response ? response.message : '未知错误'); // 保留错误日志
         }
     });
 }
@@ -241,9 +241,9 @@ function joinTopic(topicId) {
 
     socket.emit('join_topic', { topic_id: topicId }, function(response) {
         if (response && response.status === 'success') {
-            console.log('成功加入论坛主题:', topicId);
+            // console.log('成功加入论坛主题:', topicId); // 注释掉成功加入主题日志
         } else {
-            console.error('加入论坛主题失败:', response ? response.message : '未知错误');
+            console.error('加入论坛主题失败:', response ? response.message : '未知错误'); // 保留错误日志
         }
     });
 }
@@ -260,9 +260,9 @@ function leaveTopic(topicId) {
 
     socket.emit('leave_topic', { topic_id: topicId }, function(response) {
         if (response && response.status === 'success') {
-            console.log('成功离开论坛主题:', topicId);
+            // console.log('成功离开论坛主题:', topicId); // 注释掉成功离开主题日志
         } else {
-            console.error('离开论坛主题失败:', response ? response.message : '未知错误');
+            console.error('离开论坛主题失败:', response ? response.message : '未知错误'); // 保留错误日志
         }
     });
 }
@@ -366,11 +366,11 @@ function onEvent(event, handler) {
     
     if (eventHandlers[event]) {
         // 清除该事件的所有现有处理函数，避免重复注册
-        console.log(`清除事件 ${event} 的现有处理函数，重新注册`);
+        // console.log(`清除事件 ${event} 的现有处理函数，重新注册`); // 注释掉事件清理日志
         eventHandlers[event] = [];
         eventHandlers[event].push(handler);
     } else {
-        console.error('未知事件类型:', event);
+        // console.error('未知事件类型:', event); // 注释掉未知事件类型的错误日志
     }
 }
 
@@ -413,8 +413,8 @@ return {
 
 })();
 
-// 页面加载时自动初始化WebSocket
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM加载完成，初始化WebSocket...');
-    WebSocketClient.init();
-});
+// 移除此处的 DOMContentLoaded 监听器，初始化将由 base.html 控制
+// document.addEventListener('DOMContentLoaded', function() {
+//     // console.log('DOM加载完成，初始化WebSocket...');
+//     WebSocketClient.init();
+// });

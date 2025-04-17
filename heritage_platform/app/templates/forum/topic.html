@@ -100,7 +100,7 @@
                             <div>
                                 <form method="POST" action="{{ url_for('forum.delete_post', id=post.id) }}" class="d-inline delete-post-form">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                    <button type="submit" class="btn btn-outline-danger btn-sm delete-post-btn">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm delete-post-btn" aria-label="删除回复">
                                         <i class="fas fa-trash"></i> 删除回复
                                     </button>
                                 </form>
@@ -114,7 +114,7 @@
                         <!-- 回复按钮 -->
                         {% if current_user.is_authenticated and not topic.is_closed %}
                         <div class="mt-2">
-                            <button class="btn btn-sm btn-outline-secondary reply-btn" data-post-id="{{ post.id }}">
+                            <button class="btn btn-sm btn-outline-secondary reply-btn" data-post-id="{{ post.id }}" aria-label="回复此楼层">
                                 <i class="fas fa-reply"></i> 回复
                             </button>
                         </div>
@@ -370,7 +370,8 @@ function addNewPost(data) {
                 <button class="btn btn-sm btn-outline-primary reply-btn" 
                         data-post-id="${data.id}"
                         data-author-id="${data.user_id}"
-                        data-author-name="${data.user_username}">
+                        data-author-name="${data.user_username}"
+                        aria-label="回复此评论">
                     <i class="fas fa-reply me-1"></i>回复
                 </button>
             </div>
@@ -448,7 +449,8 @@ function addReplyToPost(data) {
                 <button class="btn btn-sm btn-outline-primary reply-btn" 
                         data-post-id="${data.parent_id}"
                         data-author-id="${data.user_id}"
-                        data-author-name="${data.user_username}">
+                        data-author-name="${data.user_username}"
+                        aria-label="回复此评论">
                     <i class="fas fa-reply me-1"></i>回复
                 </button>
             </div>
