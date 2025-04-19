@@ -1,93 +1,127 @@
 // 表单样式
+// 表单样式
 @use '../base/variables' as *;
-@use '../base/mixins' as mix;
+@use '../base/mixins' as mix; // Import global mixins
 @use '../base/responsive' as resp;
 
-// 基础表单控件
-.form-control {
-  padding: $input-padding;
-  border-radius: $border-radius;
-  border: 1px solid $border-color;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+// --- Base Form Styles ---
 
-  &:focus {
-    border-color: $primary-light;
-    box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+// 基础表单控件 (input, textarea, select)
+.form-control {
+  display: block; // 确保占据整行
+  width: 100%; // 默认宽度100%
+  padding: $input-padding;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  line-height: $line-height-base;
+  color: $input-color;
+  background-color: $input-bg;
+  background-clip: padding-box;
+  border: 1px solid $input-border-color;
+  appearance: none; // 移除默认外观
+  border-radius: $border-radius;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  @include mix.form-control-focus(); // 应用通用焦点样式
+
+  // 禁用状态
+  &:disabled,
+  &[readonly] {
+    background-color: $input-disabled-bg;
+    opacity: 1; // 覆盖 Bootstrap 的默认透明度
+  }
+
+  // Placeholder 样式
+  &::placeholder {
+    color: $input-placeholder-color;
+    opacity: 1; // Firefox 需要
   }
 }
 
 // 表单标签
 .form-label {
-  font-weight: $font-weight-medium;
-  color: $secondary-dark;
+  // 表单字段的标签
+  margin-bottom: $form-label-margin-bottom;
+  font-size: $form-label-font-size;
+  font-weight: $form-label-font-weight;
+  color: $form-label-color;
 }
 
-// 搜索框增强
+// --- Specific Form Components ---
+
+// 导航栏搜索框
 .search-form {
-  margin-right: 1.5rem; // 增加右边距
-  position: relative; // 添加相对定位作为绝对定位子元素的参考
-  display: flex; // 使用flex布局确保表单元素正确对齐
+  margin-right: 1.5rem; // 与右侧元素的间距
+  position: relative;
+  display: flex;
   align-items: center;
 
   .form-control {
-    width: 250px;
-    padding: 0.6rem 2.5rem 0.6rem 1rem;
-    border-radius: $border-radius-pill;
-    border: 2px solid transparent;
-    background: rgba($primary, 0.05);
-    transition: $transition-base;
+    // 搜索输入框特定样式
+    width: 250px; // 默认宽度
+    padding: 0.6rem 2.5rem 0.6rem 1rem; // 调整内边距以容纳按钮
+    border-radius: $border-radius-pill; // 圆角
+    border: 2px solid transparent; // 透明边框，焦点时变色
+    background: rgba($primary, 0.05); // 轻微背景色
+    transition: width $transition-base, background-color $transition-base, border-color $transition-base, box-shadow $transition-base; // 添加宽度过渡
 
     &:focus {
       border-color: $primary;
       background: white;
-      box-shadow: 0 5px 15px rgba($primary, 0.1);
-      width: 300px;
+      box-shadow: 0 5px 15px rgba($primary, 0.1); // 自定义焦点阴影
+      width: 300px; // 焦点时宽度增加
+      outline: 0; // 移除默认 outline
     }
   }
 
   .btn {
-    width: 35px;
-    height: 35px;
+    // 搜索按钮
+    width: 35px; height: 35px; // 固定尺寸
     padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
+    @include mix.flex-center;
+    position: absolute; // 绝对定位在输入框内右侧
     right: 5px;
     top: 50%;
-    transform: translateY(-50%);
-    border-radius: 50%;
+    transform: translateY(-50%); // 垂直居中
+    border-radius: 50%; // 圆形
     background: $primary-gradient;
     border: none;
+    color: white; // 确保图标颜色
     box-shadow: 0 3px 10px rgba($primary, 0.2);
-    transition: $transition-base;
+    transition: transform $transition-base, box-shadow $transition-base;
     z-index: 5; // 确保按钮在输入框上方
 
-    &:hover {
-      transform: translateY(-50%) scale(1.1);
+    &:hover, &:focus {
+      transform: translateY(-50%) scale(1.1); // 悬停/焦点时放大
       box-shadow: 0 5px 15px rgba($primary, 0.3);
+      outline: 0; // 移除默认 outline
     }
   }
 }
 
-// 搜索工具栏
+// 页面内搜索工具栏 (通常较窄)
 .search-toolbar {
-  max-width: 300px;
+  // 用于限制搜索框宽度的容器
+  max-width: 300px; // 限制最大宽度
 }
 
-// 文件上传
+// 文件上传区域 (在内容编辑表单中)
 .content-edit-form .file-upload {
+  // 包含文件输入框和按钮的容器
   position: relative;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.5rem; // 元素间距
   align-items: center;
+  // 通常包含一个 <input type="file"> 和一个 <button> 或 <a>
 }
 
-// 编辑器基础样式
+// --- Rich Text Editor Styles ---
+
+// CKEditor 编辑区域和普通 Textarea 的基础样式
 .ck-editor__editable,
 .content-edit-form textarea {
-  min-height: 300px;
-  max-height: 500px;
+  // 统一编辑器和文本域外观
+  min-height: 300px; // 最小高度
+  max-height: 500px; // 最大高度 (可滚动)
   width: 100%;
   font-family: $font-family-base;
   font-size: $font-size-base;
@@ -97,246 +131,328 @@
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 0.75rem;
+  overflow-y: auto; // 内容超出时显示滚动条
 }
 
-// 编辑器交互样式
+// Textarea 特定交互样式
 .content-edit-form textarea {
-  // 移除所有可能导致渲染问题的属性
-  animation: none;
-  transform: none;
-  transition: none;
-  backface-visibility: hidden;
-  perspective: none;
-  transform-style: preserve-3d;
-  will-change: auto;
-
-  &:focus {
-    border-color: $primary-light;
-    box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
-    outline: none;
-  }
+  // 移除可能干扰渲染的属性 (有时用于解决特定浏览器问题)
+  // animation: none;
+  // transform: none;
+  // transition: none;
+  // backface-visibility: hidden;
+  // perspective: none;
+  // transform-style: preserve-3d;
+  // will-change: auto;
+  @include mix.form-control-focus(); // 应用通用焦点样式
 }
 
+// 浮动标签内的 Textarea
 .content-edit-form .form-floating textarea {
-  height: auto;
+  // 调整高度以适应浮动标签
+  height: auto; // 覆盖 .form-control 的固定高度
 }
 
-// 输入组
+// --- Input Groups ---
 .input-group {
+  // 将输入框、按钮、文本等组合在一起
   position: relative;
   display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
+  flex-wrap: wrap; // 允许换行
+  align-items: stretch; // 子元素拉伸以匹配高度
   width: 100%;
 
-  > .form-control {
-    position: relative;
-    flex: 1 1 auto;
-    width: 1%;
-    min-width: 0;
+  // 输入框在组内的样式
+  > .form-control,
+  > .form-select { // 也适用于下拉选择框
+    position: relative; // 确保 z-index 生效
+    flex: 1 1 auto; // 占据可用空间
+    width: 1%; // 防止内容撑开
+    min-width: 0; // 覆盖默认 min-width
+
+    // 调整相邻元素的圆角
+    &:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+    &:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; } // 使用负 margin 连接边框
   }
 
+  // 按钮在组内的样式
   > .btn {
     position: relative;
-    z-index: 2;
+    z-index: 2; // 确保按钮在输入框之上 (用于边框连接)
+    &:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+    &:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+  }
+
+  // 文本附加组件 (.input-group-text)
+  > .input-group-text {
+    display: flex;
+    align-items: center;
+    padding: $input-padding-y $input-padding-x;
+    font-size: $font-size-base;
+    font-weight: $font-weight-normal;
+    line-height: $line-height-base;
+    color: $input-group-addon-color;
+    text-align: center;
+    white-space: nowrap;
+    background-color: $input-group-addon-bg;
+    border: 1px solid $input-group-addon-border-color;
+    border-radius: $border-radius;
+    &:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+    &:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -1px; }
   }
 }
 
-// 浮动标签
+// --- Floating Labels ---
 .form-floating {
+  // 实现标签在输入框内浮动的效果
   position: relative;
 
-  > .form-control {
-    height: calc(3.5rem + 2px);
-    padding: 1rem 0.75rem;
+  > .form-control,
+  > .form-select {
+    height: calc(3.5rem + 2px); // 固定高度以容纳标签
+    line-height: 1.25; // 调整行高
+    padding: 1rem $input-padding-x; // 默认内边距
 
+    // 当输入框有内容或获得焦点时，调整内边距给标签留出空间
     &:focus,
-    &:not(:placeholder-shown) {
-      padding-top: 1.625rem;
-      padding-bottom: 0.625rem;
+    &:not(:placeholder-shown):not([type="date"]):not([type="time"]) { // 排除某些输入类型，它们始终显示内容
+      padding-top: $input-padding-y * 2 + $form-label-margin-bottom; // 计算顶部内边距
+      padding-bottom: $input-padding-y;
     }
 
+    // 当输入框有内容或获得焦点时，移动并缩小标签
     &:focus ~ label,
-    &:not(:placeholder-shown) ~ label {
-      opacity: 0.65;
-      transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    &:not(:placeholder-shown):not([type="date"]):not([type="time"]) ~ label {
+      opacity: 0.65; // 标签变淡
+      transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem); // 向上移动并缩小
     }
   }
 
+  // 浮动标签样式
   > label {
     position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    padding: 1rem 0.75rem;
-    pointer-events: none;
-    border: 1px solid transparent;
-    transform-origin: 0 0;
-    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    top: 0; left: 0;
+    height: 100%; // 与输入框等高
+    padding: 1rem $input-padding-x; // 与输入框内边距匹配
+    pointer-events: none; // 允许点击穿透标签到输入框
+    border: 1px solid transparent; // 占位边框，防止布局移动
+    transform-origin: 0 0; // 设置变换原点
+    transition: opacity $transition-fast, transform $transition-fast; // 添加过渡效果
   }
 }
 
-// 复选框和单选框
+// --- Checkboxes and Radios ---
 .form-check {
-  display: block;
-  min-height: 1.5rem;
-  padding-left: 1.5em;
-  margin-bottom: 0.125rem;
+  // 复选框和单选框容器
+  display: block; // 每个选项占一行
+  min-height: $form-check-min-height;
+  padding-left: $form-check-padding-start;
+  margin-bottom: $form-check-margin-bottom;
 
+  // 输入框本身 (checkbox/radio)
   .form-check-input {
-    float: left;
-    margin-left: -1.5em;
+    float: left; // 左浮动
+    margin-left: -#{$form-check-padding-start}; // 负 margin 使其与标签对齐
 
+    // 选中状态
     &:checked {
       background-color: $primary;
       border-color: $primary;
     }
 
-    &:focus {
-      border-color: $primary-light;
-      box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
-    }
+    // 焦点状态
+    @include mix.form-control-focus();
   }
 
+  // 标签文本
   .form-check-label {
-    margin-bottom: 0;
+    color: $form-check-label-color;
+    cursor: pointer; // 添加手型光标
+    margin-bottom: 0; // 移除默认 margin
+  }
+
+  // 行内排列
+  &.form-check-inline {
+    display: inline-block;
+    margin-right: $form-check-inline-margin-end;
+    padding-left: 0; // 重置 padding
+    .form-check-input {
+      float: none;
+      margin-left: 0;
+      margin-right: 0.3125rem; // 输入框和标签间距
+    }
   }
 }
 
-// 开关
+// 开关 (Switch) 样式
 .form-switch {
-  padding-left: 2.5em;
+  // 基于 .form-check 的开关变体
+  padding-left: $form-switch-padding-start;
 
   .form-check-input {
-    width: 2em;
-    margin-left: -2.5em;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+    // 开关输入框特定样式
+    width: $form-switch-width;
+    margin-left: -#{$form-switch-padding-start};
+    background-image: escape-svg($form-switch-bg-image); // 使用变量和转义函数
     background-position: left center;
-    border-radius: 2em;
-    transition: background-position 0.15s ease-in-out;
+    border-radius: $form-switch-border-radius;
+    transition: background-position $transition-fast; // 使用变量
 
+    // 选中状态
     &:checked {
       background-position: right center;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+      background-image: escape-svg($form-switch-checked-bg-image);
+      background-color: $primary; // 选中时背景变为主色
+      border-color: $primary;
     }
+
+    // 焦点状态 (继承 .form-check-input)
   }
 }
 
-// 范围滑块
+// --- Range Slider ---
 .form-range {
+  // 范围滑块样式
   width: 100%;
-  height: 1.5rem;
-  padding: 0;
-  background-color: transparent;
-  appearance: none;
+  height: $form-range-height;
+  padding: 0; // 移除默认内边距
+  background-color: transparent; // 透明背景
+  appearance: none; // 移除默认外观
 
+  // 焦点状态 (应用于滑块按钮)
   &:focus {
-    outline: none;
-
-    &::-webkit-slider-thumb {
-      box-shadow: 0 0 0 1px #fff, 0 0 0 0.25rem rgba($primary, 0.25);
-    }
-
-    &::-moz-range-thumb {
-      box-shadow: 0 0 0 1px #fff, 0 0 0 0.25rem rgba($primary, 0.25);
-    }
+    outline: 0; // 移除默认 outline
+    // 焦点阴影通过伪元素应用
+    &::-webkit-slider-thumb { box-shadow: $form-range-thumb-focus-box-shadow; }
+    &::-moz-range-thumb { box-shadow: $form-range-thumb-focus-box-shadow; }
   }
 
+  // Webkit (Chrome, Safari) 滑块按钮
   &::-webkit-slider-thumb {
-    width: 1rem;
-    height: 1rem;
-    margin-top: -0.25rem;
+    width: $form-range-thumb-width;
+    height: $form-range-thumb-height;
+    margin-top: ($form-range-track-height - $form-range-thumb-height) / 2; // 垂直居中
     background-color: $primary;
-    border: 0;
-    border-radius: 1rem;
+    border: $form-range-thumb-border;
+    border-radius: $form-range-thumb-border-radius;
     appearance: none;
-    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    transition: background-color $transition-fast, border-color $transition-fast, box-shadow $transition-fast;
 
+    // 按下状态
     &:active {
-      background-color: lighten($primary, 35%);
+      background-color: $form-range-thumb-active-bg;
     }
   }
 
+  // Webkit 滑块轨道
   &::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 0.5rem;
-    color: transparent;
+    width: $form-range-track-width;
+    height: $form-range-track-height;
+    color: transparent; // 隐藏轨道颜色 (如果需要)
     cursor: pointer;
-    background-color: $border-color;
+    background-color: $form-range-track-bg;
     border-color: transparent;
-    border-radius: 1rem;
+    border-radius: $form-range-track-border-radius;
   }
 
+  // Firefox 滑块按钮
   &::-moz-range-thumb {
-    width: 1rem;
-    height: 1rem;
+    width: $form-range-thumb-width;
+    height: $form-range-thumb-height;
     background-color: $primary;
-    border: 0;
-    border-radius: 1rem;
+    border: $form-range-thumb-border;
+    border-radius: $form-range-thumb-border-radius;
     appearance: none;
-    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    transition: background-color $transition-fast, border-color $transition-fast, box-shadow $transition-fast;
 
     &:active {
-      background-color: lighten($primary, 35%);
+      background-color: $form-range-thumb-active-bg;
     }
   }
 
+  // Firefox 滑块轨道
   &::-moz-range-track {
-    width: 100%;
-    height: 0.5rem;
+    width: $form-range-track-width;
+    height: $form-range-track-height;
     color: transparent;
     cursor: pointer;
-    background-color: $border-color;
+    background-color: $form-range-track-bg;
     border-color: transparent;
-    border-radius: 1rem;
+    border-radius: $form-range-track-border-radius;
+  }
+
+  // 禁用状态
+  &:disabled {
+    &::-webkit-slider-thumb { background-color: $form-range-thumb-disabled-bg; }
+    &::-moz-range-thumb { background-color: $form-range-thumb-disabled-bg; }
   }
 }
 
-// 表单验证
-.was-validated .form-control:valid,
-.form-control.is-valid {
+// --- Form Validation States ---
+
+// 有效状态
+.was-validated .form-control:valid, // 配合 .was-validated 使用
+.form-control.is-valid { // 直接添加 .is-valid 类
   border-color: $success;
-  padding-right: calc(1.5em + 0.75rem);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+  padding-right: $input-padding-x * 3; // 增加右内边距以容纳图标
+  background-image: escape-svg($form-feedback-icon-valid);
   background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-
-  &:focus {
-    border-color: $success;
-    box-shadow: 0 0 0 0.25rem rgba($success, 0.25);
-  }
+  background-position: right $input-padding-x center;
+  background-size: $input-height-inner-half $input-height-inner-half;
+  @include mix.form-control-focus($success, rgba($success, 0.25)); // 应用带颜色的焦点样式
 }
 
+// 无效状态
 .was-validated .form-control:invalid,
 .form-control.is-invalid {
   border-color: $danger;
-  padding-right: calc(1.5em + 0.75rem);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+  padding-right: $input-padding-x * 3;
+  background-image: escape-svg($form-feedback-icon-invalid);
   background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-
-  &:focus {
-    border-color: $danger;
-    box-shadow: 0 0 0 0.25rem rgba($danger, 0.25);
-  }
+  background-position: right $input-padding-x center;
+  background-size: $input-height-inner-half $input-height-inner-half;
+  @include mix.form-control-focus($danger, rgba($danger, 0.25));
 }
 
-// 响应式调整
+// 验证反馈文本 (.valid-feedback, .invalid-feedback)
+.valid-feedback,
+.invalid-feedback {
+  display: none; // 默认隐藏
+  width: 100%;
+  margin-top: $form-feedback-margin-top;
+  font-size: $form-feedback-font-size;
+}
+.valid-feedback { color: $success; }
+.invalid-feedback { color: $danger; }
+
+// 当输入无效时显示反馈
+.was-validated :invalid ~ .invalid-feedback,
+.is-invalid ~ .invalid-feedback {
+  display: block;
+}
+// 当输入有效时显示反馈 (如果需要)
+.was-validated :valid ~ .valid-feedback,
+.is-valid ~ .valid-feedback {
+  display: block;
+}
+
+// --- Responsive Adjustments ---
 @include resp.respond-to('md') {
-  // 调整表单元素
+  // 中等屏幕及以下
+  // 调整表单元素间距和大小
   .form-label {
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.3rem; // 减小标签底部间距
   }
 
-  .form-control {
-    padding: 0.6rem 0.8rem;
+  .form-control,
+  .form-select { // 也应用于下拉选择框
+    padding-top: 0.6rem; // 调整内边距
+    padding-bottom: 0.6rem;
+    font-size: $font-size-sm; // 减小字体大小
   }
 
-  // 移动端顶部搜索框
+  // 隐藏导航栏折叠后的顶部搜索框 (通常在移动端有单独的搜索入口)
   .navbar-collapse .search-form {
-    display: none !important;
+    display: none !important; // 强制隐藏
   }
 }
-

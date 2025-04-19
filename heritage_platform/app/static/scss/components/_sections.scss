@@ -1,0 +1,140 @@
+// 页面区域通用样式
+// 提供统一的页面区域样式，用于各种页面的标题、头部等
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+
+// 页面内容头部
+.content-header {
+  margin-bottom: 2.5rem;
+  
+  // 渐变文本标题
+  .gradient-text {
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent; // 标准属性，替代text-fill-color
+    font-weight: $font-weight-bold;
+    display: inline-block;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: $primary-gradient;
+      border-radius: $border-radius;
+    }
+  }
+  
+  // 副标题
+  .subtitle {
+    color: $text-muted;
+    margin-top: 0.75rem;
+    font-size: 1.1rem;
+  }
+}
+
+// 页面区域
+.page-section {
+  padding: 2rem 0;
+  
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1.5rem;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: $primary;
+      border-radius: $border-radius;
+    }
+  }
+}
+
+// 内容区块
+.content-block {
+  background-color: white;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: $transition-base;
+  
+  &:hover {
+    box-shadow: $box-shadow-lg;
+  }
+  
+  .block-title {
+    font-size: 1.25rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1rem;
+  }
+}
+
+// 响应式调整
+@media (max-width: map-get($breakpoints, 'lg')) {
+  .content-header {
+    .gradient-text {
+      font-size: 1.75rem;
+      
+      &::after {
+        width: 50px;
+      }
+    }
+  }
+  
+  .page-section {
+    .section-title {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .content-block {
+    padding: 1.25rem;
+    
+    .block-title {
+      font-size: 1.15rem;
+    }
+  }
+}
+
+@media (max-width: map-get($breakpoints, 'md')) {
+  .content-header {
+    margin-bottom: 2rem;
+    
+    .gradient-text {
+      font-size: 1.5rem;
+      
+      &::after {
+        width: 40px;
+        height: 3px;
+      }
+    }
+    
+    .subtitle {
+      font-size: 1rem;
+    }
+  }
+  
+  .content-block {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: map-get($breakpoints, 'sm')) {
+  .content-header {
+    .gradient-text {
+      font-size: 1.35rem;
+    }
+  }
+}

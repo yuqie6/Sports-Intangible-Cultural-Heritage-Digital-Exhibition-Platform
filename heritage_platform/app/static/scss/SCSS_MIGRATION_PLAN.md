@@ -36,7 +36,10 @@ heritage_platform/app/static/scss/
 │   ├── _pagination.scss       # 分页样式
 │   ├── _toast.scss            # Toast通知样式
 │   ├── _gallery.scss          # 图片画廊样式
-│   └── _stats.scss            # 统计卡片样式
+│   ├── _stats.scss            # 统计卡片样式
+│   ├── _avatars.scss          # 头像样式
+│   ├── _filters.scss          # 筛选器样式
+│   └── _sections.scss         # 页面区域样式
 ├── layout/                    # 布局样式
 │   ├── _header.scss           # 头部/导航栏样式
 │   ├── _footer.scss           # 页脚样式
@@ -106,7 +109,28 @@ heritage_platform/app/static/scss/
 
 ### 阶段7: 优化与完善
 - [x] 优化英雄区样式，提升视觉效果
-- [ ] 优化其他SCSS代码，减少重复
+- [x] 优化 `_cards.scss`，使用 Mixin 减少重复并添加注释
+- [x] 优化 `_buttons.scss`，使用全局 Mixin 减少重复并添加注释 (包括删除冗余注释)
+- [x] 优化 `_forms.scss`，使用全局 Mixin 减少重复并添加注释 (包括删除冗余注释和添加变量)
+- [x] 优化 `_badges.scss`，使用全局 Mixin 减少重复并添加注释
+- [x] 优化 `_alerts.scss`，使用 Mixin 和 `@each` 循环减少重复并添加注释
+- [x] 优化 `_dropdowns.scss`，移动动画定义，修正响应式断点，添加注释
+- [x] 优化 `_heritage.scss`，添加分类筛选器和分页样式，支持feature-card类
+- [x] 修复 `_mixins.scss` 中的 alert-variant 混合器，添加缺失的 sass:color 和 sass:map 模块
+- [x] 修复 `_responsive.scss` 中缺失的 respond-to-max 混合器
+- [x] 优化 `_content.scss`，添加分类筛选器和分页样式，增强响应式表现
+- [x] 优化 `_forum.scss`，添加论坛主题列表和详情页样式，增强响应式表现
+
+### 阶段8: 合并重复样式，减少代码臃肿
+- [x] 提取卡片通用样式到 `_cards.scss`，创建通用卡片混合器
+- [x] 提取分页通用样式到 `_pagination.scss`
+- [x] 提取筛选器通用样式到新的 `_filters.scss`
+- [x] 提取页面区域通用样式到新的 `_sections.scss`
+- [x] 在 `_mixins.scss` 中添加更多通用混合器（卡片悬停效果、图片悬停效果、渐变文本等）
+- [ ] 重构 `_heritage.scss`，使用新的混合器和组件样式
+- [ ] 重构 `_content.scss`，使用新的混合器和组件样式
+- [ ] 重构 `_forum.scss`，使用新的混合器和组件样式
+- [ ] 统一响应式断点处理，避免重复定义相似的媒体查询规则
 - [ ] 添加注释，提高可读性
 - [ ] 确保响应式设计在各种设备上正常工作
 - [ ] 最终测试并部署
@@ -130,6 +154,126 @@ heritage_platform/app/static/scss/
 | 2025/4/20 | 修复英雄区背景图片问题 | 将背景图片设置为项目中已有的default-heritage.jpg，并修改首页模板文件使用自定义的hero-section类 |
 | 2025/4/20 | 优化英雄区样式 | 增强英雄区的视觉效果，添加渐变背景、文字效果和动画 |
 | 2025/4/20 | 进一步优化英雄区样式 | 使用clip-path创建非矩形形状，添加玻璃态效果，优化按钮和文字样式 |
+| 2025/4/20 | 优化卡片样式 | 在 `_cards.scss` 中使用 Mixin 提取通用 hover 效果，添加注释 |
+| 2025/4/20 | 优化按钮样式 | 将按钮悬停 Mixin 移至全局，优化 `_buttons.scss` 并添加注释 |
+| 2025/4/20 | 优化表单样式 | 创建并应用 `form-control-focus` Mixin，优化 `_forms.scss` 并添加注释，修复变量缺失和冗余代码问题 |
+| 2025/4/20 | 优化徽章样式 | 应用 `badge-style` Mixin，重构 `_badges.scss`，减少重复并添加注释 |
+| 2025/4/20 | 优化提醒样式 | 创建 `alert-variant` Mixin，使用 `@each` 循环重构 `_alerts.scss` |
+| 2025/4/20 | 优化下拉菜单样式 | 移动动画定义到 Mixin，修正响应式断点，添加注释 |
+| 2025/4/20 | 优化非遗项目列表页面样式 | 添加分类筛选器和分页样式，支持feature-card类，增强响应式表现 |
+| 2025/4/20 | 修复 SCSS 编译错误 | 在 `_mixins.scss` 中添加缺失的 sass:color 和 sass:map 模块，修复 alert-variant 混合器的参数传递问题 |
+| 2025/4/20 | 修复响应式混合器错误 | 在 `_responsive.scss` 中添加缺失的 respond-to-max 混合器，修复在 `_dropdowns.scss` 中的使用问题 |
+| 2025/4/20 | 优化内容页面样式 | 优化 `_content.scss`，添加分类筛选器和分页样式，增强响应式表现 |
+| 2025/4/20 | 优化论坛页面样式 | 优化 `_forum.scss`，添加论坛主题列表和详情页样式，增强响应式表现 |
+| 2025/4/20 | 制定合并重复样式计划 | 添加阶段8，计划提取通用样式到独立文件并创建更多混合器，减少代码重复 |
+| 2025/4/20 | 提取通用样式组件 | 创建 `_filters.scss` 和 `_sections.scss`，添加卡片通用混合器到 `_cards.scss`，更新分页样式到 `_pagination.scss` |
+| 2025/4/20 | 添加更多通用混合器 | 在 `_mixins.scss` 中添加卡片悬停效果、图片悬停效果、渐变文本等混合器 |
+
+## 新增混合器和通用组件
+
+为了减少代码重复并提高可维护性，我们添加了以下新的混合器和通用组件：
+
+### 新增混合器
+
+```scss
+// 卡片悬停效果
+@mixin card-hover-effect($y-translate: -5px, $hover-shadow: $box-shadow-lg) {
+  transition: transform $transition-base, box-shadow $transition-base;
+  will-change: transform, box-shadow;
+
+  &:hover {
+    transform: translateY($y-translate);
+    box-shadow: $hover-shadow;
+  }
+}
+
+// 图片缩放悬停效果
+@mixin image-scale-hover($scale: 1.05, $duration: 0.6s) {
+  overflow: hidden;
+
+  img, .img-fluid, .card-img-top {
+    transition: transform $duration ease;
+    will-change: transform;
+
+    &:hover {
+      transform: scale($scale);
+    }
+  }
+}
+
+// 渐变文本
+@mixin gradient-text-enhanced($gradient: $primary-gradient, $underline: true) {
+  background: $gradient;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-weight: $font-weight-bold;
+  display: inline-block;
+  position: relative;
+
+  @if $underline {
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: $gradient;
+      border-radius: $border-radius;
+    }
+  }
+}
+
+// 筛选器按钮组
+@mixin filter-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .btn {
+    border-radius: $border-radius;
+    transition: $transition-fast;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// 内容块样式
+@mixin content-block {
+  background-color: white;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: $box-shadow-lg;
+  }
+}
+```
+
+### 新增通用组件
+
+1. **筛选器组件 (`_filters.scss`)**
+   - 提供统一的筛选器样式，用于各种页面的分类筛选功能
+   - 包含响应式调整，确保在各种设备上正常显示
+
+2. **页面区域组件 (`_sections.scss`)**
+   - 提供统一的页面区域样式，如内容头部、渐变文本标题等
+   - 包含响应式调整，确保在各种设备上正常显示
+
+3. **卡片基础组件 (`_cards.scss`)**
+   - 添加了通用卡片基础样式、内容卡片基础样式和特色卡片基础样式
+   - 使用混合器减少代码重复，提高可维护性
+
+4. **分页组件 (`_pagination.scss`)**
+   - 添加了分页区域样式，统一各页面的分页外观
+   - 包含响应式调整，确保在各种设备上正常显示
 
 ## 注意事项
 1. 保持与Bootstrap框架的兼容性
@@ -139,3 +283,4 @@ heritage_platform/app/static/scss/
 5. 编译前需要先安装Sass：`npm install -g sass`
 6. 在SCSS文件中使用命名空间引用变量和混合器，例如`@include resp.respond-to('md')`
 7. 确保所有HTML模板文件引用新的`main.css`文件，而不是原来的`style.css`
+8. 使用新增的混合器和通用组件来减少代码重复，提高可维护性

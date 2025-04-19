@@ -4,65 +4,84 @@
 @use '../base/responsive' as resp;
 @use 'sass:color';
 
-// 基础提醒样式
+// --- Alert Color Map ---
+// Maps alert context names to their base colors
+$alert-colors: (
+  'primary': $primary,
+  'secondary': $secondary,
+  'success': $success,
+  'danger': $danger,
+  'warning': $warning,
+  'info': $info,
+  'light': $light,
+  'dark': $dark
+);
+
+// --- Base Alert Styles ---
 .alert {
   position: relative;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border: 1px solid transparent;
-  border-radius: $border-radius;
+  padding: 1rem; // Default padding
+  margin-bottom: 1rem; // Default margin
+  border: 1px solid transparent; // Base border
+  border-radius: $border-radius; // Default border radius
 }
 
-// 提醒变体
-.alert-primary {
-  color: color.adjust($primary, $blackness: 30%);
-  background-color: color.adjust($primary, $lightness: 40%);
-  border-color: color.adjust($primary, $lightness: 30%);
+// --- Alert Color Variants (Generated using Mixin and Loop) ---
+@each $name, $color in $alert-colors {
+  .alert-#{$name} {
+    // Apply the alert-variant mixin
+    // Special handling for light and dark variants if needed
+    @if $name == 'light' {
+      // Original light: text(blackness: 40%), bg(no change), border(blackness: 10%)
+      @include mix.alert-variant(
+        $color,
+        $text-adjust: (blackness: 40%),
+        $bg-adjust: (), // No background adjustment for light
+        $border-adjust: (blackness: 10%)
+      );
+      // Override background explicitly as mixin defaults to lightening
+      background-color: $color;
+    } @else if $name == 'dark' {
+      // Original dark: text(lightness: 40%), bg(lightness: 70%), border(lightness: 60%)
+      @include mix.alert-variant(
+        $color,
+        $text-adjust: (lightness: 40%),
+        $bg-adjust: (lightness: 70%),
+        $border-adjust: (lightness: 60%)
+      );
+    } @else if $name == 'success' {
+       // Original success: text(blackness: 30%), bg(lightness: 50%), border(lightness: 40%)
+       @include mix.alert-variant(
+        $color,
+        $text-adjust: (blackness: 30%),
+        $bg-adjust: (lightness: 50%),
+        $border-adjust: (lightness: 40%)
+      );
+    } @else if $name == 'danger' {
+       // Original danger: text(blackness: 20%), bg(lightness: 40%), border(lightness: 30%)
+       @include mix.alert-variant(
+        $color,
+        $text-adjust: (blackness: 20%),
+        $bg-adjust: (lightness: 40%),
+        $border-adjust: (lightness: 30%)
+      );
+    } @else if $name == 'warning' or $name == 'info' {
+       // Original warning/info: text(blackness: 40%), bg(lightness: 40%), border(lightness: 30%)
+       @include mix.alert-variant(
+        $color,
+        $text-adjust: (blackness: 40%),
+        $bg-adjust: (lightness: 40%),
+        $border-adjust: (lightness: 30%)
+      );
+    } @else {
+      // Default adjustments for primary, secondary
+      // Original primary/secondary: text(blackness: 30%), bg(lightness: 40%), border(lightness: 30%)
+      @include mix.alert-variant($color); // Use default mixin adjustments
+    }
+  }
 }
 
-.alert-secondary {
-  color: color.adjust($secondary, $blackness: 30%);
-  background-color: color.adjust($secondary, $lightness: 40%);
-  border-color: color.adjust($secondary, $lightness: 30%);
-}
-
-.alert-success {
-  color: color.adjust($success, $blackness: 30%);
-  background-color: color.adjust($success, $lightness: 50%);
-  border-color: color.adjust($success, $lightness: 40%);
-}
-
-.alert-danger {
-  color: color.adjust($danger, $blackness: 20%);
-  background-color: color.adjust($danger, $lightness: 40%);
-  border-color: color.adjust($danger, $lightness: 30%);
-}
-
-.alert-warning {
-  color: color.adjust($warning, $blackness: 40%);
-  background-color: color.adjust($warning, $lightness: 40%);
-  border-color: color.adjust($warning, $lightness: 30%);
-}
-
-.alert-info {
-  color: color.adjust($info, $blackness: 40%);
-  background-color: color.adjust($info, $lightness: 40%);
-  border-color: color.adjust($info, $lightness: 30%);
-}
-
-.alert-light {
-  color: color.adjust($light, $blackness: 40%);
-  background-color: $light;
-  border-color: color.adjust($light, $blackness: 10%);
-}
-
-.alert-dark {
-  color: color.adjust($dark, $lightness: 40%);
-  background-color: color.adjust($dark, $lightness: 70%);
-  border-color: color.adjust($dark, $lightness: 60%);
-}
-
-// 可关闭的提醒
+// --- Dismissible Alerts ---
 .alert-dismissible {
   padding-right: 3rem;
 

@@ -7,14 +7,14 @@
 // 下拉菜单容器
 .dropdown-menu {
   border: none;
-  border-radius: $border-radius-xl;
-  box-shadow: $box-shadow-lg;
-  padding: 1rem 0;
-  margin-top: 0.5rem;
-  animation: fadeInDown 0.3s ease;
+  border-radius: $border-radius-xl; // Custom large radius
+  box-shadow: $box-shadow-lg; // Custom shadow
+  padding: 1rem 0; // Vertical padding
+  margin-top: 0.5rem; // Space from toggle button
+  @include mix.animation(fadeInDown 0.3s ease); // Apply fade-in animation from mixins
 }
 
-// 下拉菜单项
+// --- Dropdown Item Styles ---
 .dropdown-item {
   padding: 0.7rem 1.5rem;
   font-weight: $font-weight-medium;
@@ -69,19 +69,8 @@
   color: $text-color;
 }
 
-// 下拉菜单动画
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// 下拉菜单方向
+// --- Dropdown Directional Modifiers ---
+// (Standard Bootstrap classes, styles are usually handled by Bootstrap itself or JS)
 .dropup .dropdown-menu {
   top: auto;
   bottom: 100%;
@@ -141,11 +130,14 @@
   }
 }
 
-// 移动端用户菜单项样式
-@include resp.respond-to('lg') {
-  // 移动端直接显示的用户菜单项链接样式
+// --- Responsive Adjustments for Mobile Navbar ---
+// Styles for dropdown items displayed directly in the collapsed navbar (mobile view)
+// NOTE: These styles are tightly coupled with the navbar structure.
+// Consider moving them to _header.scss or a dedicated _mobile-nav.scss in the future.
+@include resp.respond-to-max('lg') { // Apply styles *below* the lg breakpoint (when navbar collapses)
   .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link {
-    padding: 0.5rem 1.2rem !important; // 保持与主导航项一致的内边距
+    // Style for items like "Edit Profile", "Logout" shown directly in mobile menu
+    padding: 0.5rem 1.2rem !important; // Match main nav item padding
     display: flex;
     align-items: center;
     color: var(--bs-nav-link-color); // 使用标准导航链接颜色
@@ -192,4 +184,3 @@
     }
   }
 }
-

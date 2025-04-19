@@ -12,29 +12,29 @@
         </a>
         {% endif %}
     </div>
-    
+
     <!-- 分类筛选器 -->
-    <div class="card mb-4">
+    <div class="card filter-card mb-4">
         <div class="card-body">
             <div class="d-flex flex-wrap">
-                <a href="{{ url_for('heritage.list') }}" class="btn {% if not current_category %}btn-primary{% else %}btn-outline-primary{% endif %} me-2 mb-2">全部</a>
+                <a href="{{ url_for('heritage.list') }}" class="btn {% if not current_category %}btn-primary{% else %}btn-outline-primary{% endif %}">全部</a>
                 {% for category in categories %}
-                <a href="{{ url_for('heritage.list', category=category) }}" class="btn {% if current_category == category %}btn-primary{% else %}btn-outline-primary{% endif %} me-2 mb-2">{{ category }}</a>
+                <a href="{{ url_for('heritage.list', category=category) }}" class="btn {% if current_category == category %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ category }}</a>
                 {% endfor %}
             </div>
         </div>
     </div>
-    
+
     <!-- 项目列表 -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% if items %}
             {% for item in items %}
             <div class="col">
-                <div class="card h-100">
+                <div class="card h-100 feature-card">
                     {% if item.cover_image %}
-                    <img src="{{ url_for('static', filename=item.cover_image) }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ item.name }}">
+                    <img src="{{ url_for('static', filename=item.cover_image) }}" class="card-img-top" alt="{{ item.name }}">
                     {% else %}
-                    <img src="{{ url_for('static', filename='img/default-heritage.jpg') }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ item.name }}">
+                    <img src="{{ url_for('static', filename='img/default-heritage.jpg') }}" class="card-img-top" alt="{{ item.name }}">
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ item.name }}</h5>
@@ -66,21 +66,25 @@
             </div>
         {% endif %}
     </div>
-    
+
     <!-- 分页 -->
     {% if pagination.pages > 1 %}
-    <nav class="mt-4" aria-label="项目分页">
-        <ul class="pagination justify-content-center">
+    <nav class="heritage-pagination" aria-label="项目分页">
+        <ul class="pagination">
             {% if pagination.has_prev %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('heritage.list', page=pagination.prev_num, category=current_category) }}">上一页</a>
+                <a class="page-link" href="{{ url_for('heritage.list', page=pagination.prev_num, category=current_category) }}">
+                    <i class="fas fa-chevron-left"></i> 上一页
+                </a>
             </li>
             {% else %}
             <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一页</a>
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                    <i class="fas fa-chevron-left"></i> 上一页
+                </a>
             </li>
             {% endif %}
-            
+
             {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
                 {% if p %}
                     {% if p == pagination.page %}
@@ -98,14 +102,18 @@
                 </li>
                 {% endif %}
             {% endfor %}
-            
+
             {% if pagination.has_next %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('heritage.list', page=pagination.next_num, category=current_category) }}">下一页</a>
+                <a class="page-link" href="{{ url_for('heritage.list', page=pagination.next_num, category=current_category) }}">
+                    下一页 <i class="fas fa-chevron-right"></i>
+                </a>
             </li>
             {% else %}
             <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">下一页</a>
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                    下一页 <i class="fas fa-chevron-right"></i>
+                </a>
             </li>
             {% endif %}
         </ul>

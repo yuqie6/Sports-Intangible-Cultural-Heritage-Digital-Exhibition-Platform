@@ -12,16 +12,42 @@
     margin-bottom: 2rem;
   }
 
-  .heritage-card {
+  // 分类筛选器
+  .filter-card {
+    margin-bottom: 1.5rem;
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow;
+    transition: $transition-base;
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    .btn {
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-radius: $border-radius;
+      transition: $transition-fast;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  // 非遗项目卡片 - 同时支持heritage-card和feature-card类
+  .heritage-card,
+  .feature-card {
     height: 100%;
     border-radius: $border-radius-lg;
     overflow: hidden;
     box-shadow: $box-shadow;
-    transition: $transition-base;
+    transition: transform $transition-base, box-shadow $transition-base;
     margin-bottom: 1.5rem;
+    will-change: transform, box-shadow; // 优化动画性能
 
     &:hover {
-      transform: translateY(-10px);
+      transform: translateY(-8px);
       box-shadow: $box-shadow-lg;
     }
 
@@ -29,6 +55,7 @@
       height: 200px;
       object-fit: cover;
       transition: transform 0.6s ease;
+      will-change: transform; // 优化动画性能
     }
 
     &:hover .card-img-top {
@@ -42,12 +69,19 @@
     .card-title {
       font-weight: $font-weight-bold;
       margin-bottom: 0.75rem;
+      color: $dark;
     }
 
     .card-text {
       color: $text-muted;
       margin-bottom: 1rem;
       @include mix.text-truncate-lines(3);
+    }
+
+    .card-footer {
+      background: transparent;
+      border-top: none;
+      padding: 0.75rem 1.25rem 1.25rem;
     }
 
     .heritage-meta {
@@ -269,6 +303,37 @@
   }
 }
 
+// 项目列表分页
+.heritage-pagination {
+  margin-top: 2.5rem;
+
+  .pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+
+    .page-item {
+      .page-link {
+        border-radius: $border-radius;
+        transition: $transition-fast;
+        font-weight: $font-weight-medium;
+        padding: 0.5rem 0.75rem;
+
+        &:hover {
+          background-color: rgba($primary, 0.1);
+          transform: translateY(-2px);
+        }
+      }
+
+      &.active .page-link {
+        background: $primary-gradient;
+        border-color: $primary;
+        box-shadow: $box-shadow-sm;
+      }
+    }
+  }
+}
+
 // 响应式调整
 @include resp.respond-to('lg') {
   .heritage-detail-section {
@@ -284,10 +349,33 @@
 
 @include resp.respond-to('md') {
   .heritage-list-section {
-    .heritage-card {
+    .heritage-card,
+    .feature-card {
       .card-img-top {
         height: 180px;
       }
+
+      .card-title {
+        font-size: 1.1rem;
+      }
+
+      .card-text {
+        font-size: 0.9rem;
+      }
+
+      .card-footer {
+        padding: 0.5rem 1rem 1rem;
+      }
+
+      .btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    .filter-card .btn {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.9rem;
     }
   }
 
@@ -327,5 +415,20 @@
       }
     }
   }
+
+  .heritage-pagination .pagination .page-link {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+  }
 }
 
+@include resp.respond-to('sm') {
+  .heritage-list-section {
+    .heritage-card,
+    .feature-card {
+      .card-img-top {
+        height: 160px;
+      }
+    }
+  }
+}

@@ -3,120 +3,142 @@
 @use '../base/mixins' as mix;
 @use '../base/responsive' as resp;
 
-// 基础徽章样式
+// --- Base Badge Styles ---
 .badge {
-  padding: 0.5em 0.8em;
+  // Bootstrap 基础徽章样式调整 (如果需要)
+  display: inline-block; // 确保是行内块元素
+  padding: 0.5em 0.8em; // 默认内边距
+  font-size: $font-size-sm; // 默认字体大小
   font-weight: $font-weight-medium;
-  transition: $transition-base;
+  line-height: 1; // 确保单行
+  text-align: center;
+  white-space: nowrap; // 防止换行
+  vertical-align: baseline;
+  border-radius: $border-radius; // 默认圆角
+  transition: $transition-base; // 基础过渡
 }
 
-// 徽章颜色
-.badge-primary {
-  background-color: $primary;
+// --- Badge Color Variations ---
+// (通常由 Bootstrap 类如 .bg-primary, .bg-danger 提供)
+// .badge-primary { // Example if needed
+//   background-color: $primary;
+//   color: white;
+// }
+
+// --- Notification Dot / Indicator Badge ---
+// 用于导航栏等处的圆形小红点或数字角标
+
+// 共同样式 (使用 Mixin)
+#notification-badge,
+#message-badge,
+#mobile-notification-badge,
+#mobile-message-badge,
+.notification-dot { // 添加一个通用类，方便在其他地方使用
+  @include mix.badge-style; // 应用核心样式
+  position: absolute; // 绝对定位是这类徽章的共性
+  z-index: 10; // 确保在父元素之上 (根据需要调整)
+  // 移除 !important，尝试通过 ID 或更具体的选择器保证优先级
 }
 
-// 导航栏角标样式
+// 特定 ID 的定位和动画
 #notification-badge,
 #message-badge,
 #mobile-notification-badge,
 #mobile-message-badge {
-  font-size: 0.65em; // 调整角标字体大小
-  padding: 0.25rem 0.4rem; // 调整角标内边距
-  min-width: 1.2em;
-  min-height: 1.2em;
-  display: flex !important;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50% !important; // 确保红点是圆形
-  transform: translate(-50%, -50%) !important;
-  margin-left: 0;
-  margin-top: -2px;
-  z-index: 1000;
-  // 添加平滑过渡，防止刷新时的弹出动画
-  transition: opacity 0.2s ease-in-out;
+  // 默认定位 (通常是右上角)
+  top: 0;
+  left: 100%; // Bootstrap 5 使用 start-100, 这里用 left 兼容
+  transform: translate(-50%, -50%); // 微调位置，使其中心在父元素右上角
+  margin-top: -2px; // 进一步微调垂直位置
+
+  // 初始隐藏和淡入效果
   opacity: 0;
-}
+  transition: opacity $transition-fast;
 
-// 显示徽章时平滑显示
-#notification-badge.show,
-#message-badge.show,
-#mobile-notification-badge.show,
-#mobile-message-badge.show {
-  opacity: 1;
-}
-
-// 徽章样式统一定义
-.badge.position-absolute.top-0.start-100.translate-middle {
-  padding: 0.25rem 0.4rem;
-  min-width: 1.2em;
-  min-height: 1.2em;
-  display: flex !important;
-  justify-content: center;
-  align-items: center;
-  font-size: 0.65rem;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  margin-left: 0;
-  margin-top: -2px;
-}
-
-// 徽章样式增强
-.badge.bg-danger.rounded-pill.position-absolute {
-  padding: 0.25rem 0.4rem;
-  min-width: 1.2em;
-  min-height: 1.2em;
-  border-radius: 50% !important;
-  transform: translate(-50%, -50%) !important;
-}
-
-// 徽章动画
-.badge {
-  transition: $transition-base;
-}
-
-.badge.new-notification {
-  animation: pulse 1.5s infinite;
-}
-
-// 消息中心导航标签徽章
-#messageTab .badge {
-  padding: 0.35em 0.65em;
-  font-size: 0.75em;
-  font-weight: $font-weight-medium;
-  transition: $transition-base;
-}
-
-#messageTab .nav-link:hover .badge {
-  transform: scale(1.1);
-}
-
-// 特色卡片徽章
-.feature-card .badge {
-  padding: 0.5em 1em;
-  font-weight: $font-weight-medium;
-  letter-spacing: 0.5px;
-}
-
-// 非遗项目徽章
-.heritage-info .badge {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: $font-weight-medium;
-  border-radius: $border-radius-pill;
-  background: $primary-gradient;
-  border: none;
-  box-shadow: 0 4px 10px rgba($primary, 0.2);
-}
-
-// 响应式调整
-@include resp.respond-to('lg') {
-  // 调整移动端顶部图标的角标位置
-  #mobile-notification-badge,
-  #mobile-message-badge {
-    top: 0.2rem; // 稍微向上调整
-    left: auto; // 移除 left
-    right: -0.3rem; // 调整到图标右侧
-    transform: translate(50%, -50%); // 重新使用 translate 微调
+  &.show {
+    opacity: 1;
   }
 }
 
+// 针对 Bootstrap 定位类的补充 (如果项目中使用了这些类来定位角标)
+// .badge.position-absolute.top-0.start-100.translate-middle {
+//   @include mix.badge-style;
+//   // 这些类已经处理了定位，Mixin 提供了外观
+//   // font-size: 0.65em; // 确保单位统一
+// }
+
+// 危险色角标 (通常是红色)
+.badge.bg-danger.notification-dot { // 使用通用类组合
+  // 颜色由 .bg-danger 提供
+  // 外观由 .notification-dot (包含 mixin) 提供
+  // 如果需要覆盖特定样式可以在这里添加
+}
+
+
+// --- Other Badge Contexts ---
+
+// 脉冲动画 (可应用于任何徽章)
+.badge.new-notification {
+  // 使用全局 Mixin 定义的 pulse 动画
+  @include mix.pulse(1.5s);
+}
+
+// 消息中心 Tab 导航中的徽章
+#messageTab .badge {
+  // 稍微大一点的徽章
+  padding: 0.35em 0.65em; // 自定义内边距
+  font-size: 0.75em; // 自定义字体大小
+  font-weight: $font-weight-medium;
+  // transition: $transition-base; // 继承基础徽章过渡
+
+  // Tab 悬停时徽章放大效果
+  .nav-link:hover & { // 使用父选择器引用
+    transform: scale(1.1);
+  }
+}
+
+// 特色卡片 (Feature Card) 上的徽章
+.feature-card .badge {
+  // 更显眼的徽章
+  padding: 0.5em 1em; // 较大内边距
+  font-weight: $font-weight-medium;
+  letter-spacing: 0.5px; // 增加字间距
+  border-radius: $border-radius-sm; // 可以自定义圆角
+}
+
+// 非遗项目信息区域的徽章 (例如标签)
+.heritage-info .badge {
+  // 使用渐变背景和阴影的药丸状徽章
+  padding: 0.5rem 1rem; // 内边距
+  font-size: 0.9rem; // 字体大小
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-pill; // 药丸形状
+  background: $primary-gradient; // 渐变背景
+  color: white; // 确保文本颜色
+  border: none; // 无边框
+  box-shadow: 0 4px 10px rgba($primary, 0.2); // 添加阴影
+  // transition: $transition-base; // 继承基础过渡
+}
+
+// --- Responsive Adjustments ---
+@include resp.respond-to('lg') {
+  // 大屏幕及以下 (这里是 lg 断点，可能意指移动端？检查断点逻辑)
+  // 调整移动端导航栏图标的角标位置 (通常在较小屏幕触发)
+  // 注意: respond-to('lg') 是 >= 992px，可能应该用 'md' 或 'sm' 断点的 max-width
+  // 假设意图是在小屏幕上调整：
+  // @include resp.respond-to-max('md') {
+    #mobile-notification-badge,
+    #mobile-message-badge {
+      // 覆盖默认的 left: 100% 和 transform
+      top: 0.2rem; // 稍微向上调整
+      left: auto; // 移除 left 定位
+      right: -0.3rem; // 定位到父元素右侧外边缘
+      transform: translate(50%, -50%); // 重新微调，使其中心在父元素右上角外侧一点
+    }
+  // }
+}
+
+// 确保在小屏幕上也有响应式调整 (如果需要)
+// @include resp.respond-to-max('sm') {
+//   // 可以在这里添加更小屏幕的特定调整
+// }

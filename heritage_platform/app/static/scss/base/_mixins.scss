@@ -1,5 +1,8 @@
 // 混合器
 // 这个文件包含通用的混合器
+@use 'variables' as *; // 导入变量供 Mixins 使用
+@use 'sass:color'; // 导入 Sass 的 color 模块
+@use 'sass:map'; // 导入 Sass 的 map 模块
 
 // 清除浮动
 @mixin clearfix {
@@ -103,13 +106,29 @@
   }
 }
 
-// 按钮悬停效果
-@mixin button-hover {
-  transition: $transition-base;
+// 按钮悬停效果 (通用)
+// $y-translate: 悬停时垂直移动的距离
+// $hover-shadow: 悬停时应用的阴影 (可选)
+@mixin button-hover-effect($y-translate: -2px, $hover-shadow: null) {
+  // 使用较快的过渡效果以获得更好的按钮反馈
+  transition: transform $transition-fast, box-shadow $transition-fast, background-color $transition-fast, border-color $transition-fast, color $transition-fast;
+  will-change: transform, box-shadow; // 优化动画性能
+  &:hover, &:focus { // 同时应用于 focus 状态以提高可访问性
+    transform: translateY($y-translate);
+    @if $hover-shadow {
+      box-shadow: $hover-shadow;
+    }
+  }
+}
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+// 表单控件焦点效果
+// $focus-border-color: 焦点状态下的边框颜色
+// $focus-box-shadow-color: 焦点状态下阴影的颜色
+@mixin form-control-focus($focus-border-color: $primary-light, $focus-box-shadow-color: rgba($primary, 0.25)) {
+  &:focus {
+    border-color: $focus-border-color;
+    box-shadow: 0 0 0 $input-focus-width $focus-box-shadow-color;
+    outline: 0; // 移除默认 outline
   }
 }
 
@@ -244,6 +263,39 @@
   border-radius: 50%;
 }
 
+// 提醒变体样式
+// Generates text, background, and border colors for an alert based on a base color.
+// Uses sass:color functions for adjustments.
+@mixin alert-variant($base-color, $text-adjust: (blackness: 30%), $bg-adjust: (lightness: 40%), $border-adjust: (lightness: 30%)) {
+  // Adjust text color - often making it darker or adjusting saturation/lightness
+  @if map-has-key($text-adjust, 'blackness') {
+    color: color.adjust($base-color, $blackness: map-get($text-adjust, 'blackness'));
+  } @else if map-has-key($text-adjust, 'lightness') {
+    color: color.adjust($base-color, $lightness: map-get($text-adjust, 'lightness'));
+  } @else {
+    color: $base-color; // 默认值
+  }
+
+  // Adjust background color - typically making it much lighter
+  @if map-has-key($bg-adjust, 'lightness') {
+    background-color: color.adjust($base-color, $lightness: map-get($bg-adjust, 'lightness'));
+  } @else {
+    background-color: color.scale($base-color, $lightness: 40%);
+  }
+
+  // Adjust border color - often slightly darker than the background
+  @if map-has-key($border-adjust, 'lightness') {
+    border-color: color.adjust($base-color, $lightness: map-get($border-adjust, 'lightness'));
+  } @else {
+    border-color: color.scale($base-color, $lightness: 30%);
+  }
+
+  // Optional: Adjust link color within the alert
+  .alert-link {
+    color: color.adjust($base-color, $blackness: 40%); // Example: make links darker
+  }
+}
+
 // 动画
 @mixin keyframes($name) {
   @keyframes #{$name} {
@@ -276,3 +328,104 @@
   @include animation(pulse $duration infinite);
 }
 
+// 卡片悬停效果混合器
+// $y-translate: 悬停时垂直移动的距离
+// $hover-shadow: 悬停时应用的阴影
+@mixin card-hover-effect($y-translate: -5px, $hover-shadow: $box-shadow-lg) {
+  transition: transform $transition-base, box-shadow $transition-base;
+  will-change: transform, box-shadow; // 优化动画性能
+
+  &:hover {
+    transform: translateY($y-translate);
+    @if $hover-shadow {
+      box-shadow: $hover-shadow;
+    }
+  }
+}
+
+// 图片缩放悬停效果
+// $scale: 悬停时的缩放比例
+// $duration: 过渡时间
+@mixin image-scale-hover($scale: 1.05, $duration: 0.6s) {
+  overflow: hidden; // 确保父元素有这个属性
+
+  img, .img-fluid, .card-img-top {
+    transition: transform $duration ease;
+    will-change: transform; // 优化动画性能
+
+    &:hover {
+      transform: scale($scale);
+    }
+  }
+}
+
+// 渐变文本混合器
+// $gradient: 文本渐变色
+// $underline: 是否添加下划线
+@mixin gradient-text-enhanced($gradient: $primary-gradient, $underline: true) {
+  background: $gradient;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; // 标准属性，替代text-fill-color
+  font-weight: $font-weight-bold;
+  display: inline-block;
+  position: relative;
+
+  @if $underline {
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: $gradient;
+      border-radius: $border-radius;
+    }
+  }
+}
+
+// 筛选器按钮组样式
+@mixin filter-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .btn {
+    border-radius: $border-radius;
+    transition: $transition-fast;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// 内容块样式
+@mixin content-block {
+  background-color: white;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: $box-shadow-lg;
+  }
+}
+
+// --- Specific Animation Keyframes ---
+// (Consider moving to a dedicated _animations.scss if many are added)
+
+@include keyframes(fadeInDown) {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

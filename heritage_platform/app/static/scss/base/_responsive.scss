@@ -1,11 +1,12 @@
 // 响应式混合器
 // 提供统一的媒体查询断点和便捷的混合器
 @use 'variables' as *;
+@use 'sass:map';
 
 // 使用变量中定义的断点
 // $breakpoints 在 _variables.scss 中定义
 
-// 响应式媒体查询混合器
+// 响应式媒体查询混合器 - 小于等于断点
 @mixin respond-to($breakpoint) {
   // 如果断点存在于映射中
   @if map-has-key($breakpoints, $breakpoint) {
@@ -15,6 +16,21 @@
     // 针对指定断点及以下的设备
     @media (max-width: $breakpoint-value) {
       @content;
+    }
+  }
+
+  // 如果是以 'max-' 开头的断点，则处理为小于等于断点
+  @else if type-of($breakpoint) == 'string' and str-index($breakpoint, 'max-') == 1 {
+    $bp-name: str-slice($breakpoint, 5); // 移除 'max-' 前缀
+
+    @if map-has-key($breakpoints, $bp-name) {
+      $breakpoint-value: map-get($breakpoints, $bp-name);
+
+      @media (max-width: $breakpoint-value) {
+        @content;
+      }
+    } @else {
+      @warn "无效的断点名称: #{$bp-name}";
     }
   }
   // 如果是自定义的min-max值范围
@@ -69,6 +85,22 @@
   // 对于未定义的断点，显示警告
   @else {
     @warn "无效的断点 #{$breakpoint}";
+  }
+}
+
+// 响应式媒体查询混合器 - 小于断点
+@mixin respond-to-max($breakpoint) {
+  // 如果断点存在于映射中
+  @if map-has-key($breakpoints, $breakpoint) {
+    // 获取断点值
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+
+    // 针对指定断点以下的设备
+    @media (max-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn "无效的断点名称: #{$breakpoint}";
   }
 }
 

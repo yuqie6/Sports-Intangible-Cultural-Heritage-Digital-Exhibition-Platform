@@ -28,6 +28,139 @@
       gap: 1rem;
     }
   }
+
+  // 论坛头部
+  .content-header {
+    margin-bottom: 2.5rem;
+
+    .gradient-text {
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent; // 标准属性，替代text-fill-color
+      font-weight: $font-weight-bold;
+      display: inline-block;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: $primary-gradient;
+        border-radius: $border-radius;
+      }
+    }
+  }
+
+  // 论坛筛选器
+  .filter-section {
+    margin-bottom: 2rem;
+
+    .card {
+      border-radius: $border-radius-lg;
+      box-shadow: $box-shadow;
+      transition: $transition-base;
+      overflow: hidden;
+
+      .card-body {
+        padding: 1.5rem;
+      }
+
+      .form-label {
+        font-weight: $font-weight-medium;
+        color: $secondary-dark;
+        margin-bottom: 0.75rem;
+      }
+
+      .filter-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+
+        .btn {
+          border-radius: $border-radius;
+          transition: $transition-fast;
+
+          &:hover {
+            transform: translateY(-2px);
+          }
+        }
+      }
+    }
+  }
+
+  // 主题列表
+  .card {
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow;
+    overflow: hidden;
+    margin-bottom: 2rem;
+
+    .card-header {
+      background-color: rgba($primary, 0.05);
+      border-bottom: 1px solid $border-color-light;
+      padding: 1rem 1.25rem;
+      font-weight: $font-weight-medium;
+
+      i {
+        color: $primary;
+      }
+    }
+
+    .list-group-item-action {
+      transition: $transition-fast;
+
+      &:hover {
+        background-color: rgba($primary, 0.05);
+        transform: translateY(-2px);
+        z-index: 1;
+      }
+
+      h5 {
+        font-weight: $font-weight-medium;
+        @include mix.text-truncate-lines(1);
+      }
+
+      .badge {
+        font-weight: $font-weight-medium;
+      }
+    }
+  }
+
+  // 分页样式
+  .pagination-section {
+    margin-top: 3rem;
+
+    .pagination {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+
+      .page-item {
+        .page-link {
+          border-radius: $border-radius;
+          transition: $transition-fast;
+          font-weight: $font-weight-medium;
+          padding: 0.5rem 0.75rem;
+
+          &:hover {
+            background-color: rgba($primary, 0.1);
+            transform: translateY(-2px);
+          }
+        }
+
+        &.active .page-link {
+          background: $primary-gradient;
+          border-color: $primary;
+          box-shadow: $box-shadow-sm;
+        }
+      }
+    }
+  }
 }
 
 // 论坛分类列表
@@ -322,6 +455,11 @@
     box-shadow: $box-shadow;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+    transition: $transition-base;
+
+    &:hover {
+      box-shadow: $box-shadow-lg;
+    }
 
     .topic-title {
       font-size: 1.5rem;
@@ -369,6 +507,11 @@
     box-shadow: $box-shadow;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+    transition: $transition-base;
+
+    &:hover {
+      box-shadow: $box-shadow-lg;
+    }
 
     .post-author {
       display: flex;
@@ -488,6 +631,11 @@
       box-shadow: $box-shadow;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
+      transition: $transition-base;
+
+      &:hover {
+        box-shadow: $box-shadow-lg;
+      }
 
       .reply-author {
         display: flex;
@@ -571,6 +719,11 @@
     border-radius: $border-radius-lg;
     box-shadow: $box-shadow;
     padding: 1.5rem;
+    transition: $transition-base;
+
+    &:hover {
+      box-shadow: $box-shadow-lg;
+    }
 
     h3 {
       font-size: 1.25rem;
@@ -658,6 +811,34 @@
 }
 
 @include resp.respond-to('md') {
+  .forum-section {
+    // 调整筛选器在平板和手机上的显示
+    .filter-section {
+      .card .form-label {
+        margin-bottom: 0.5rem;
+      }
+
+      .filter-group {
+        gap: 0.3rem;
+
+        .btn {
+          padding: 0.4rem 0.75rem;
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    // 调整分页在平板和手机上的显示
+    .pagination-section {
+      .pagination {
+        .page-link {
+          padding: 0.4rem 0.6rem;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
   .forum-categories {
     .category-card {
       .category-stats {
@@ -727,3 +908,50 @@
   }
 }
 
+// 小屏幕设备的额外调整
+@include resp.respond-to('sm') {
+  .forum-section {
+    .filter-section {
+      .card .card-body {
+        padding: 1rem;
+      }
+
+      .filter-group {
+        .btn {
+          padding: 0.3rem 0.6rem;
+          font-size: 0.85rem;
+        }
+      }
+    }
+
+    .pagination-section {
+      .pagination {
+        .page-link {
+          padding: 0.3rem 0.5rem;
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+
+  .topic-detail-section {
+    .topic-header,
+    .topic-content,
+    .reply-item,
+    .reply-form {
+      padding: 1rem;
+    }
+
+    .topic-title {
+      font-size: 1.2rem;
+    }
+
+    .post-author,
+    .reply-author {
+      .author-avatar {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  }
+}

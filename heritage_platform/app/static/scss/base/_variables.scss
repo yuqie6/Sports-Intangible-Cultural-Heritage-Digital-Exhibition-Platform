@@ -118,8 +118,56 @@ $avatar-md: 64px;
 $avatar-lg: 128px;
 $avatar-xs: 24px;
 
+// 表单相关变量
+$input-padding-y: 0.75rem;
+$input-padding-x: 1rem;
+$input-height-inner-half: calc(#{$line-height-base} * 0.5em + #{$input-padding-y}); // 用于计算验证图标大小
+$input-focus-width: 0.25rem; // Standard Bootstrap focus shadow width
+$input-color: $dark;
+$input-bg: white;
+$input-border-color: $border-color;
+$input-placeholder-color: $text-muted;
+$input-disabled-bg: $light;
+$input-group-addon-color: $text-muted;
+$input-group-addon-bg: $light;
+$input-group-addon-border-color: $border-color;
+$form-label-margin-bottom: 0.5rem;
+$form-label-font-size: $font-size-base;
+$form-label-font-weight: $font-weight-medium;
+$form-label-color: $secondary-dark;
+$form-check-min-height: 1.5rem;
+$form-check-padding-start: 1.5em;
+$form-check-margin-bottom: 0.125rem;
+$form-check-label-color: $text-color;
+$form-check-inline-margin-end: 1rem;
+$form-switch-width: 2em;
+$form-switch-padding-start: 2.5em;
+$form-switch-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+$form-switch-checked-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+$form-switch-border-radius: 2em;
+$form-range-height: 1.5rem;
+$form-range-track-width: 100%;
+$form-range-track-height: 0.5rem;
+$form-range-track-cursor: pointer;
+$form-range-track-bg: $border-color;
+$form-range-track-border-radius: 1rem;
+$form-range-thumb-width: 1rem;
+$form-range-thumb-height: 1rem;
+$form-range-thumb-bg: $primary;
+$form-range-thumb-border: 0;
+$form-range-thumb-border-radius: 1rem;
+$form-range-thumb-focus-box-shadow: 0 0 0 1px #fff, 0 0 0 $input-focus-width rgba($primary, 0.25);
+$form-range-thumb-active-bg: lighten($primary, 10%);
+$form-range-thumb-disabled-bg: $secondary-light;
+$form-feedback-margin-top: $spacer-1;
+$form-feedback-font-size: $font-size-sm;
+$form-feedback-icon-valid-color: $success;
+$form-feedback-icon-invalid-color: $danger;
+$form-feedback-icon-valid: "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e";
+$form-feedback-icon-invalid: "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='#{$form-feedback-icon-invalid-color}'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='#{$form-feedback-icon-invalid-color}' stroke='none'/%3e%3c/svg%3e";
+
+
 // 动画时间
 $animation-duration-fast: 0.3s;
 $animation-duration-normal: 0.5s;
 $animation-duration-slow: 0.8s;
-

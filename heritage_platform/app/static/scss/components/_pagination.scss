@@ -113,6 +113,37 @@
   justify-content: flex-end;
 }
 
+// 分页区域
+.pagination-section {
+  margin-top: 3rem;
+
+  .pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+
+    .page-item {
+      .page-link {
+        border-radius: $border-radius;
+        transition: $transition-fast;
+        font-weight: $font-weight-medium;
+        padding: 0.5rem 0.75rem;
+
+        &:hover {
+          background-color: rgba($primary, 0.1);
+          transform: translateY(-2px);
+        }
+      }
+
+      &.active .page-link {
+        background: $primary-gradient;
+        border-color: $primary;
+        box-shadow: $box-shadow-sm;
+      }
+    }
+  }
+}
+
 // 响应式调整
 @include resp.respond-to('md') {
   .pagination {
@@ -123,5 +154,24 @@
     padding: 0.4rem 0.6rem;
     font-size: $font-size-sm;
   }
+
+  .pagination-section {
+    .pagination {
+      .page-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
 }
 
+@include resp.respond-to('sm') {
+  .pagination-section {
+    .pagination {
+      .page-link {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
