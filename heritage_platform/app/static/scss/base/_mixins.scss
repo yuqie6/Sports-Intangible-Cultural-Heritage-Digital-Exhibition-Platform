@@ -1,0 +1,278 @@
+// 混合器
+// 这个文件包含通用的混合器
+
+// 清除浮动
+@mixin clearfix {
+  &::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+// 文本截断
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 多行文本截断
+@mixin text-truncate-lines($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// 盒阴影
+@mixin box-shadow($shadow...) {
+  box-shadow: $shadow;
+}
+
+// 过渡效果
+@mixin transition($transition...) {
+  transition: $transition;
+}
+
+// 变换
+@mixin transform($transform...) {
+  transform: $transform;
+}
+
+// 绝对定位居中
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// 水平居中
+@mixin horizontal-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+// 垂直居中
+@mixin vertical-center {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+// Flex居中
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// 背景图片覆盖
+@mixin bg-cover {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+// 背景图片包含
+@mixin bg-contain {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+// 渐变文本
+@mixin gradient-text($gradient) {
+  background: $gradient;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+}
+
+// 卡片悬停效果
+@mixin card-hover {
+  transition: $transition-base;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $box-shadow-lg;
+  }
+}
+
+// 按钮悬停效果
+@mixin button-hover {
+  transition: $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 自定义滚动条
+@mixin custom-scrollbar($width: 8px, $track-color: #f1f1f1, $thumb-color: #888) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+    border-radius: $width / 2;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: $width / 2;
+
+    &:hover {
+      background: darken($thumb-color, 10%);
+    }
+  }
+}
+
+// 禁止用户选择
+@mixin user-select-none {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+// 允许用户选择
+@mixin user-select-text {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+// 触摸操作优化
+@mixin touch-action-manipulation {
+  touch-action: manipulation;
+  -ms-touch-action: manipulation;
+  -webkit-touch-action: manipulation;
+}
+
+// 文本大小调整
+@mixin text-size-adjust {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+// 模糊背景
+@mixin backdrop-blur($blur: 10px) {
+  -webkit-backdrop-filter: blur($blur);
+  backdrop-filter: blur($blur);
+}
+
+// 卡片样式
+@mixin card-style {
+  box-shadow: $box-shadow;
+  transition: $transition-base;
+  border: none;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+}
+
+// 按钮样式
+@mixin button-style {
+  border-radius: $border-radius;
+  font-weight: $font-weight-medium;
+  padding: $button-padding;
+  transition: $transition-fast;
+}
+
+// 主按钮样式
+@mixin primary-button {
+  @include button-style;
+  background: $primary-gradient;
+  border: none;
+  color: white;
+  box-shadow: 0 4px 6px rgba($primary, 0.2);
+
+  &:hover {
+    background: $primary-gradient-hover;
+    box-shadow: 0 6px 8px rgba($primary, 0.3);
+    transform: translateY(-1px);
+  }
+}
+
+// 次要按钮样式
+@mixin secondary-button {
+  @include button-style;
+  background: $secondary-gradient;
+  border: none;
+  color: white;
+  box-shadow: 0 4px 6px rgba($secondary, 0.2);
+
+  &:hover {
+    background: $secondary-gradient-hover;
+    box-shadow: 0 6px 8px rgba($secondary, 0.3);
+    transform: translateY(-1px);
+  }
+}
+
+// 轮廓按钮样式
+@mixin outline-button($color: $primary) {
+  @include button-style;
+  background: transparent;
+  border: 1px solid $color;
+  color: $color;
+
+  &:hover {
+    background-color: $color;
+    color: white;
+    box-shadow: 0 4px 6px rgba($color, 0.2);
+  }
+}
+
+// 徽章样式
+@mixin badge-style {
+  padding: 0.25rem 0.4rem;
+  min-width: 1.2em;
+  min-height: 1.2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.65em;
+  border-radius: 50%;
+}
+
+// 动画
+@mixin keyframes($name) {
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+// 应用动画
+@mixin animation($animation) {
+  animation: $animation;
+}
+
+// 淡入动画
+@mixin fade-in($duration: $animation-duration-normal) {
+  @include animation(fadeIn $duration ease-out);
+}
+
+// 从左滑入动画
+@mixin slide-in-left($duration: $animation-duration-normal) {
+  @include animation(slideInLeft $duration ease-out);
+}
+
+// 从右滑入动画
+@mixin slide-in-right($duration: $animation-duration-normal) {
+  @include animation(slideInRight $duration ease-out);
+}
+
+// 脉冲动画
+@mixin pulse($duration: $animation-duration-slow) {
+  @include animation(pulse $duration infinite);
+}
+

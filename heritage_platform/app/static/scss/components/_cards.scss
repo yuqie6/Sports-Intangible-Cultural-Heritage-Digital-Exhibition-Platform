@@ -1,0 +1,324 @@
+// 卡片样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+// 基础卡片样式
+.card {
+  box-shadow: $box-shadow;
+  transition: $transition-base;
+  border: none;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  animation: fadeIn $animation-duration-slow ease-out;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $box-shadow-lg;
+  }
+}
+
+// 卡片头部
+.card-header {
+  border-bottom: none;
+  padding: 1.25rem 1.5rem;
+}
+
+// 卡片内容
+.card-body {
+  padding: 1.5rem;
+}
+
+// 卡片底部
+.card-footer {
+  background: transparent;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.25rem;
+}
+
+// 功能图标卡片
+.feature-icon-card {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: transform 0.3s ease,
+              box-shadow 0.3s ease;
+  border-radius: $border-radius-xl;
+  background: white;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  will-change: transform;
+  contain: content;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, $primary 0%, $dark 100%);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-10px);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .card-title,
+    .card-text,
+    i {
+      color: white !important;
+    }
+
+    .btn-outline-primary {
+      background-color: white;
+      color: $primary;
+      border-color: white;
+    }
+  }
+
+  i {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    color: $primary;
+    transition: $transition-base;
+  }
+
+  .card-title {
+    font-weight: $font-weight-bold;
+    margin-bottom: 1rem;
+    transition: $transition-base;
+  }
+
+  .card-text {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    transition: $transition-base;
+  }
+
+  .btn {
+    border-radius: $border-radius-pill;
+    padding: 0.5rem 1.5rem;
+    transition: $transition-base;
+  }
+}
+
+// 特色内容卡片
+.feature-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: $border-radius-xl;
+  overflow: hidden;
+  box-shadow: $box-shadow;
+  transition: $transition-slow;
+
+  .card-img-top {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+
+  &:hover .card-img-top {
+    transform: scale(1.08);
+  }
+
+  .card-body {
+    flex: 1;
+  }
+
+  .card-title {
+    font-weight: $font-weight-bold;
+    color: $dark;
+    margin-bottom: 1rem;
+  }
+
+  .card-footer {
+    background: transparent;
+    padding-top: 0;
+  }
+
+  .badge {
+    padding: 0.5em 1em;
+    font-weight: $font-weight-medium;
+    letter-spacing: 0.5px;
+  }
+}
+
+// 内容卡片列表
+.content-card {
+  border-radius: $border-radius-xl;
+  overflow: hidden;
+  box-shadow: $box-shadow;
+  transition: $transition-slow;
+  margin-bottom: 1.5rem;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: $box-shadow-xl;
+  }
+
+  .card-img-top {
+    height: 180px;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+
+  &:hover .card-img-top {
+    transform: scale(1.05);
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  .card-title {
+    font-weight: $font-weight-bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-footer {
+    padding: 1rem 1.25rem;
+    background: transparent;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+}
+
+// 视频卡片
+.video-card {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5));
+  }
+
+  .play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 3rem;
+    z-index: 2;
+    opacity: 0.8;
+    transition: $transition-base;
+  }
+
+  &:hover .play-icon {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+}
+
+// 统计卡片
+.stats-card {
+  border-radius: $border-radius;
+  padding: 1.5rem;
+  text-align: center;
+  transition: $transition-base;
+  height: 100%;
+  box-shadow: $box-shadow;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $box-shadow-lg;
+  }
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+  }
+
+  h3 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: $font-weight-bold;
+  }
+
+  p {
+    margin-bottom: 0;
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+}
+
+// 媒体网格卡片
+.media-grid .card {
+  border: none;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition: $transition-slow;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: $box-shadow-xl;
+  }
+
+  .card-img-top {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  &:hover .card-img-top {
+    transform: scale(1.1);
+  }
+}
+
+// 响应式调整
+@include resp.respond-to('md') {
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-header {
+    padding: 1rem;
+  }
+
+  .content-card .card-img-top,
+  .feature-card .card-img-top,
+  .media-grid .card-img-top {
+    height: 150px; // 减小移动端卡片图片高度
+  }
+
+  .content-card .card-title {
+    font-size: 1rem; // 调整移动端卡片标题大小
+  }
+
+  .feature-icon-card {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@include resp.respond-to('xs') {
+  .feature-icon-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .feature-icon-card .card-title {
+    font-size: 1.1rem;
+  }
+
+  .card-body {
+    padding: 0.75rem;
+  }
+}
+

@@ -4,10 +4,10 @@
 
 {% block content %}
 <!-- 头部横幅 - 英雄区 -->
-<div class="p-5 mb-4 bg-light">
-    <div class="container-fluid py-5">
-        <h1 class="display-5">体育非遗数字展示平台</h1>
-        <p class="col-md-8 fs-4">连接课堂学习与数字化分享，共同探索体育非遗的魅力，传承中华文化精髓。让我们携手守护这份宝贵的文化遗产。</p>
+<div class="hero-section">
+    <div class="container py-5">
+        <h1>体育非遗数字展示平台</h1>
+        <p>连接课堂学习与数字化分享，共同探索体育非遗的魅力，传承中华文化精髓。让我们携手守护这份宝贵的文化遗产。</p>
         <div class="mt-4">
             <a href="{{ url_for('heritage.list') }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-compass me-2"></i>探索非遗项目
@@ -74,7 +74,7 @@
         </h2>
         <a href="{{ url_for('heritage.list') }}" class="btn btn-outline-primary btn-hover-float">查看全部</a>
     </div>
-    
+
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% if featured_items %}
             {% for item in featured_items %}
@@ -115,7 +115,7 @@
         </h2>
         <a href="{{ url_for('content.list') }}" class="btn btn-outline-primary btn-hover-float">查看全部</a>
     </div>
-    
+
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
         {% if latest_contents %}
             {% for content in latest_contents %}
@@ -174,7 +174,7 @@
         </h2>
         <a href="{{ url_for('forum.index') }}" class="btn btn-outline-primary btn-hover-float">进入论坛</a>
     </div>
-    
+
     <div class="forum-activity">
         <div class="card-header bg-light">
             <div class="row forum-table">
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 const container = document.getElementById('latest-topics-container');
                 container.innerHTML = '';
-                
+
                 if (!data.data || !data.data.topics || data.data.topics.length === 0) {
                     container.innerHTML = `
                         <div class="alert alert-info m-3">
@@ -218,12 +218,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     return;
                 }
-                
+
                 data.data.topics.forEach(topic => {
                     const topicElement = document.createElement('a');
                     topicElement.className = 'list-group-item list-group-item-action';
                     topicElement.href = `/forum/topic/${topic.id}`;
-                    
+
                     topicElement.innerHTML = `
                         <div class="row forum-table">
                             <div class="col-7">
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
-                    
+
                     container.appendChild(topicElement);
                 });
             })
@@ -252,10 +252,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             });
     }
-    
+
     // 初始加载
     fetchLatestTopics();
-    
+
     // 每30秒刷新一次
     setInterval(fetchLatestTopics, 30000);
 });

@@ -1,0 +1,260 @@
+// 响应式混合器
+// 提供统一的媒体查询断点和便捷的混合器
+@use 'variables' as *;
+
+// 使用变量中定义的断点
+// $breakpoints 在 _variables.scss 中定义
+
+// 响应式媒体查询混合器
+@mixin respond-to($breakpoint) {
+  // 如果断点存在于映射中
+  @if map-has-key($breakpoints, $breakpoint) {
+    // 获取断点值
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+
+    // 针对指定断点及以下的设备
+    @media (max-width: $breakpoint-value) {
+      @content;
+    }
+  }
+  // 如果是自定义的min-max值范围
+  @else if type-of($breakpoint) == 'string' and str-index($breakpoint, 'min') and str-index($breakpoint, 'max') {
+    $min: null;
+    $max: null;
+
+    // 提取min值
+    $min-start: str-index($breakpoint, 'min') + 3;
+    $min-end: str-index($breakpoint, 'max') - 1;
+    $min-str: str-slice($breakpoint, $min-start, $min-end);
+
+    // 提取max值
+    $max-start: str-index($breakpoint, 'max') + 3;
+    $max-str: str-slice($breakpoint, $max-start);
+
+    // 使用map获取断点值或直接使用像素值
+    @if map-has-key($breakpoints, $min-str) {
+      $min: map-get($breakpoints, $min-str);
+    } @else {
+      $min: $min-str;
+    }
+
+    @if map-has-key($breakpoints, $max-str) {
+      $max: map-get($breakpoints, $max-str);
+    } @else {
+      $max: $max-str;
+    }
+
+    // 应用min-max范围的媒体查询
+    @media (min-width: $min) and (max-width: $max) {
+      @content;
+    }
+  }
+  // 针对最小宽度(大于指定断点)
+  @else if type-of($breakpoint) == 'string' and str-index($breakpoint, 'min') {
+    $min-start: str-index($breakpoint, 'min') + 3;
+    $min-str: str-slice($breakpoint, $min-start);
+
+    $min: null;
+
+    @if map-has-key($breakpoints, $min-str) {
+      $min: map-get($breakpoints, $min-str);
+    } @else {
+      $min: $min-str;
+    }
+
+    @media (min-width: $min) {
+      @content;
+    }
+  }
+  // 对于未定义的断点，显示警告
+  @else {
+    @warn "无效的断点 #{$breakpoint}";
+  }
+}
+
+// 快捷混合器 - 仅在移动设备上显示
+@mixin only-mobile {
+  @include respond-to('md') {
+    @content;
+  }
+}
+
+// 快捷混合器 - 仅在平板及以上设备显示
+@mixin only-tablet-up {
+  @media (min-width: map-get($breakpoints, 'md')) {
+    @content;
+  }
+}
+
+// 快捷混合器 - 仅在桌面显示
+@mixin only-desktop {
+  @media (min-width: map-get($breakpoints, 'lg')) {
+    @content;
+  }
+}
+
+// 快捷混合器 - 仅在大屏桌面显示
+@mixin only-large-desktop {
+  @media (min-width: map-get($breakpoints, 'xl')) {
+    @content;
+  }
+}
+
+// 快捷混合器 - 针对超大屏幕优化
+@mixin only-extra-large-screen {
+  @media (min-width: map-get($breakpoints, 'xxl')) {
+    @content;
+  }
+}
+
+// 快捷混合器 - 仅在打印时应用
+@mixin print-only {
+  @media print {
+    @content;
+  }
+}
+
+// 快捷混合器 - 高DPI/Retina屏幕
+@mixin high-dpi {
+  @media only screen and (-webkit-min-device-pixel-ratio: 2),
+         only screen and (min--moz-device-pixel-ratio: 2),
+         only screen and (-o-min-device-pixel-ratio: 2/1),
+         only screen and (min-device-pixel-ratio: 2),
+         only screen and (min-resolution: 192dpi),
+         only screen and (min-resolution: 2dppx) {
+    @content;
+  }
+}
+
+// 快捷混合器 - 横屏方向
+@mixin landscape {
+  @media screen and (orientation: landscape) {
+    @content;
+  }
+}
+
+// 快捷混合器 - 竖屏方向
+@mixin portrait {
+  @media screen and (orientation: portrait) {
+    @content;
+  }
+}
+
+// 常用响应式布局混合器
+
+// 响应式容器
+@mixin responsive-container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+
+  @include respond-to('min-sm') {
+    max-width: 540px;
+  }
+
+  @include respond-to('min-md') {
+    max-width: 720px;
+  }
+
+  @include respond-to('min-lg') {
+    max-width: 960px;
+  }
+
+  @include respond-to('min-xl') {
+    max-width: 1140px;
+  }
+
+  @include respond-to('min-xxl') {
+    max-width: 1320px;
+  }
+}
+
+// 响应式字体大小
+@mixin responsive-font-size($min-size, $max-size, $min-width: map-get($breakpoints, 'xs'), $max-width: map-get($breakpoints, 'xl')) {
+  font-size: $min-size;
+
+  @media (min-width: $min-width) {
+    font-size: calc(#{$min-size} + #{strip-unit($max-size - $min-size)} * ((100vw - #{$min-width}) / #{strip-unit($max-width - $min-width)}));
+  }
+
+  @media (min-width: $max-width) {
+    font-size: $max-size;
+  }
+}
+
+// 辅助函数：移除单位
+@function strip-unit($number) {
+  @if type-of($number) == 'number' and not unitless($number) {
+    @return $number / ($number * 0 + 1);
+  }
+  @return $number;
+}
+
+// 响应式网格
+@mixin responsive-grid($min-width: 280px, $gap: 1.5rem) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: $gap;
+}
+
+// 响应式表格
+@mixin responsive-table {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  table {
+    min-width: 100%;
+  }
+}
+
+// 响应式图片
+@mixin responsive-image {
+  max-width: 100%;
+  height: auto;
+}
+
+// 响应式视频容器
+@mixin responsive-video-container {
+  position: relative;
+  padding-bottom: 56.25%; // 16:9 比例
+  height: 0;
+  overflow: hidden;
+
+  iframe, video, object, embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// 响应式隐藏元素
+@mixin hide-on($breakpoint) {
+  @include respond-to($breakpoint) {
+    display: none !important;
+  }
+}
+
+// 响应式显示元素
+@mixin show-on($breakpoint) {
+  display: none !important;
+
+  @include respond-to($breakpoint) {
+    display: block !important;
+  }
+}
+
+// 响应式Flex布局
+@mixin responsive-flex-direction($direction-mobile: column, $direction-desktop: row, $breakpoint: 'lg') {
+  display: flex;
+  flex-direction: $direction-mobile;
+
+  @include respond-to('min-' + $breakpoint) {
+    flex-direction: $direction-desktop;
+  }
+}
+

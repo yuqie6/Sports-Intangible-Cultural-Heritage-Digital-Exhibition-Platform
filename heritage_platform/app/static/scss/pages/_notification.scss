@@ -1,0 +1,322 @@
+// 通知页面样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+
+// 通知中心
+.notification-section {
+  padding: 2rem 0;
+  
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: $font-weight-bold;
+    }
+    
+    .notification-actions {
+      display: flex;
+      gap: 1rem;
+    }
+  }
+  
+  .notification-tabs {
+    background-color: white;
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow;
+    margin-bottom: 2rem;
+    
+    .nav-tabs {
+      border-bottom: none;
+      padding: 0 1.5rem;
+      
+      .nav-link {
+        border: none;
+        padding: 1rem 1.5rem;
+        font-weight: $font-weight-medium;
+        color: $text-muted;
+        position: relative;
+        
+        &.active {
+          color: $primary;
+          background-color: transparent;
+          border-bottom: 2px solid $primary;
+        }
+        
+        &:hover:not(.active) {
+          color: $text-color;
+          border-bottom: 2px solid $border-color;
+        }
+        
+        .badge {
+          margin-left: 0.5rem;
+        }
+      }
+    }
+  }
+  
+  .notification-list {
+    background-color: white;
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow;
+    overflow: hidden;
+    
+    .notification-item {
+      display: flex;
+      padding: 1.5rem;
+      border-bottom: 1px solid $border-color-light;
+      transition: $transition-base;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      &:hover {
+        background-color: rgba($primary, 0.05);
+      }
+      
+      &.unread {
+        background-color: rgba($primary, 0.05);
+        
+        .notification-content {
+          font-weight: $font-weight-medium;
+        }
+      }
+      
+      .notification-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: rgba($primary, 0.1);
+        color: $primary;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1.5rem;
+        
+        i {
+          font-size: 1.5rem;
+        }
+        
+        &.system {
+          background-color: rgba($info, 0.1);
+          color: $info;
+        }
+        
+        &.success {
+          background-color: rgba($success, 0.1);
+          color: $success;
+        }
+        
+        &.warning {
+          background-color: rgba($warning, 0.1);
+          color: $warning;
+        }
+        
+        &.danger {
+          background-color: rgba($danger, 0.1);
+          color: $danger;
+        }
+      }
+      
+      .notification-content {
+        flex: 1;
+        
+        .notification-title {
+          margin-bottom: 0.5rem;
+          
+          a {
+            color: $text-color;
+            text-decoration: none;
+            
+            &:hover {
+              color: $primary;
+              text-decoration: underline;
+            }
+          }
+        }
+        
+        .notification-meta {
+          display: flex;
+          justify-content: space-between;
+          
+          .notification-time {
+            font-size: 0.85rem;
+            color: $text-muted;
+          }
+          
+          .notification-actions {
+            display: flex;
+            gap: 1rem;
+            
+            a {
+              font-size: 0.85rem;
+              color: $text-muted;
+              
+              &:hover {
+                color: $primary;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .notification-empty {
+    background-color: white;
+    border-radius: $border-radius-lg;
+    box-shadow: $box-shadow;
+    padding: 3rem;
+    text-align: center;
+    
+    i {
+      font-size: 4rem;
+      color: $text-muted;
+      margin-bottom: 1.5rem;
+    }
+    
+    h3 {
+      font-size: 1.5rem;
+      font-weight: $font-weight-bold;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      color: $text-muted;
+      margin-bottom: 1.5rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  
+  .notification-pagination {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+// 通知设置
+.notification-settings {
+  background-color: white;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  padding: 2rem;
+  
+  .settings-title {
+    font-size: 1.5rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid $border-color-light;
+  }
+  
+  .settings-group {
+    margin-bottom: 2rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .group-title {
+      font-size: 1.25rem;
+      font-weight: $font-weight-bold;
+      margin-bottom: 1rem;
+    }
+    
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid $border-color-light;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .item-info {
+        flex: 1;
+        
+        .item-title {
+          font-weight: $font-weight-medium;
+          margin-bottom: 0.25rem;
+        }
+        
+        .item-description {
+          font-size: 0.85rem;
+          color: $text-muted;
+        }
+      }
+    }
+  }
+  
+  .settings-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid $border-color-light;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+}
+
+// 响应式调整
+@include resp.respond-to('lg') {
+  .notification-section {
+    .notification-header {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      .notification-actions {
+        margin-top: 1rem;
+        align-self: flex-end;
+      }
+    }
+    
+    .notification-tabs {
+      .nav-tabs {
+        .nav-link {
+          padding: 0.75rem 1rem;
+        }
+      }
+    }
+  }
+}
+
+@include resp.respond-to('md') {
+  .notification-section {
+    .notification-list {
+      .notification-item {
+        .notification-content {
+          .notification-meta {
+            flex-direction: column;
+            
+            .notification-actions {
+              margin-top: 0.5rem;
+            }
+          }
+        }
+      }
+    }
+    
+    .notification-settings {
+      .settings-item {
+        flex-direction: column;
+        align-items: flex-start;
+        
+        .item-info {
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
+}
+

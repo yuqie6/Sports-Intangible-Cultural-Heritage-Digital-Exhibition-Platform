@@ -12,7 +12,7 @@
     <!-- Animate.css 动画库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- 自定义CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <!-- 兼容性修复CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/compatibility-fixes.css') }}">
     {% block styles %}{% endblock %}
@@ -199,7 +199,7 @@
         </div>
         {% endfor %}
     </div>
-    
+
     <!-- 实时通知浮动提示区域 -->
     <div class="toast-container position-fixed p-3" id="toast-container" style="bottom: 80px; right: 20px; z-index: 10000;">
         <!-- 通知将会动态添加到这里 -->
@@ -218,7 +218,7 @@
                     <h5><i class="fas fa-dragon me-2"></i>体育非遗数字展示平台</h5>
                     <p class="mt-3">连接课堂学习与数字化分享，促进体育非遗文化的传播与保护。我们致力于让每一个珍贵的非物质文化遗产得以永续传承。</p>
                 </div>
-                
+
                 <div class="col-lg-3 col-md-6">
                     <h5>快速链接</h5>
                     <ul class="list-unstyled mt-3">
@@ -239,7 +239,7 @@
                         </li>
                     </ul>
                 </div>
-                
+
                 <div class="col-lg-2 col-md-6">
                     <h5>用户中心</h5>
                     <ul class="list-unstyled mt-3">
@@ -259,7 +259,7 @@
                         {% endif %}
                     </ul>
                 </div>
-                
+
                 <div class="col-lg-3 col-md-6">
                     <h5>联系我们</h5>
                     <ul class="list-unstyled mt-3">
@@ -283,7 +283,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="footer-bottom">
             <div class="container">
                 <div class="row">
@@ -292,9 +292,9 @@
                     </div>
                     <div class="col-md-6 text-md-end">
                         <p class="mb-0">
-                            <a href="{{ url_for('main.privacy_policy') }}">隐私政策</a> | 
-                            <a href="{{ url_for('main.terms_of_service') }}">使用条款</a> | 
-                            <a href="{{ url_for('main.technical_doc') }}">技术文档</a> | 
+                            <a href="{{ url_for('main.privacy_policy') }}">隐私政策</a> |
+                            <a href="{{ url_for('main.terms_of_service') }}">使用条款</a> |
+                            <a href="{{ url_for('main.technical_doc') }}">技术文档</a> |
                             <a href="{{ url_for('main.sitemap') }}">网站地图</a>
                         </p>
                     </div>
@@ -312,13 +312,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- 自定义JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    
+
     <!-- Socket.IO 库 -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI" crossorigin="anonymous"></script>
-    
+
     <!-- WebSocket 客户端 -->
     <script src="{{ url_for('static', filename='js/websocket.js') }}"></script>
-    
+
     <!-- WebSocket初始化和调试 -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -333,7 +333,7 @@
         window.addEventListener('unhandledrejection', function(event) {
             console.error('未处理的Promise拒绝:', event.reason);
         });
-        
+
         // 调试可能的Socket.IO问题
         // console.info('Socket.IO调试信息:'); // 注释掉调试信息
         // console.info('- 当前页面URL:', window.location.href); // 注释掉调试信息
@@ -342,13 +342,13 @@
         // console.info('- CSRF令牌:', document.querySelector('meta[name="csrf-token"]')?.content ? '存在' : '不存在'); // 注释掉调试信息
     });
     </script>
-    
+
     <!-- 通用通知脚本 -->
     <script>
     // 显示Toast通知
     function showToast(title, message, type = 'primary', delay = 5000) {
         const toastId = 'toast-' + Math.random().toString(36).substr(2, 9);
-        
+
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.id = toastId;
@@ -356,14 +356,14 @@
         toast.setAttribute('aria-live', 'assertive');
         toast.setAttribute('aria-atomic', 'true');
         toast.setAttribute('data-bs-delay', delay);
-        
+
         // 设置样式
         let bgClass = 'bg-primary';
         if (type === 'success') bgClass = 'bg-success';
         if (type === 'danger') bgClass = 'bg-danger';
         if (type === 'warning') bgClass = 'bg-warning';
         if (type === 'info') bgClass = 'bg-info';
-        
+
         // 生成Toast HTML
         toast.innerHTML = `
             <div class="toast-header ${bgClass} text-white">
@@ -375,20 +375,20 @@
                 ${message}
             </div>
         `;
-        
+
         // 添加到容器
         const container = document.getElementById('toast-container');
         container.appendChild(toast);
-        
+
         // 初始化Toast
         const bsToast = new bootstrap.Toast(toast);
         bsToast.show();
-        
+
         // 自动移除DOM元素
         toast.addEventListener('hidden.bs.toast', function () {
             container.removeChild(toast);
         });
-        
+
         return bsToast;
     }
 
@@ -399,7 +399,7 @@
             if (count > 0) {
                 // 有未读消息时显示
                 badge.textContent = count;
-                badge.style.display = 'flex';  
+                badge.style.display = 'flex';
                 badge.style.visibility = 'visible';
                 // 添加show类以触发平滑过渡
                 setTimeout(() => {
@@ -438,7 +438,7 @@
     // 处理未读通知
     document.addEventListener('DOMContentLoaded', function() {
         // console.log('DOM加载完成，初始化通知系统'); // 注释掉初始化日志
-        
+
         // 页面加载时检查徽章元素是否存在及其初始显示状态
         function checkBadges() {
             // 检查桌面端通知徽章
@@ -454,7 +454,7 @@
             } else {
                 console.error('通知徽章元素不存在');
             }
-            
+
             // 同样处理移动端通知徽章
             const mobileBadge = document.getElementById('mobile-notification-badge');
             if (mobileBadge) {
@@ -465,7 +465,7 @@
                     hideBadge('mobile-notification-badge');
                 }
             }
-            
+
             // 检查消息徽章
             const msgBadge = document.getElementById('message-badge');
             if (msgBadge) {
@@ -478,7 +478,7 @@
             } else {
                 console.error('消息徽章元素不存在');
             }
-            
+
             // 同样处理移动端消息徽章
             const mobileMsgBadge = document.getElementById('mobile-message-badge');
             if (mobileMsgBadge) {
@@ -490,19 +490,19 @@
                 }
             }
         }
-        
+
         // 页面加载时立即检查
         checkBadges();
-        
+
         // 确保WebSocketClient存在并正确初始化
         if (typeof WebSocketClient !== 'undefined') {
             // console.log('WebSocketClient已定义，设置事件监听器'); // 注释掉事件监听器设置日志
-            
+
             // 通知事件处理
             WebSocketClient.onEvent('new_notification', function(data) {
                 // console.log('收到新通知事件:', data); // 注释掉收到新通知事件日志
                 showToast('新通知', data.content, 'info');
-                
+
                 // 更新顶部导航栏的通知徽章
                 const badge = document.getElementById('notification-badge');
                 if (badge) {
@@ -510,7 +510,7 @@
                     count += 1;
                     showBadge('notification-badge', count);
                 }
-                
+
                 // 同时更新移动端通知徽章
                 const mobileBadge = document.getElementById('mobile-notification-badge');
                 if (mobileBadge) {
@@ -523,14 +523,14 @@
             // 私信事件处理
             WebSocketClient.onEvent('new_private_message', function(data) {
                 showToast('新私信', `来自 ${data.sender_username} 的新消息`, 'primary');
-                
+
                 // 立即检查徽章元素状态
                 const desktopBadge = document.getElementById('message-badge');
                 const mobileBadge = document.getElementById('mobile-message-badge');
-                
+
                 // console.log('桌面端私信徽章元素:', desktopBadge); // 注释掉私信徽章检查日志
                 // console.log('移动端私信徽章元素:', mobileBadge); // 注释掉私信徽章检查日志
-                
+
                 // 更新顶部导航栏的消息徽章
                 if (desktopBadge) {
                     let count = parseInt(desktopBadge.textContent || '0');
@@ -539,7 +539,7 @@
                 } else {
                     console.error('桌面端私信徽章元素不存在!');
                 }
-                
+
                 // 同时更新移动端消息徽章
                 if (mobileBadge) {
                     let count = parseInt(mobileBadge.textContent || '0');
@@ -549,7 +549,7 @@
                     console.error('移动端私信徽章元素不存在!');
                 }
             });
-            
+
             // 修复：改为监听通知已读事件或者定期检查更新数量
             // 使用更通用的事件名称或检查机制
             function checkForNotificationUpdates() {
@@ -557,7 +557,7 @@
                 updateBadgeCount();
                 setTimeout(checkForNotificationUpdates, 30000);
             }
-            
+
             // 启动周期性检查
             checkForNotificationUpdates();
 
@@ -568,7 +568,7 @@
         } else {
             console.error('WebSocketClient未定义，无法接收实时通知');
         }
-        
+
         // 从服务器获取最新的未读通知和消息数量
         function updateBadgeCount() {
             fetch('/api/notifications/unread-count')
@@ -581,7 +581,7 @@
                     }
                 })
                 .catch(error => console.error('获取未读通知数量失败:', error));
-                
+
             fetch('/api/messages/unread-count')
                 .then(response => response.json())
                 .then(data => {
@@ -593,21 +593,21 @@
                 })
                 .catch(error => console.error('获取未读消息数量失败:', error));
         }
-        
+
         // 页面加载时获取最新数量
         updateBadgeCount();
-        
+
         // 检查徽章是否被CSS规则隐藏
         setTimeout(checkBadgesVisibility, 500);
-        
+
         function checkBadgesVisibility() {
             const badges = [
-                'notification-badge', 
+                'notification-badge',
                 'mobile-notification-badge',
-                'message-badge', 
+                'message-badge',
                 'mobile-message-badge'
             ];
-            
+
             badges.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
@@ -624,13 +624,13 @@
         }
     });
     </script>
-    
+
     {% block scripts %}{% endblock %}
 
     <script>
         // 返回顶部按钮
         const backToTopButton = document.getElementById('back-to-top');
-        
+
         window.onscroll = function() {
             if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
                 backToTopButton.classList.add("show"); // 添加show类以启用新的动画效果
@@ -643,14 +643,14 @@
                 }, 300); // 等待动画完成后隐藏
             }
         };
-        
+
         backToTopButton.addEventListener('click', function() {
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
         });
-        
+
         // 页面加载动画
         document.addEventListener('DOMContentLoaded', function() {
             // 添加页面内容淡入效果
@@ -660,12 +660,12 @@
                     el.style.transform = 'translateY(0)';
                 });
             }, 100);
-            
+
             // 为卡片添加延迟动画
             document.querySelectorAll('.card').forEach((card, index) => {
                 card.style.animationDelay = (index * 0.1) + 's';
             });
-            
+
             // 平滑滚动到锚点
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
@@ -682,18 +682,18 @@
                     }
                 });
             });
-            
+
             // 为下拉菜单添加动画
             const dropdownMenus = document.querySelectorAll('.dropdown-menu');
             dropdownMenus.forEach(menu => {
                 menu.style.transition = 'all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)';
                 menu.style.transformOrigin = 'top center';
             });
-            
+
             // 改进导航栏响应式行为
             const navbarToggler = document.querySelector('.navbar-toggler');
             const navbarCollapse = document.querySelector('.navbar-collapse');
-            
+
             if(navbarToggler && navbarCollapse) {
                 navbarToggler.addEventListener('click', function() {
                     document.body.classList.toggle('navbar-open');
@@ -701,12 +701,12 @@
             }
         });
     </script>
-    
+
     <!-- 深色模式检测脚本 -->
     <script>
         // 深色模式默认禁用
         const darkModeEnabled = false;
-        
+
         // 检测系统深色模式但不自动应用
         function detectDarkMode() {
             if (darkModeEnabled && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -715,10 +715,10 @@
                 document.body.classList.remove('prefers-dark-mode');
             }
         }
-        
+
         // 页面加载时检测
         detectDarkMode();
-        
+
         // 监听系统深色模式变化
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             if (darkModeEnabled) {

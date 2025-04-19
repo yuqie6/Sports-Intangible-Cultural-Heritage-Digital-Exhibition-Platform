@@ -1,0 +1,331 @@
+// 非遗项目页面样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+
+// 非遗项目列表区域
+.heritage-list-section {
+  padding: 2rem 0;
+
+  .section-title {
+    margin-bottom: 2rem;
+  }
+
+  .heritage-card {
+    height: 100%;
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+    box-shadow: $box-shadow;
+    transition: $transition-base;
+    margin-bottom: 1.5rem;
+
+    &:hover {
+      transform: translateY(-10px);
+      box-shadow: $box-shadow-lg;
+    }
+
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    &:hover .card-img-top {
+      transform: scale(1.05);
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    .card-title {
+      font-weight: $font-weight-bold;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-text {
+      color: $text-muted;
+      margin-bottom: 1rem;
+      @include mix.text-truncate-lines(3);
+    }
+
+    .heritage-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid $border-color-light;
+
+      .category {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background-color: rgba($primary, 0.1);
+        color: $primary;
+        border-radius: $border-radius-pill;
+        font-size: 0.85rem;
+      }
+
+      .views {
+        color: $text-muted;
+        font-size: 0.85rem;
+
+        i {
+          margin-right: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+// 非遗项目详情页
+.heritage-detail-section {
+  padding: 2rem 0;
+
+  .heritage-title {
+    font-size: 2.5rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1.5rem;
+  }
+
+  .heritage-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      color: $text-muted;
+
+      i {
+        margin-right: 0.5rem;
+        color: $primary;
+      }
+    }
+  }
+
+  .heritage-cover {
+    position: relative;
+    overflow: hidden;
+    border-radius: $border-radius-xl;
+    box-shadow: $box-shadow-lg;
+    margin-bottom: 2rem;
+
+    img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      transition: transform 0.8s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+
+  .heritage-content {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.75rem;
+      font-weight: $font-weight-bold;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      line-height: 1.8;
+    }
+
+    ul, ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+
+      li {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: $border-radius;
+      margin: 1.5rem 0;
+    }
+
+    blockquote {
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-left: 4px solid $primary;
+      background-color: rgba($primary, 0.05);
+      font-style: italic;
+    }
+  }
+
+  .heritage-info {
+    background-color: $light;
+    border-radius: $border-radius-lg;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: $font-weight-bold;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+      display: flex;
+      margin-bottom: 1rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .info-label {
+        width: 120px;
+        font-weight: $font-weight-medium;
+        color: $text-muted;
+      }
+
+      .info-value {
+        flex: 1;
+      }
+    }
+  }
+
+  .heritage-gallery {
+    margin-bottom: 2rem;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: $font-weight-bold;
+      margin-bottom: 1.5rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+
+      .gallery-item {
+        position: relative;
+        border-radius: $border-radius;
+        overflow: hidden;
+        aspect-ratio: 3/2;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+
+        &:hover img {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  .heritage-video {
+    margin-bottom: 2rem;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: $font-weight-bold;
+      margin-bottom: 1.5rem;
+    }
+
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: $border-radius-lg;
+
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+  .heritage-related {
+    margin-top: 3rem;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: $font-weight-bold;
+      margin-bottom: 1.5rem;
+    }
+  }
+}
+
+// 响应式调整
+@include resp.respond-to('lg') {
+  .heritage-detail-section {
+    .heritage-title {
+      font-size: 2rem;
+    }
+
+    .heritage-cover img {
+      height: 300px;
+    }
+  }
+}
+
+@include resp.respond-to('md') {
+  .heritage-list-section {
+    .heritage-card {
+      .card-img-top {
+        height: 180px;
+      }
+    }
+  }
+
+  .heritage-detail-section {
+    .heritage-title {
+      font-size: 1.75rem;
+    }
+
+    .heritage-meta {
+      gap: 1rem;
+    }
+
+    .heritage-cover img {
+      height: 250px;
+    }
+
+    .heritage-content {
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .heritage-info {
+      .info-item {
+        flex-direction: column;
+
+        .info-label {
+          width: 100%;
+          margin-bottom: 0.25rem;
+        }
+      }
+    }
+
+    .heritage-gallery {
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+    }
+  }
+}
+

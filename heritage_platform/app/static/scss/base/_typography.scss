@@ -1,0 +1,319 @@
+// 排版样式
+@use 'variables' as *;
+@use 'mixins' as mix;
+@use 'responsive' as resp;
+
+// 标题样式
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  margin-top: 0;
+  margin-bottom: $spacer-2;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+  color: $dark;
+}
+
+h1, .h1 {
+  font-size: 2.5rem;
+
+  @include resp.respond-to('md') {
+    font-size: 2rem;
+  }
+
+  @include resp.respond-to('xs') {
+    font-size: 1.75rem;
+  }
+}
+
+h2, .h2 {
+  font-size: 2rem;
+
+  @include resp.respond-to('md') {
+    font-size: 1.75rem;
+  }
+
+  @include resp.respond-to('xs') {
+    font-size: 1.5rem;
+  }
+}
+
+h3, .h3 {
+  font-size: 1.75rem;
+
+  @include resp.respond-to('md') {
+    font-size: 1.5rem;
+  }
+}
+
+h4, .h4 {
+  font-size: 1.5rem;
+
+  @include resp.respond-to('md') {
+    font-size: 1.25rem;
+  }
+}
+
+h5, .h5 {
+  font-size: 1.25rem;
+
+  @include resp.respond-to('md') {
+    font-size: 1.1rem;
+  }
+}
+
+h6, .h6 {
+  font-size: 1rem;
+}
+
+// 段落样式
+p {
+  margin-top: 0;
+  margin-bottom: $spacer;
+  line-height: $line-height-base;
+}
+
+// 强调文本
+.lead {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-normal;
+}
+
+// 小文本
+small, .small {
+  font-size: $font-size-sm;
+}
+
+// 文本颜色
+.text-primary { color: $primary !important; }
+.text-secondary { color: $secondary !important; }
+.text-success { color: $success !important; }
+.text-info { color: $info !important; }
+.text-warning { color: $warning !important; }
+.text-danger { color: $danger !important; }
+.text-light { color: $light !important; }
+.text-dark { color: $dark !important; }
+.text-muted { color: $text-muted !important; }
+
+// 文本对齐
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+.text-center { text-align: center !important; }
+.text-justify { text-align: justify !important; }
+
+// 文本转换
+.text-lowercase { text-transform: lowercase !important; }
+.text-uppercase { text-transform: uppercase !important; }
+.text-capitalize { text-transform: capitalize !important; }
+
+// 文本装饰
+.text-decoration-none { text-decoration: none !important; }
+.text-decoration-underline { text-decoration: underline !important; }
+.text-decoration-line-through { text-decoration: line-through !important; }
+
+// 文本换行
+.text-wrap { white-space: normal !important; }
+.text-nowrap { white-space: nowrap !important; }
+
+// 文本截断
+.text-truncate {
+  @include mix.text-truncate;
+}
+
+// 字体粗细
+.fw-light { font-weight: 300 !important; }
+.fw-normal { font-weight: 400 !important; }
+.fw-medium { font-weight: 500 !important; }
+.fw-bold { font-weight: 700 !important; }
+.fw-bolder { font-weight: 800 !important; }
+
+// 字体样式
+.fst-italic { font-style: italic !important; }
+.fst-normal { font-style: normal !important; }
+
+// 行高
+.lh-1 { line-height: 1 !important; }
+.lh-sm { line-height: 1.25 !important; }
+.lh-base { line-height: $line-height-base !important; }
+.lh-lg { line-height: 2 !important; }
+
+// 特殊文本样式
+.gradient-text {
+  @include mix.gradient-text($primary-gradient);
+}
+
+// 显示标题
+.display-1 {
+  font-size: 5rem;
+  font-weight: $font-weight-extra-bold;
+  line-height: 1.2;
+
+  @include resp.respond-to('md') {
+    font-size: 4rem;
+  }
+
+  @include resp.respond-to('xs') {
+    font-size: 3rem;
+  }
+}
+
+.display-2 {
+  font-size: 4.5rem;
+  font-weight: $font-weight-extra-bold;
+  line-height: 1.2;
+
+  @include resp.respond-to('md') {
+    font-size: 3.5rem;
+  }
+
+  @include resp.respond-to('xs') {
+    font-size: 2.5rem;
+  }
+}
+
+.display-3 {
+  font-size: 4rem;
+  font-weight: $font-weight-extra-bold;
+  line-height: 1.2;
+
+  @include resp.respond-to('md') {
+    font-size: 3rem;
+  }
+
+  @include resp.respond-to('xs') {
+    font-size: 2.25rem;
+  }
+}
+
+.display-4 {
+  font-size: 3.5rem;
+  font-weight: $font-weight-extra-bold;
+  line-height: 1.2;
+
+  @include resp.respond-to('md') {
+    font-size: 2.5rem;
+  }
+
+  @include resp.respond-to('xs') {
+    font-size: 2rem;
+  }
+}
+
+.display-5 {
+  font-size: 3rem;
+  font-weight: $font-weight-extra-bold;
+  line-height: 1.2;
+
+  @include resp.respond-to('md') {
+    font-size: 2.25rem;
+  }
+
+  @include resp.respond-to('xs') {
+    font-size: 1.75rem;
+  }
+}
+
+.display-6 {
+  font-size: 2.5rem;
+  font-weight: $font-weight-extra-bold;
+  line-height: 1.2;
+
+  @include resp.respond-to('md') {
+    font-size: 2rem;
+  }
+
+  @include resp.respond-to('xs') {
+    font-size: 1.5rem;
+  }
+}
+
+// 引用
+blockquote {
+  margin: 0 0 $spacer;
+  padding: $spacer;
+  border-left: 4px solid $primary;
+  background-color: rgba($primary, 0.05);
+  font-style: italic;
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// 列表
+ul, ol {
+  margin-top: 0;
+  margin-bottom: $spacer;
+  padding-left: $spacer-4;
+
+  ul, ol {
+    margin-bottom: 0;
+  }
+}
+
+// 描述列表
+dl {
+  margin-top: 0;
+  margin-bottom: $spacer;
+}
+
+dt {
+  font-weight: $font-weight-bold;
+}
+
+dd {
+  margin-bottom: $spacer-2;
+  margin-left: 0;
+}
+
+// 代码
+code, pre, kbd, samp {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+code {
+  font-size: 0.875em;
+  color: $danger;
+  word-wrap: break-word;
+}
+
+pre {
+  display: block;
+  margin-top: 0;
+  margin-bottom: $spacer;
+  overflow: auto;
+  font-size: 0.875em;
+
+  code {
+    font-size: inherit;
+    color: inherit;
+    word-break: normal;
+  }
+}
+
+kbd {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.875em;
+  color: $light;
+  background-color: $dark;
+  border-radius: $border-radius-sm;
+}
+
+// 水平线
+hr {
+  margin: $spacer 0;
+  color: inherit;
+  background-color: currentColor;
+  border: 0;
+  opacity: 0.25;
+}
+
+// 标记
+mark, .mark {
+  padding: 0.2em;
+  background-color: $warning;
+}
+

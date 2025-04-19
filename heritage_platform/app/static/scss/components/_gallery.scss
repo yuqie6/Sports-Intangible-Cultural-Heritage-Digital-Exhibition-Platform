@@ -1,0 +1,222 @@
+// 图片画廊样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+
+// 图片画廊容器
+.image-gallery {
+  margin: 2rem auto;
+  max-width: 1200px;
+}
+
+// 画廊网格
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 0 auto;
+}
+
+// 画廊项
+.gallery-item {
+  position: relative;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition: $transition-base;
+  background: white;
+  aspect-ratio: 3/2;
+  box-shadow: $box-shadow;
+
+  &.main-image {
+    grid-column: 1 / -1;
+    margin-bottom: 2rem;
+    max-height: 600px;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $box-shadow-lg;
+
+    img {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// 画廊项覆盖层
+.gallery-item-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: $transition-base;
+  padding: 1rem;
+
+  i {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease 0.1s;
+  }
+
+  .gallery-item:hover & {
+    opacity: 1;
+
+    i {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// 画廊标题
+.gallery-caption {
+  color: white;
+  text-align: center;
+  font-size: 0.95rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease 0.2s;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin-top: 0.5rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+
+  .gallery-item:hover & {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 画廊链接
+.gallery-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+// 内容封面样式
+.content-cover-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 2rem;
+  background: $light;
+  min-height: 300px;
+}
+
+.content-cover-image {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; // 16:9 宽高比
+  border-radius: $border-radius;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.content-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: $transition-base;
+  border-radius: $border-radius;
+
+  // 填充模式
+  &.cover-mode {
+    object-fit: cover;
+  }
+
+  // 完整显示模式
+  &.fit-mode {
+    object-fit: contain;
+  }
+}
+
+.content-cover-image:hover {
+  .content-cover.cover-mode {
+    transform: scale(1.05);
+  }
+
+  .content-cover.fit-mode {
+    transform: scale(1.05); // 移除了translateY(-50%)
+  }
+}
+
+// 非遗项目封面
+.heritage-cover {
+  position: relative;
+  overflow: hidden;
+  border-radius: $border-radius-xl;
+  box-shadow: $box-shadow-lg;
+
+  img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+// 响应式调整
+@include resp.respond-to('md') {
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .gallery-item.main-image {
+    max-height: 400px;
+  }
+
+  .gallery-caption {
+    font-size: 0.875rem;
+  }
+
+  // 调整内容详情页封面
+  .content-cover-image {
+    padding-top: 66.66%; // 调整为3:2 比例
+  }
+
+  .heritage-cover img {
+    height: 250px; // 调整非遗详情页封面高度
+  }
+}
+
+@include resp.respond-to('xs') {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-item.main-image {
+    max-height: 300px;
+  }
+}
+

@@ -9,7 +9,7 @@ from app.models import User
 load_dotenv()
 
 # 通过环境变量设置配置类型，默认为开发环境
-config_name = os.environ.get('FLASK_CONFIG') or 'production'
+config_name = os.environ.get('FLASK_CONFIG') or 'development'
 app = create_app(config_name)
 migrate = Migrate(app, db)
 

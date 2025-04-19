@@ -1,0 +1,332 @@
+// 按钮样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+// 基础按钮样式
+.btn {
+  border-radius: $border-radius;
+  font-weight: $font-weight-medium;
+  padding: $button-padding;
+  transition: $transition-fast;
+}
+
+// 主要按钮
+.btn-primary {
+  background: $primary-gradient;
+  border: none;
+  box-shadow: 0 4px 6px rgba($primary, 0.2);
+
+  &:hover {
+    background: $primary-gradient-hover;
+    box-shadow: 0 6px 8px rgba($primary, 0.3);
+    transform: translateY(-1px);
+  }
+}
+
+// 次要按钮
+.btn-secondary {
+  background: $secondary-gradient;
+  border: none;
+  box-shadow: 0 4px 6px rgba($secondary, 0.2);
+
+  &:hover {
+    background: $secondary-gradient-hover;
+    box-shadow: 0 6px 8px rgba($secondary, 0.3);
+    transform: translateY(-1px);
+  }
+}
+
+// 轮廓按钮
+.btn-outline-primary {
+  border-color: $primary;
+  color: $primary;
+
+  &:hover {
+    background-color: $primary;
+    color: white;
+    box-shadow: 0 4px 6px rgba($primary, 0.2);
+  }
+}
+
+// 轮廓次要按钮
+.btn-outline-secondary {
+  border-color: $secondary;
+  color: $secondary;
+
+  &:hover {
+    background-color: $secondary;
+    color: white;
+    box-shadow: 0 4px 6px rgba($secondary, 0.2);
+  }
+}
+
+// 浅色按钮
+.btn-light {
+  background: rgb(255, 255, 255);
+  border: 2px solid $border-color-light;
+  color: $secondary;
+  font-weight: $font-weight-medium;
+  transition: $transition-base;
+
+  &:hover {
+    background: $light;
+    border-color: $primary;
+    color: $primary;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba($primary, 0.1);
+  }
+}
+
+// 按钮尺寸
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: $font-size-sm;
+}
+
+.btn-lg {
+  padding: 1rem 1.5rem;
+  font-size: $font-size-lg;
+}
+
+// 按钮悬停效果
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+// 导航栏按钮样式
+.navbar .btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: $border-radius-pill;
+  font-weight: $font-weight-medium;
+  transition: $transition-base;
+}
+
+.navbar .btn-outline-primary {
+  border-width: 2px;
+}
+
+.navbar .btn:hover {
+  transform: translateY(-2px);
+}
+
+// 英雄区按钮样式
+.mt-4 .btn {
+  padding: 1rem 2.5rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: $border-radius-pill;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: fadeIn 1s ease-out;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  &:hover::after {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+.mt-4 .btn-primary {
+  background: $button-gradient;
+  border: none;
+  box-shadow: 0 10px 20px rgba(0,114,255,0.3);
+  margin-right: 1.5rem;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(0,114,255,0.4);
+  }
+}
+
+.mt-4 .btn-outline-primary {
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.8);
+  color: white;
+
+  &:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
+}
+
+// 编辑页面按钮样式
+.content-edit-form .input-group .btn {
+  border-radius: $border-radius;
+  padding: 0.5rem 1.25rem;
+  font-weight: $font-weight-medium;
+  transition: $transition-base;
+  margin: 0 2px;
+}
+
+.content-edit-form .input-group .btn-outline-primary {
+  background-color: transparent;
+  border: 1px solid $primary;
+  color: $primary;
+
+  &:hover {
+    background-color: $primary;
+    color: white;
+  }
+}
+
+.content-edit-form .input-group .btn-primary {
+  background: $primary-gradient;
+  border: none;
+  color: white;
+}
+
+// 悬停浮动效果按钮
+.btn-hover-float {
+  transition: $transition-base;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba($primary, 0.2);
+  }
+}
+
+// 圆形按钮
+.btn-circle {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 返回顶部按钮
+#back-to-top {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  transition: $transition-base;
+  z-index: $z-index-fixed;
+  box-shadow: $box-shadow;
+  animation: fadeIn $animation-duration-fast ease-out;
+
+  &.show {
+    display: flex;
+    opacity: 1;
+  }
+
+  &:not(.show) {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+// 模块关闭按钮
+.module-close-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+// 封面控制按钮
+.cover-controls {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: $z-index-dropdown;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 0.75rem 1rem;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow-lg;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+
+  .btn {
+    background: white;
+    border: 1px solid $border-color;
+    padding: 0.5rem 1.25rem;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    transition: $transition-base;
+    min-width: 90px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: $light;
+      transform: translateY(-2px);
+      box-shadow: $box-shadow-sm;
+    }
+
+    &.active {
+      background: $primary;
+      color: white;
+      border-color: $primary;
+      box-shadow: 0 2px 8px rgba($primary, 0.2);
+    }
+
+    i {
+      margin-right: 0.5rem;
+      font-size: 1rem;
+    }
+
+    &:not(.active):hover {
+      background: $light;
+    }
+  }
+}
+
+// 响应式调整
+@include resp.respond-to('md') {
+  .cover-controls {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 1rem;
+    width: calc(100% - 2rem);
+    justify-content: center;
+
+    .btn {
+      min-width: auto;
+      padding: 0.5rem 1rem;
+    }
+  }
+
+  .mt-4 .btn {
+    padding: 0.8rem 1.5rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    touch-action: manipulation;
+  }
+
+  // 确保按钮有足够的点击区域
+  .btn {
+    padding: 0.6rem 1rem; // 稍微增加垂直内边距
+    min-height: 40px; // 设置最小高度
+  }
+}

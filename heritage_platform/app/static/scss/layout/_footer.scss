@@ -1,0 +1,103 @@
+// 页脚样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+
+// 页脚基础样式
+footer {
+  background-color: $footer-bg;
+  color: $text-light;
+  padding: 2rem 0;
+  margin-top: 3rem;
+}
+
+// 页脚标题
+footer h5 {
+  color: white;
+  font-weight: $font-weight-bold;
+  margin-bottom: 1.5rem;
+}
+
+// 页脚文本
+footer p {
+  color: $secondary-light;
+}
+
+// 页脚链接
+footer a {
+  color: $secondary-light;
+  text-decoration: none;
+  transition: color 0.15s ease-in-out;
+
+  &:hover {
+    color: white;
+    text-decoration: none;
+  }
+}
+
+// 页脚底部区域
+footer .footer-bottom {
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// 页脚列表
+footer .list-unstyled {
+  li {
+    margin-bottom: 0.75rem; // 增加列表项间距
+  }
+
+  i {
+    width: 20px;
+    text-align: center;
+  }
+}
+
+// 页脚图标
+footer i.fas {
+  margin-right: 0.5rem;
+  color: $primary;
+}
+
+// 响应式调整
+@include resp.respond-to('md') {
+  footer {
+    padding: 1.5rem 0;
+    padding-bottom: 80px; // 为底部导航栏留出空间
+  }
+
+  footer .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  footer h5 {
+    margin-bottom: 1rem;
+  }
+
+  footer .list-unstyled li {
+    margin-bottom: 0.5rem;
+  }
+
+  footer .footer-bottom {
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+
+  footer .footer-bottom .row > div {
+    text-align: center; // 小屏幕时底部文本居中
+    margin-bottom: 0.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+@include resp.respond-to('xs') {
+  footer {
+    padding-bottom: 80px; // 为底部导航栏留出空间
+  }
+}

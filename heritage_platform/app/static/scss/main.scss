@@ -1,0 +1,39 @@
+// 主SCSS文件
+// 导入所有其他SCSS文件
+
+// 基础样式
+@use 'base/variables' as *;
+@use 'base/mixins' as mix;
+@use 'base/responsive' as resp;
+@use 'base/reset';
+@use 'base/typography';
+
+// 组件样式
+@use 'components/buttons';
+@use 'components/cards';
+@use 'components/forms';
+@use 'components/badges';
+@use 'components/alerts';
+@use 'components/modals';
+@use 'components/dropdowns';
+@use 'components/pagination';
+@use 'components/toast';
+@use 'components/gallery';
+@use 'components/stats';
+@use 'components/avatars';
+
+// 布局样式
+@use 'layout/header';
+@use 'layout/footer';
+@use 'layout/sidebar';
+@use 'layout/bottom-nav';
+
+// 页面特定样式
+@use 'pages/home';
+@use 'pages/heritage';
+@use 'pages/content';
+@use 'pages/forum';
+@use 'pages/user';
+@use 'pages/message';
+@use 'pages/notification';
+@use 'pages/auth';

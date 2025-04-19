@@ -1,0 +1,124 @@
+// 提醒样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+@use 'sass:color';
+
+// 基础提醒样式
+.alert {
+  position: relative;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: $border-radius;
+}
+
+// 提醒变体
+.alert-primary {
+  color: color.adjust($primary, $blackness: 30%);
+  background-color: color.adjust($primary, $lightness: 40%);
+  border-color: color.adjust($primary, $lightness: 30%);
+}
+
+.alert-secondary {
+  color: color.adjust($secondary, $blackness: 30%);
+  background-color: color.adjust($secondary, $lightness: 40%);
+  border-color: color.adjust($secondary, $lightness: 30%);
+}
+
+.alert-success {
+  color: color.adjust($success, $blackness: 30%);
+  background-color: color.adjust($success, $lightness: 50%);
+  border-color: color.adjust($success, $lightness: 40%);
+}
+
+.alert-danger {
+  color: color.adjust($danger, $blackness: 20%);
+  background-color: color.adjust($danger, $lightness: 40%);
+  border-color: color.adjust($danger, $lightness: 30%);
+}
+
+.alert-warning {
+  color: color.adjust($warning, $blackness: 40%);
+  background-color: color.adjust($warning, $lightness: 40%);
+  border-color: color.adjust($warning, $lightness: 30%);
+}
+
+.alert-info {
+  color: color.adjust($info, $blackness: 40%);
+  background-color: color.adjust($info, $lightness: 40%);
+  border-color: color.adjust($info, $lightness: 30%);
+}
+
+.alert-light {
+  color: color.adjust($light, $blackness: 40%);
+  background-color: $light;
+  border-color: color.adjust($light, $blackness: 10%);
+}
+
+.alert-dark {
+  color: color.adjust($dark, $lightness: 40%);
+  background-color: color.adjust($dark, $lightness: 70%);
+  border-color: color.adjust($dark, $lightness: 60%);
+}
+
+// 可关闭的提醒
+.alert-dismissible {
+  padding-right: 3rem;
+
+  .btn-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    padding: 1.25rem 1rem;
+  }
+}
+
+// 带图标的提醒
+.alert i {
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+  vertical-align: middle;
+}
+
+// 提醒动画
+.alert.animate__animated {
+  animation-duration: 0.5s;
+}
+
+// 提醒链接
+.alert-link {
+  font-weight: $font-weight-bold;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// 提醒标题
+.alert-heading {
+  color: inherit;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+// 提醒内容
+.alert p:last-child {
+  margin-bottom: 0;
+}
+
+// 响应式调整
+@include resp.respond-to('md') {
+  .alert {
+    padding: 0.75rem;
+  }
+
+  .alert-dismissible {
+    padding-right: 2.5rem;
+
+    .btn-close {
+      padding: 0.875rem 0.875rem;
+    }
+  }
+}

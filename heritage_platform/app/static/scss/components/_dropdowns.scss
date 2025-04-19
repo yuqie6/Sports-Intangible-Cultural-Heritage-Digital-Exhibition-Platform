@@ -1,0 +1,195 @@
+// 下拉菜单样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+
+// 下拉菜单容器
+.dropdown-menu {
+  border: none;
+  border-radius: $border-radius-xl;
+  box-shadow: $box-shadow-lg;
+  padding: 1rem 0;
+  margin-top: 0.5rem;
+  animation: fadeInDown 0.3s ease;
+}
+
+// 下拉菜单项
+.dropdown-item {
+  padding: 0.7rem 1.5rem;
+  font-weight: $font-weight-medium;
+  transition: $transition-fast;
+
+  &:hover {
+    background: rgba($primary, 0.05);
+    transform: translateX(5px);
+  }
+
+  &:active {
+    background-color: rgba($primary, 0.1);
+  }
+
+  &.active {
+    background-color: $primary;
+    color: white;
+  }
+
+  &.disabled {
+    color: $text-muted;
+    pointer-events: none;
+    background-color: transparent;
+  }
+
+  i {
+    width: 20px;
+    text-align: center;
+    margin-right: 0.5rem;
+  }
+}
+
+// 下拉分隔线
+.dropdown-divider {
+  margin: 0.5rem 0;
+  opacity: 0.1;
+}
+
+// 下拉菜单标题
+.dropdown-header {
+  display: block;
+  padding: 0.5rem 1.5rem;
+  margin-bottom: 0;
+  font-size: $font-size-sm;
+  color: $text-muted;
+  white-space: nowrap;
+}
+
+// 下拉菜单文本
+.dropdown-text {
+  padding: 0.5rem 1.5rem;
+  color: $text-color;
+}
+
+// 下拉菜单动画
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 下拉菜单方向
+.dropup .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.dropend .dropdown-menu {
+  top: 0;
+  right: auto;
+  left: 100%;
+  margin-top: 0;
+  margin-left: 0.5rem;
+}
+
+.dropstart .dropdown-menu {
+  top: 0;
+  right: 100%;
+  left: auto;
+  margin-top: 0;
+  margin-right: 0.5rem;
+}
+
+// 下拉菜单对齐
+.dropdown-menu-end {
+  right: 0;
+  left: auto;
+}
+
+// 下拉菜单暗色主题
+.dropdown-menu-dark {
+  color: $text-light;
+  background-color: $dark;
+
+  .dropdown-item {
+    color: $text-light;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    &.active {
+      background-color: $primary;
+    }
+
+    &.disabled {
+      color: $secondary-light;
+    }
+  }
+
+  .dropdown-divider {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .dropdown-header {
+    color: $secondary-light;
+  }
+}
+
+// 移动端用户菜单项样式
+@include resp.respond-to('lg') {
+  // 移动端直接显示的用户菜单项链接样式
+  .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link {
+    padding: 0.5rem 1.2rem !important; // 保持与主导航项一致的内边距
+    display: flex;
+    align-items: center;
+    color: var(--bs-nav-link-color); // 使用标准导航链接颜色
+    font-weight: $font-weight-medium;
+    border-radius: $border-radius; // 添加圆角
+    margin: 0 0.2rem; // 添加边距
+    width: 100%; // 确保链接占满宽度
+    text-align: left; // 左对齐
+
+    &:hover {
+      color: $primary !important;
+      background: rgba($primary, 0.05) !important;
+    }
+  }
+
+  // 调整移动端用户名显示区域的样式
+  .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link.d-flex {
+    font-weight: $font-weight-bold; // 加粗用户名
+    background: none !important; // 移除背景
+    padding-left: 1.2rem !important; // 对齐
+    margin-bottom: 0.25rem; // 增加下方间距
+    color: var(--bs-navbar-color); // 使用导航栏默认颜色
+    pointer-events: none; // 让它不可点击
+
+    &:hover {
+      color: var(--bs-navbar-color) !important; // 移除用户名悬停颜色变化
+      background: none !important;
+    }
+  }
+
+  // 调整移动端分割线
+  .navbar-collapse .navbar-nav .nav-item.d-lg-none .dropdown-divider {
+    margin: 0.5rem 1.2rem;
+    border-top: 1px solid rgba(0,0,0,.1);
+    opacity: 1;
+  }
+
+  // 确保移动端用户区域垂直堆叠
+  .navbar-collapse .navbar-nav.align-items-center {
+    align-items: stretch; // 让列表项撑满宽度
+
+    .nav-item {
+      width: 100%; // 列表项占满宽度
+    }
+  }
+}
+

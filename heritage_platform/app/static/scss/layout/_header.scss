@@ -1,0 +1,342 @@
+// 头部/导航栏样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+
+// 导航栏基础样式
+.navbar {
+  --bs-navbar-bg: #ffffff !important; // 覆盖 Bootstrap 背景变量
+  background-color: #ffffff !important; // 强制背景色
+  background: #ffffff !important; // 再次强制背景
+  // backdrop-filter: blur(10px); // 移除模糊效果
+  // -webkit-backdrop-filter: blur(10px); // 移除模糊效果
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 0.8rem 0.8rem; // 减少左右整体内边距
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+// 品牌标志
+.navbar-brand {
+  font-weight: $font-weight-extra-bold;
+  font-size: 1.4rem;
+  @include mix.gradient-text($primary-gradient);
+  transition: transform 0.3s ease;
+  will-change: transform;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// 导航链接
+.navbar-nav .nav-link {
+  font-weight: $font-weight-medium;
+  font-size: 0.95rem; // 稍微减小字体大小
+  padding: 0.5rem 0.6rem !important; // 再次减小左右内边距
+  margin: 0 0.1rem; // 减小导航项之间的外边距
+  border-radius: $border-radius;
+  transition: $transition-base;
+  position: relative;
+  white-space: nowrap; // 强制不换行
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: $primary-gradient;
+    transition: $transition-base;
+    transform: translateX(-50%);
+  }
+
+  &:hover {
+    color: $primary !important;
+    background: rgba($primary, 0.05);
+
+    &::after {
+      width: 80%;
+    }
+  }
+}
+
+// 活动导航项
+.navbar-nav .active .nav-link {
+  color: $primary !important;
+  font-weight: $font-weight-bold;
+  background: rgba($primary, 0.1);
+
+  &::after {
+    width: 80%;
+  }
+}
+
+// 导航栏图标链接样式(桌面端)
+.navbar-nav .nav-link[title="通知中心"],
+.navbar-nav .nav-link[title="私信消息"] {
+  padding: 0.5rem 0.6rem !important; // 调整图标链接的内边距
+  background: none !important; // 移除背景色
+
+  &::after {
+    display: none; // 移除图标链接的下划线效果
+  }
+}
+
+// 导航栏角标样式 (桌面端)
+#notification-badge,
+#message-badge,
+#mobile-notification-badge,
+#mobile-message-badge {
+  font-size: 0.65em; // 调整角标字体大小
+  padding: 0.25rem 0.4rem; // 调整角标内边距
+  min-width: 1.2em;
+  min-height: 1.2em;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50% !important; // 确保红点是圆形
+  transform: translate(-50%, -50%) !important;
+  margin-left: 0;
+  margin-top: -2px;
+  z-index: 1000;
+  // 添加平滑过渡，防止刷新时的弹出动画
+  transition: opacity 0.2s ease-in-out;
+  opacity: 0;
+}
+
+// 显示徽章时平滑显示
+#notification-badge.show,
+#message-badge.show,
+#mobile-notification-badge.show,
+#mobile-message-badge.show {
+  opacity: 1;
+}
+
+// 徽章样式统一定义
+.badge.position-absolute.top-0.start-100.translate-middle {
+  padding: 0.25rem 0.4rem;
+  min-width: 1.2em;
+  min-height: 1.2em;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.65rem;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  margin-left: 0;
+  margin-top: -2px;
+}
+
+// 徽章样式增强
+.badge.bg-danger.rounded-pill.position-absolute {
+  padding: 0.25rem 0.4rem;
+  min-width: 1.2em;
+  min-height: 1.2em;
+  border-radius: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+// 徽章动画
+.badge {
+  transition: all 0.3s ease;
+}
+
+.badge.new-notification {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 导航栏折叠按钮
+.navbar-toggler {
+  border: none;
+  padding: 0.5rem;
+
+  &:focus {
+    box-shadow: none;
+    outline: none;
+  }
+
+  .navbar-toggler-icon {
+    width: 1.5em;
+    height: 1.5em;
+  }
+}
+
+// 移动端导航栏样式
+@include resp.respond-to('lg') {
+  // 强制确保移动端导航栏背景不透明
+  .navbar {
+    background-color: #ffffff !important; // 确保白色背景
+    background: #ffffff !important; // 再次确保
+  }
+
+  // 移动端顶部搜索框
+  .navbar-collapse .search-form {
+    display: none !important;
+  }
+
+  // 移动端顶部右侧图标区域
+  .navbar .d-lg-none.d-flex {
+    align-items: center;
+  }
+
+  // 移动端顶部图标的角标位置
+  #mobile-notification-badge,
+  #mobile-message-badge {
+    top: 0.2rem; // 稍微向上调整
+    left: auto; // 移除 left
+    right: -0.3rem; // 调整到图标右侧
+    transform: translate(50%, -50%); // 重新使用 translate 微调
+  }
+
+  // 移动端直接显示的用户菜单项链接样式
+  .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link {
+    padding: 0.5rem 1.2rem !important; // 保持与主导航项一致的内边距
+    display: flex;
+    align-items: center;
+    color: var(--bs-nav-link-color); // 使用标准导航链接颜色
+    font-weight: $font-weight-medium;
+    border-radius: $border-radius; // 添加圆角
+    margin: 0 0.2rem; // 添加边距
+    width: 100%; // 确保链接占满宽度
+    text-align: left; // 左对齐
+
+    &:hover {
+      color: $primary !important;
+      background: rgba($primary, 0.05) !important;
+    }
+  }
+
+  // 调整移动端用户名显示区域的样式
+  .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link.d-flex {
+    font-weight: $font-weight-bold; // 加粗用户名
+    background: none !important; // 移除背景
+    padding-left: 1.2rem !important; // 对齐
+    margin-bottom: 0.25rem; // 增加下方间距
+    color: var(--bs-navbar-color); // 使用导航栏默认颜色
+    pointer-events: none; // 让它不可点击
+
+    &:hover {
+      color: var(--bs-navbar-color) !important; // 移除用户名悬停颜色变化
+      background: none !important;
+    }
+  }
+
+  // 调整移动端分割线
+  .navbar-collapse .navbar-nav .nav-item.d-lg-none .dropdown-divider {
+    margin: 0.5rem 1.2rem;
+    border-top: 1px solid rgba(0,0,0,.1);
+    opacity: 1;
+  }
+
+  // 确保移动端用户区域垂直堆叠
+  .navbar-collapse .navbar-nav.align-items-center {
+    align-items: stretch; // 让列表项撑满宽度
+
+    .nav-item {
+      width: 100%; // 列表项占满宽度
+    }
+  }
+}
+
+// 桌面端导航栏样式
+@include resp.respond-to('min-lg') {
+  // 强制确保桌面端导航栏背景不透明
+  .navbar {
+    background-color: #ffffff !important; // 确保白色背景
+    background: #ffffff !important; // 再次确保
+  }
+}
+
+// 消息提示
+.container.mt-3 {
+  .alert {
+    animation: fadeIn 0.5s ease-in;
+  }
+}
+
+// 搜索框增强
+.search-form {
+  margin-right: 1.5rem; // 增加右边距
+  position: relative; // 添加相对定位作为绝对定位子元素的参考
+  display: flex; // 使用flex布局确保表单元素正确对齐
+  align-items: center;
+
+  .form-control {
+    width: 250px;
+    padding: 0.6rem 2.5rem 0.6rem 1rem;
+    border-radius: 50px;
+    border: 2px solid transparent;
+    background: rgba($primary, 0.05);
+    transition: all 0.3s ease;
+
+    &:focus {
+      border-color: $primary;
+      background: white;
+      box-shadow: 0 5px 15px rgba($primary, 0.1);
+      width: 300px;
+    }
+  }
+
+  .btn {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: $primary-gradient;
+    border: none;
+    box-shadow: 0 3px 10px rgba($primary, 0.2);
+    transition: all 0.3s ease;
+    z-index: 5; // 确保按钮在输入框上方
+
+    &:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 5px 15px rgba($primary, 0.3);
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+

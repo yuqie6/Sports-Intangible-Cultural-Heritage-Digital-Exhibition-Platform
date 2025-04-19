@@ -1,0 +1,122 @@
+// 徽章样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+// 基础徽章样式
+.badge {
+  padding: 0.5em 0.8em;
+  font-weight: $font-weight-medium;
+  transition: $transition-base;
+}
+
+// 徽章颜色
+.badge-primary {
+  background-color: $primary;
+}
+
+// 导航栏角标样式
+#notification-badge,
+#message-badge,
+#mobile-notification-badge,
+#mobile-message-badge {
+  font-size: 0.65em; // 调整角标字体大小
+  padding: 0.25rem 0.4rem; // 调整角标内边距
+  min-width: 1.2em;
+  min-height: 1.2em;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50% !important; // 确保红点是圆形
+  transform: translate(-50%, -50%) !important;
+  margin-left: 0;
+  margin-top: -2px;
+  z-index: 1000;
+  // 添加平滑过渡，防止刷新时的弹出动画
+  transition: opacity 0.2s ease-in-out;
+  opacity: 0;
+}
+
+// 显示徽章时平滑显示
+#notification-badge.show,
+#message-badge.show,
+#mobile-notification-badge.show,
+#mobile-message-badge.show {
+  opacity: 1;
+}
+
+// 徽章样式统一定义
+.badge.position-absolute.top-0.start-100.translate-middle {
+  padding: 0.25rem 0.4rem;
+  min-width: 1.2em;
+  min-height: 1.2em;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.65rem;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  margin-left: 0;
+  margin-top: -2px;
+}
+
+// 徽章样式增强
+.badge.bg-danger.rounded-pill.position-absolute {
+  padding: 0.25rem 0.4rem;
+  min-width: 1.2em;
+  min-height: 1.2em;
+  border-radius: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+// 徽章动画
+.badge {
+  transition: $transition-base;
+}
+
+.badge.new-notification {
+  animation: pulse 1.5s infinite;
+}
+
+// 消息中心导航标签徽章
+#messageTab .badge {
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+  font-weight: $font-weight-medium;
+  transition: $transition-base;
+}
+
+#messageTab .nav-link:hover .badge {
+  transform: scale(1.1);
+}
+
+// 特色卡片徽章
+.feature-card .badge {
+  padding: 0.5em 1em;
+  font-weight: $font-weight-medium;
+  letter-spacing: 0.5px;
+}
+
+// 非遗项目徽章
+.heritage-info .badge {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-pill;
+  background: $primary-gradient;
+  border: none;
+  box-shadow: 0 4px 10px rgba($primary, 0.2);
+}
+
+// 响应式调整
+@include resp.respond-to('lg') {
+  // 调整移动端顶部图标的角标位置
+  #mobile-notification-badge,
+  #mobile-message-badge {
+    top: 0.2rem; // 稍微向上调整
+    left: auto; // 移除 left
+    right: -0.3rem; // 调整到图标右侧
+    transform: translate(50%, -50%); // 重新使用 translate 微调
+  }
+}
+

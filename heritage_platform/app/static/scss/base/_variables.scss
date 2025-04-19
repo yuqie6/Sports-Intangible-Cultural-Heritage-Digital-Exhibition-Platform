@@ -1,0 +1,125 @@
+// 变量定义
+// 这个文件包含项目中使用的所有变量
+
+// 颜色
+// 主色和辅助色
+$primary: #0d6efd;
+$primary-light: #86b7fe;
+$primary-dark: #0b5ed7;
+$secondary: #6c757d;
+$secondary-light: #adb5bd;
+$secondary-dark: #495057;
+$success: #198754;
+$info: #0dcaf0;
+$warning: #ffc107;
+$danger: #dc3545;
+$light: #f8f9fa;
+$dark: #212529;
+
+// 渐变色
+$primary-gradient: linear-gradient(135deg, #2980b9 0%, #0d6efd 100%);
+$primary-gradient-hover: linear-gradient(135deg, #3498db 0%, #0b5ed7 100%);
+$secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+$secondary-gradient-hover: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+$hero-gradient: linear-gradient(135deg, #0099f7, #0575E6);
+$button-gradient: linear-gradient(45deg, #00c6ff, #0072ff);
+
+// 文本颜色
+$text-color: #333;
+$text-muted: #6c757d;
+$text-light: #f8f9fa;
+$link-color: #0d6efd;
+$link-hover-color: #0a58ca;
+
+// 边框颜色
+$border-color: #dee2e6;
+$border-color-light: #e9ecef;
+$border-color-dark: #495057;
+
+// 背景颜色
+$bg-color: #f8f9fa;
+$card-bg: #ffffff;
+$footer-bg: #343a40;
+
+// 深色模式颜色
+$dark-bg: #212529;
+$dark-card-bg: #2a2d31;
+$dark-text: #e9ecef;
+$dark-border: #495057;
+$dark-hover: #343a40;
+
+// 字体
+$font-family-base: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$font-size-base: 1rem;
+$font-size-sm: 0.875rem;
+$font-size-lg: 1.25rem;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+$font-weight-extra-bold: 800;
+$line-height-base: 1.6;
+
+// 间距
+$spacer: 1rem;
+$spacer-1: $spacer * 0.25;  // 0.25rem
+$spacer-2: $spacer * 0.5;   // 0.5rem
+$spacer-3: $spacer;         // 1rem
+$spacer-4: $spacer * 1.5;   // 1.5rem
+$spacer-5: $spacer * 3;     // 3rem
+
+// 边框
+$border-width: 1px;
+$border-radius: 5px;
+$border-radius-sm: 3px;
+$border-radius-lg: 8px;
+$border-radius-xl: 12px;
+$border-radius-pill: 50px;
+$border-radius-circle: 50%;
+
+// 盒阴影
+$box-shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+$box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+$box-shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+$box-shadow-xl: 0 15px 30px rgba(0, 0, 0, 0.2);
+
+// 过渡
+$transition-base: all 0.3s ease;
+$transition-fast: all 0.2s ease;
+$transition-slow: all 0.4s ease;
+
+// 断点
+$breakpoints: (
+  'xs': 375px,    // 小型手机设备
+  'sm': 576px,    // 中型手机
+  'md': 768px,    // 大型手机/平板
+  'lg': 992px,    // 平板/小型桌面
+  'xl': 1200px,   // 桌面
+  'xxl': 1400px   // 大屏桌面
+);
+
+// Z-index
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+$z-index-toast: 10000;
+
+// 组件尺寸
+$navbar-height: 70px;
+$footer-padding: 2rem;
+$card-padding: 1.5rem;
+$button-padding: 0.5rem 1.25rem;
+$input-padding: 0.75rem 1rem;
+$avatar-sm: 32px;
+$avatar-md: 64px;
+$avatar-lg: 128px;
+$avatar-xs: 24px;
+
+// 动画时间
+$animation-duration-fast: 0.3s;
+$animation-duration-normal: 0.5s;
+$animation-duration-slow: 0.8s;
+

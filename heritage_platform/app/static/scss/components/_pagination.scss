@@ -1,0 +1,127 @@
+// 分页样式
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+
+// 分页容器
+.pagination {
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+  border-radius: $border-radius;
+}
+
+// 分页项
+.pagination .page-item {
+  &:first-child .page-link {
+    border-top-left-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+  }
+
+  &:last-child .page-link {
+    border-top-right-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+  }
+
+  &.active .page-link {
+    background-color: $primary;
+    border-color: $primary;
+    color: white;
+    z-index: 3;
+  }
+
+  &.disabled .page-link {
+    color: $text-muted;
+    pointer-events: none;
+    background-color: white;
+    border-color: $border-color;
+  }
+}
+
+// 分页链接
+.pagination .page-link {
+  color: $primary;
+  padding: 0.5rem 0.75rem;
+  border-radius: $border-radius-sm;
+  margin: 0 2px;
+  position: relative;
+  display: block;
+  text-decoration: none;
+  background-color: white;
+  border: 1px solid $border-color;
+  transition: $transition-fast;
+
+  &:hover {
+    background-color: $light;
+    border-color: $border-color;
+    color: $primary;
+  }
+
+  &:focus {
+    z-index: 3;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+  }
+}
+
+// 分页尺寸
+.pagination-lg {
+  .page-link {
+    padding: 0.75rem 1.5rem;
+    font-size: $font-size-lg;
+  }
+
+  .page-item {
+    &:first-child .page-link {
+      border-top-left-radius: $border-radius-lg;
+      border-bottom-left-radius: $border-radius-lg;
+    }
+
+    &:last-child .page-link {
+      border-top-right-radius: $border-radius-lg;
+      border-bottom-right-radius: $border-radius-lg;
+    }
+  }
+}
+
+.pagination-sm {
+  .page-link {
+    padding: 0.25rem 0.5rem;
+    font-size: $font-size-sm;
+  }
+
+  .page-item {
+    &:first-child .page-link {
+      border-top-left-radius: $border-radius-sm;
+      border-bottom-left-radius: $border-radius-sm;
+    }
+
+    &:last-child .page-link {
+      border-top-right-radius: $border-radius-sm;
+      border-bottom-right-radius: $border-radius-sm;
+    }
+  }
+}
+
+// 分页对齐
+.pagination-center {
+  justify-content: center;
+}
+
+.pagination-end {
+  justify-content: flex-end;
+}
+
+// 响应式调整
+@include resp.respond-to('md') {
+  .pagination {
+    flex-wrap: wrap;
+  }
+
+  .pagination .page-link {
+    padding: 0.4rem 0.6rem;
+    font-size: $font-size-sm;
+  }
+}
+
