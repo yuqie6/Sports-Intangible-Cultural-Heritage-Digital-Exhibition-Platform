@@ -9,12 +9,33 @@
   --bs-navbar-bg: #ffffff !important; // 覆盖 Bootstrap 背景变量
   background-color: #ffffff !important; // 强制背景色
   background: #ffffff !important; // 再次强制背景
-  // backdrop-filter: blur(10px); // 移除模糊效果
-  // -webkit-backdrop-filter: blur(10px); // 移除模糊效果
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06); // 优化阴影效果，更加柔和
   padding: 0.8rem 0.8rem; // 减少左右整体内边距
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); // 使用更平滑的过渡效果
   will-change: transform, box-shadow;
+  position: relative; // 为装饰元素提供定位上下文
+  border-bottom: 1px solid rgba($primary, 0.05); // 添加微妙的边框
+
+  // 滚动时的样式
+  &.scrolled {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    padding: 0.6rem 0.8rem; // 滚动时稍微减小高度
+  }
+
+  // 添加微妙的装饰线
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+      rgba($primary, 0.2) 0%,
+      rgba($primary, 0.1) 20%,
+      rgba($primary, 0) 100%);
+    opacity: 0.7;
+  }
 }
 
 // 品牌标志
@@ -22,11 +43,49 @@
   font-weight: $font-weight-extra-bold;
   font-size: 1.4rem;
   @include mix.gradient-text($primary-gradient);
-  transition: transform 0.3s ease;
-  will-change: transform;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); // 使用弹性过渡
+  will-change: transform, filter;
+  position: relative;
+  padding: 0.3rem 0.5rem;
+  border-radius: $border-radius;
+  letter-spacing: 0.01em; // 微调字间距
 
+  // 图标样式 - 确保龙形图标显示
+  i {
+    filter: drop-shadow(0 2px 4px rgba($primary, 0.3));
+    transition: all 0.3s ease;
+    color: $primary; // 添加颜色，确保图标可见
+    font-size: 1.5rem; // 增大图标尺寸
+    display: inline-block; // 确保可以应用变换
+  }
+
+  // 悬停效果增强
   &:hover {
-    transform: scale(1.05);
+    transform: scale(1.03); // 减小缩放比例，使效果更微妙
+    background-color: rgba($primary, 0.03); // 添加微妙背景色
+
+    i {
+      transform: rotate(-5deg) scale(1.1); // 图标旋转效果
+    }
+  }
+
+  // 添加微妙的光晕效果
+  &::after {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    background: radial-gradient(circle, rgba($primary, 0.1) 0%, rgba($primary, 0) 70%);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
   }
 }
 
@@ -34,13 +93,17 @@
 .navbar-nav .nav-link {
   font-weight: $font-weight-medium;
   font-size: 0.95rem; // 稍微减小字体大小
-  padding: 0.5rem 0.6rem !important; // 再次减小左右内边距
-  margin: 0 0.1rem; // 减小导航项之间的外边距
+  padding: 0.5rem 0.8rem !important; // 稍微增加内边距提高可点击区域
+  margin: 0 0.15rem; // 增加导航项之间的间距
   border-radius: $border-radius;
-  transition: $transition-base;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); // 使用平滑过渡
   position: relative;
   white-space: nowrap; // 强制不换行
+  letter-spacing: 0.01em; // 微调字间距
+  overflow: hidden; // 隐藏溢出内容
+  z-index: 1; // 确保伪元素正确显示
 
+  // 下划线效果
   &::after {
     content: '';
     position: absolute;
@@ -49,17 +112,51 @@
     width: 0;
     height: 2px;
     background: $primary-gradient;
-    transition: $transition-base;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); // 使用平滑过渡
     transform: translateX(-50%);
+    border-radius: 1px; // 微妙圆角
+    opacity: 0.9;
   }
 
+  // 背景效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba($primary, 0.05);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.3s ease;
+    z-index: -1;
+    border-radius: $border-radius;
+  }
+
+  // 悬停效果
   &:hover {
     color: $primary !important;
-    background: rgba($primary, 0.05);
+    transform: translateY(-1px); // 微妙的上浮效果
+
+    &::before {
+      transform: scaleY(1); // 显示背景
+    }
 
     &::after {
       width: 80%;
     }
+
+    i {
+      transform: translateY(-1px); // 图标微小上浮
+    }
+  }
+
+  // 图标样式
+  i {
+    transition: transform 0.3s ease;
+    display: inline-block; // 使变形生效
+    margin-right: 0.3rem; // 增加图标与文字的间距
   }
 }
 
@@ -67,21 +164,108 @@
 .navbar-nav .active .nav-link {
   color: $primary !important;
   font-weight: $font-weight-bold;
-  background: rgba($primary, 0.1);
+  background: rgba($primary, 0.08); // 调整背景色透明度
+  box-shadow: 0 2px 8px rgba($primary, 0.1); // 添加微妙阴影
+  transform: translateY(-1px); // 微小的上浮效果
 
   &::after {
     width: 80%;
+    height: 3px; // 增加下划线高度
+    opacity: 1;
+  }
+
+  &::before {
+    transform: scaleY(1); // 显示背景
+  }
+
+  // 添加微妙的光晕效果
+  position: relative;
+  overflow: visible; // 允许光晕效果溢出
+
+  &::after {
+    box-shadow: 0 0 8px rgba($primary, 0.3); // 下划线发光效果
   }
 }
 
 // 导航栏图标链接样式(桌面端)
 .navbar-nav .nav-link[title="通知中心"],
 .navbar-nav .nav-link[title="私信消息"] {
-  padding: 0.5rem 0.6rem !important; // 调整图标链接的内边距
-  background: none !important; // 移除背景色
+  padding: 0.5rem 0.7rem !important; // 增加图标链接的内边距
+  margin: 0 0.2rem; // 增加间距
+  border-radius: 50%; // 圆形按钮
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); // 弹性过渡
+  position: relative;
+  overflow: visible;
 
+  // 移除下划线效果
   &::after {
-    display: none; // 移除图标链接的下划线效果
+    display: none;
+  }
+
+  // 移除背景效果
+  &::before {
+    display: none;
+  }
+
+  // 图标样式
+  i {
+    font-size: 1.1rem; // 稍微增大图标
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  // 悬停效果
+  &:hover {
+    background-color: rgba($primary, 0.08) !important; // 添加背景色
+    transform: translateY(-2px); // 上浮效果
+    box-shadow: 0 4px 8px rgba($primary, 0.15); // 添加阴影
+
+    i {
+      transform: scale(1.1); // 图标缩放
+    }
+
+    // 通知图标特殊效果
+    &[title="通知中心"] i {
+      animation: bell-ring 1s ease;
+    }
+
+    // 消息图标特殊效果
+    &[title="私信消息"] i {
+      animation: message-bounce 1s ease;
+    }
+  }
+
+  // 添加光晕效果
+  &::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba($primary, 0.1) 0%, rgba($primary, 0) 70%);
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+
+  // 通知图标颜色
+  &[title="通知中心"] i {
+    color: $warning;
+    filter: drop-shadow(0 2px 4px rgba($warning, 0.3));
+  }
+
+  // 消息图标颜色
+  &[title="私信消息"] i {
+    color: $info;
+    filter: drop-shadow(0 2px 4px rgba($info, 0.3));
   }
 }
 
@@ -148,6 +332,9 @@
   animation: pulse 1.5s infinite;
 }
 
+// 导航栏动画效果
+
+// 从上到下淡入
 @keyframes fadeInDown {
   from {
     opacity: 0;
@@ -159,19 +346,74 @@
   }
 }
 
+// 铃铛效果
+@keyframes bell-ring {
+  0%, 100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(15deg);
+  }
+  40% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(5deg);
+  }
+  80% {
+    transform: rotate(-5deg);
+  }
+}
+
+// 消息弹跳效果
+@keyframes message-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.2);
+  }
+  60% {
+    transform: scale(0.9);
+  }
+  80% {
+    transform: scale(1.1);
+  }
+}
+
 // 导航栏折叠按钮
 .navbar-toggler {
   border: none;
   padding: 0.5rem;
+  border-radius: $border-radius;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1030; // 确保在折叠菜单之上
 
   &:focus {
     box-shadow: none;
     outline: none;
   }
 
+  &:hover {
+    background-color: rgba($primary, 0.05);
+    transform: translateY(-1px);
+  }
+
   .navbar-toggler-icon {
     width: 1.5em;
     height: 1.5em;
+    transition: transform 0.3s ease;
+  }
+
+  // 打开状态下的效果
+  &[aria-expanded="true"] {
+    background-color: rgba($primary, 0.08);
+    box-shadow: 0 2px 8px rgba($primary, 0.1);
+
+    .navbar-toggler-icon {
+      transform: rotate(90deg); // 旋转图标
+    }
   }
 }
 
@@ -183,6 +425,22 @@
     background: #ffffff !important; // 再次确保
   }
 
+  // 折叠菜单样式增强
+  .navbar-collapse {
+    background-color: white;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+    max-height: 80vh; // 限制最大高度
+    overflow-y: auto; // 允许滚动
+    animation: fadeInDown 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); // 添加动画
+    border: 1px solid rgba($primary, 0.05); // 添加边框
+
+    // 自定义滚动条
+    @include mix.custom-scrollbar;
+  }
+
   // 移动端顶部搜索框
   .navbar-collapse .search-form {
     display: none !important;
@@ -191,6 +449,29 @@
   // 移动端顶部右侧图标区域
   .navbar .d-lg-none.d-flex {
     align-items: center;
+  }
+
+  // 移动端图标链接样式
+  .navbar .d-lg-none.d-flex .nav-link {
+    padding: 0.5rem 0.6rem !important;
+    margin: 0 0.1rem;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: rgba($primary, 0.05);
+      transform: translateY(-1px);
+    }
+
+    i {
+      font-size: 1.1rem;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover i {
+      transform: scale(1.1);
+    }
   }
 
   // 移动端顶部图标的角标位置
@@ -204,41 +485,86 @@
 
   // 移动端直接显示的用户菜单项链接样式
   .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link {
-    padding: 0.5rem 1.2rem !important; // 保持与主导航项一致的内边距
+    padding: 0.7rem 1.2rem !important; // 增加内边距提高可点击区域
     display: flex;
     align-items: center;
-    color: var(--bs-nav-link-color); // 使用标准导航链接颜色
+    color: $text-color; // 使用文本颜色变量
     font-weight: $font-weight-medium;
     border-radius: $border-radius; // 添加圆角
-    margin: 0 0.2rem; // 添加边距
-    width: 100%; // 确保链接占满宽度
+    margin: 0.15rem 0.5rem; // 增加边距
+    width: calc(100% - 1rem); // 确保链接占满宽度但有边距
     text-align: left; // 左对齐
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+
+    // 图标样式
+    i {
+      margin-right: 0.8rem; // 增加图标与文字的间距
+      font-size: 1rem;
+      transition: transform 0.3s ease;
+      display: inline-block;
+    }
+
+    // 背景效果
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba($primary, 0.05);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+      z-index: -1;
+      border-radius: $border-radius;
+    }
 
     &:hover {
       color: $primary !important;
-      background: rgba($primary, 0.05) !important;
+      transform: translateX(3px); // 微小的平移效果
+
+      &::before {
+        transform: scaleX(1); // 显示背景
+      }
+
+      i {
+        transform: translateX(2px) scale(1.1); // 图标平移和缩放
+        color: $primary; // 图标变色
+      }
     }
   }
 
   // 调整移动端用户名显示区域的样式
   .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link.d-flex {
     font-weight: $font-weight-bold; // 加粗用户名
-    background: none !important; // 移除背景
-    padding-left: 1.2rem !important; // 对齐
-    margin-bottom: 0.25rem; // 增加下方间距
-    color: var(--bs-navbar-color); // 使用导航栏默认颜色
+    background: rgba($light, 0.5) !important; // 添加浅色背景
+    padding: 0.8rem 1.2rem !important; // 增加内边距
+    margin: 0.5rem 0.5rem 0.75rem; // 增加上下间距
+    color: $text-color; // 使用文本颜色
     pointer-events: none; // 让它不可点击
+    border-radius: $border-radius;
+    border-left: 3px solid $primary; // 添加左侧边框
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); // 添加微妙阴影
+
+    img.avatar-sm {
+      border: 2px solid rgba($primary, 0.2); // 增强头像边框
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); // 添加阴影
+    }
 
     &:hover {
-      color: var(--bs-navbar-color) !important; // 移除用户名悬停颜色变化
-      background: none !important;
+      color: $text-color !important; // 移除用户名悬停颜色变化
+      background: rgba($light, 0.5) !important;
     }
   }
 
   // 调整移动端分割线
   .navbar-collapse .navbar-nav .nav-item.d-lg-none .dropdown-divider {
-    margin: 0.5rem 1.2rem;
-    border-top: 1px solid rgba(0,0,0,.1);
+    margin: 0.75rem 1rem;
+    border-top: 1px solid rgba($primary, 0.08); // 使用主色调的分割线
     opacity: 1;
   }
 
@@ -249,6 +575,33 @@
     .nav-item {
       width: 100%; // 列表项占满宽度
     }
+  }
+
+  // 特殊菜单项样式
+  .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link[href*="logout"] {
+    color: $danger !important;
+
+    i {
+      color: $danger;
+    }
+
+    &:hover {
+      background-color: rgba($danger, 0.05) !important;
+
+      &::before {
+        background-color: rgba($danger, 0.05);
+      }
+    }
+  }
+
+  // 管理员菜单项
+  .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link[href*="dashboard"] i {
+    color: $danger;
+  }
+
+  // 创建项目菜单项
+  .navbar-collapse .navbar-nav .nav-item.d-lg-none .nav-link[href*="create"] i {
+    color: $success;
   }
 }
 
@@ -277,23 +630,32 @@
 
   .form-control {
     width: 250px;
-    padding: 0.6rem 2.5rem 0.6rem 1rem;
+    padding: 0.7rem 2.5rem 0.7rem 1.2rem; // 增加内边距
     border-radius: 50px;
-    border: 2px solid transparent;
-    background: rgba($primary, 0.05);
-    transition: all 0.3s ease;
+    border: 2px solid rgba($primary, 0.1); // 增加边框可见度
+    background: rgba($primary, 0.03); // 减小背景色强度
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); // 使用平滑过渡
+    font-size: 0.95rem; // 微调字体大小
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02); // 添加微妙阴影
+    color: $text-color;
+
+    &::placeholder {
+      color: rgba($text-muted, 0.8);
+      font-size: 0.9rem;
+    }
 
     &:focus {
       border-color: $primary;
       background: white;
-      box-shadow: 0 5px 15px rgba($primary, 0.1);
+      box-shadow: 0 5px 15px rgba($primary, 0.15);
       width: 300px;
+      outline: none; // 移除默认轮廓
     }
   }
 
   .btn {
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     display: flex;
     align-items: center;
@@ -306,12 +668,46 @@
     background: $primary-gradient;
     border: none;
     box-shadow: 0 3px 10px rgba($primary, 0.2);
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); // 使用弹性过渡
     z-index: 5; // 确保按钮在输入框上方
+    overflow: hidden; // 隐藏溢出内容
+
+    // 波纹效果
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(white, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    &:active::before {
+      width: 100px;
+      height: 100px;
+    }
+
+    i {
+      font-size: 0.9rem;
+      position: relative;
+      z-index: 1;
+      color: white;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+    }
 
     &:hover {
-      transform: translateY(-50%) scale(1.1);
+      transform: translateY(-50%) scale(1.08); // 减小缩放比例
       box-shadow: 0 5px 15px rgba($primary, 0.3);
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.95); // 点击时缩小
     }
   }
 }

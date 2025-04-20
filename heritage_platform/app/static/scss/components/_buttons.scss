@@ -315,6 +315,65 @@
   }
 }
 
+// --- 英雄区专用按钮 ---
+// 这些按钮专门用于首页英雄区，提供更加醒目的视觉效果
+
+// 英雄区主按钮
+.btn-hero-primary {
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  border-radius: $border-radius-pill;
+  background: white;
+  color: $primary;
+  border: none;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.5px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.5));
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+
+    &::before {
+      transform: translateX(100%);
+    }
+  }
+}
+
+// 英雄区次要按钮
+.btn-hero-secondary {
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  border-radius: $border-radius-pill;
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.5px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+    transform: translateY(-5px);
+  }
+}
+
 // --- Responsive Adjustments ---
 @include resp.respond-to('md') {
   // 中等屏幕及以下
@@ -338,6 +397,15 @@
     margin-bottom: 1rem; // 增加底部间距
     width: 100%; // 占据全部宽度
     @include mix.touch-action-manipulation; // 优化触摸操作
+  }
+
+  // 英雄区专用按钮响应式调整
+  .btn-hero-primary,
+  .btn-hero-secondary {
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    width: 100%;
+    margin-bottom: 1rem;
   }
 
   // 确保所有按钮在移动端有足够的点击区域

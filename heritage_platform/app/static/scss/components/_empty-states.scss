@@ -1,0 +1,357 @@
+// 空状态组件样式
+// 提供统一的空状态提示样式，用于各种页面的无内容状态展示
+@use '../base/variables' as *;
+@use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+
+// 基础空状态
+// 用于各种页面的无内容状态展示，包含图标、标题、描述和可选的操作按钮
+// 示例用法：
+// <div class="empty-state">
+//   <i class="fas fa-inbox"></i>
+//   <h3>暂无内容</h3>
+//   <p>当前没有任何内容可以显示</p>
+//   <button class="btn btn-primary">添加内容</button>
+// </div>
+.empty-state {
+  text-align: center;
+  padding: 3.5rem;
+  color: $text-muted;
+  background-color: rgba(white, 0.95);
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  transition: all $transition-base;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba($primary, 0.08);
+
+  // 装饰性背景元素
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.4;
+  }
+
+  &::before {
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba($primary, 0.1) 0%, rgba($primary, 0) 70%);
+    top: -100px;
+    right: -50px;
+    animation: float 15s infinite ease-in-out;
+  }
+
+  &::after {
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba($info, 0.08) 0%, rgba($info, 0) 70%);
+    bottom: -120px;
+    left: -70px;
+    animation: float 20s infinite ease-in-out reverse;
+  }
+
+  &:hover {
+    box-shadow: $box-shadow-lg;
+    transform: translateY(-3px);
+  }
+
+  i {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+    position: relative;
+    filter: drop-shadow(0 3px 5px rgba($primary, 0.2));
+    background: linear-gradient(45deg, $primary, lighten($primary, 15%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1rem;
+    color: $text-color;
+    position: relative;
+    display: inline-block;
+
+    // 装饰性下划线
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: $primary-gradient;
+      border-radius: 1.5px;
+      opacity: 0.7;
+    }
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+    font-size: 1.05rem;
+  }
+
+  .btn {
+    margin-top: 0.5rem;
+    @include mix.gradient-button($primary-gradient);
+    transition: all 0.3s ease;
+    padding: 0.6rem 1.5rem;
+    font-weight: $font-weight-medium;
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+
+    // 波纹效果
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(white, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    &:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba($primary, 0.3);
+    }
+
+    &:active {
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// 内联空状态
+// 用于列表或卡片内部的空状态展示，样式更加紧凑
+.empty-state-inline {
+  text-align: center;
+  padding: 2rem;
+  color: $text-muted;
+  position: relative;
+  overflow: hidden;
+  border-radius: $border-radius;
+  transition: all $transition-base;
+
+  // 添加微妙的背景效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, rgba($primary, 0.1), rgba($primary, 0.3), rgba($primary, 0.1));
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  &:hover {
+    background-color: rgba($light, 0.3);
+  }
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, $primary, lighten($primary, 15%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 2px 3px rgba($primary, 0.15));
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 0.75rem;
+    position: relative;
+    display: inline-block;
+
+    // 微妙的下划线
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 2px;
+      background: $primary-gradient;
+      border-radius: 1px;
+      opacity: 0.5;
+    }
+  }
+
+  p {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// 图标变体
+// 为不同类型的空状态提供不同的颜色样式
+.empty-state, .empty-state-inline {
+  &.primary i {
+    background: linear-gradient(45deg, $primary, lighten($primary, 15%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba($primary, 0.2));
+  }
+
+  &.info i {
+    background: linear-gradient(45deg, $info, lighten($info, 15%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba($info, 0.2));
+  }
+
+  &.success i {
+    background: linear-gradient(45deg, $success, lighten($success, 15%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba($success, 0.2));
+  }
+
+  &.warning i {
+    background: linear-gradient(45deg, $warning, lighten($warning, 15%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba($warning, 0.2));
+  }
+
+  &.danger i {
+    background: linear-gradient(45deg, $danger, lighten($danger, 15%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 2px 4px rgba($danger, 0.2));
+  }
+
+  // 动画效果
+  &.animated i {
+    animation: empty-state-pulse 2s infinite;
+  }
+
+  // 添加悬停效果
+  i {
+    transition: all 0.3s ease;
+  }
+
+  &:hover i {
+    transform: scale(1.1);
+    filter: drop-shadow(0 4px 8px rgba($primary, 0.3));
+  }
+}
+
+// 响应式调整
+@include resp.respond-to('md') {
+  .empty-state {
+    padding: 2rem;
+
+    i {
+      font-size: 3rem;
+      margin-bottom: 1.25rem;
+    }
+
+    h3 {
+      font-size: 1.35rem;
+    }
+  }
+
+  .empty-state-inline {
+    padding: 1.5rem;
+
+    i {
+      font-size: 2rem;
+    }
+
+    h4 {
+      font-size: 1.15rem;
+    }
+  }
+}
+
+// 动画关键帧
+@keyframes empty-state-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+    filter: saturate(1);
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+    filter: saturate(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+    filter: saturate(1);
+  }
+}
+
+// 浮动动画
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-10px) translateX(10px);
+  }
+  50% {
+    transform: translateY(0) translateX(20px);
+  }
+  75% {
+    transform: translateY(10px) translateX(10px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}

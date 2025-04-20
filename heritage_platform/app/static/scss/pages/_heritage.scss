@@ -2,73 +2,78 @@
 @use '../base/variables' as *;
 @use '../base/mixins' as mix;
 @use '../base/responsive' as resp;
-
+@use '../components/sections' as sections;
+@use '../components/filters' as filters;
+@use '../components/cards' as cards;
 
 // 非遗项目列表区域
 .heritage-list-section {
   padding: 2rem 0;
 
   .section-title {
-    margin-bottom: 2rem;
+    font-size: 1.75rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1.5rem;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: $primary;
+      border-radius: $border-radius;
+    }
   }
 
-  // 分类筛选器
-  .filter-card {
-    margin-bottom: 1.5rem;
-    border-radius: $border-radius-lg;
-    box-shadow: $box-shadow;
-    transition: $transition-base;
+  // 分类筛选器 - 使用通用筛选器样式
+  .filter-section {
+    margin-bottom: 2rem;
 
-    .card-body {
-      padding: 1.25rem;
+    .card {
+      border-radius: $border-radius-lg;
+      box-shadow: $box-shadow;
+      transition: $transition-base;
+      overflow: hidden;
+
+      .card-body {
+        padding: 1.25rem;
+      }
+
+      .form-label {
+        font-weight: $font-weight-medium;
+        color: $secondary-dark;
+        margin-bottom: 0.75rem;
+      }
     }
+
+    // 筛选器按钮组
+    @include mix.filter-button-group;
 
     .btn {
       margin-right: 0.5rem;
       margin-bottom: 0.5rem;
-      border-radius: $border-radius;
-      transition: $transition-fast;
-
-      &:hover {
-        transform: translateY(-2px);
-      }
     }
   }
 
   // 非遗项目卡片 - 同时支持heritage-card和feature-card类
   .heritage-card,
   .feature-card {
-    height: 100%;
-    border-radius: $border-radius-lg;
-    overflow: hidden;
-    box-shadow: $box-shadow;
-    transition: transform $transition-base, box-shadow $transition-base;
-    margin-bottom: 1.5rem;
-    will-change: transform, box-shadow; // 优化动画性能
+    // 使用卡片基础混合器
+    @include cards.content-card-base;
+    // 使用卡片悬停效果混合器
+    @include mix.card-hover-effect(-8px);
 
-    &:hover {
-      transform: translateY(-8px);
-      box-shadow: $box-shadow-lg;
-    }
+    // 图片悬停效果
+    @include mix.image-scale-hover(1.05, 0.6s);
 
     .card-img-top {
-      height: 200px;
-      object-fit: cover;
-      transition: transform 0.6s ease;
-      will-change: transform; // 优化动画性能
-    }
-
-    &:hover .card-img-top {
-      transform: scale(1.05);
-    }
-
-    .card-body {
-      padding: 1.25rem;
+      height: 200px; // 覆盖默认高度
     }
 
     .card-title {
-      font-weight: $font-weight-bold;
-      margin-bottom: 0.75rem;
       color: $dark;
     }
 
@@ -303,38 +308,12 @@
   }
 }
 
-// 项目列表分页
-.heritage-pagination {
-  margin-top: 2.5rem;
+// 项目列表分页 - 使用通用分页样式
+// 直接使用 _pagination.scss 中的 .pagination-section 类
 
-  .pagination {
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.25rem;
+// 响应式调整 - 使用统一的响应式断点处理
 
-    .page-item {
-      .page-link {
-        border-radius: $border-radius;
-        transition: $transition-fast;
-        font-weight: $font-weight-medium;
-        padding: 0.5rem 0.75rem;
-
-        &:hover {
-          background-color: rgba($primary, 0.1);
-          transform: translateY(-2px);
-        }
-      }
-
-      &.active .page-link {
-        background: $primary-gradient;
-        border-color: $primary;
-        box-shadow: $box-shadow-sm;
-      }
-    }
-  }
-}
-
-// 响应式调整
+// 大屏幕设备调整
 @include resp.respond-to('lg') {
   .heritage-detail-section {
     .heritage-title {
@@ -347,38 +326,8 @@
   }
 }
 
+// 平板设备调整
 @include resp.respond-to('md') {
-  .heritage-list-section {
-    .heritage-card,
-    .feature-card {
-      .card-img-top {
-        height: 180px;
-      }
-
-      .card-title {
-        font-size: 1.1rem;
-      }
-
-      .card-text {
-        font-size: 0.9rem;
-      }
-
-      .card-footer {
-        padding: 0.5rem 1rem 1rem;
-      }
-
-      .btn {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.9rem;
-      }
-    }
-
-    .filter-card .btn {
-      padding: 0.4rem 0.75rem;
-      font-size: 0.9rem;
-    }
-  }
-
   .heritage-detail-section {
     .heritage-title {
       font-size: 1.75rem;
@@ -415,20 +364,17 @@
       }
     }
   }
-
-  .heritage-pagination .pagination .page-link {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.9rem;
-  }
 }
 
+// 手机设备调整
 @include resp.respond-to('sm') {
-  .heritage-list-section {
-    .heritage-card,
-    .feature-card {
-      .card-img-top {
-        height: 160px;
-      }
+  .heritage-detail-section {
+    .heritage-title {
+      font-size: 1.5rem;
+    }
+
+    .heritage-cover img {
+      height: 200px;
     }
   }
 }

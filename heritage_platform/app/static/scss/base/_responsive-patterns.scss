@@ -1,0 +1,396 @@
+// 响应式模式
+// 提供统一的响应式模式，用于各种组件和页面
+@use 'variables' as *;
+@use 'responsive' as resp;
+@use 'sass:map';
+
+// 通用响应式模式 - 卡片
+@mixin responsive-card-pattern {
+  // 大屏幕设备调整
+  @include resp.respond-to('lg') {
+    .card-body,
+    .card-header,
+    .card-footer {
+      padding: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+    }
+  }
+
+  // 平板设备调整
+  @include resp.respond-to('md') {
+    .card-body,
+    .card-header,
+    .card-footer {
+      padding: 1rem;
+    }
+
+    .card-img-top {
+      height: 180px;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    .card-text {
+      font-size: 0.9rem;
+    }
+  }
+
+  // 手机设备调整
+  @include resp.respond-to('sm') {
+    .card-body,
+    .card-header,
+    .card-footer {
+      padding: 0.75rem;
+    }
+
+    .card-img-top {
+      height: 160px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+    }
+  }
+}
+
+// 通用响应式模式 - 筛选器
+@mixin responsive-filter-pattern {
+  // 平板设备调整
+  @include resp.respond-to('md') {
+    .filter-section {
+      .card .form-label {
+        margin-bottom: 0.5rem;
+      }
+
+      .filter-group {
+        gap: 0.3rem;
+
+        .btn {
+          padding: 0.4rem 0.75rem;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
+  // 手机设备调整
+  @include resp.respond-to('sm') {
+    .filter-section {
+      .card .card-body {
+        padding: 1rem;
+      }
+
+      .filter-group {
+        .btn {
+          padding: 0.3rem 0.6rem;
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+}
+
+// 通用响应式模式 - 分页
+@mixin responsive-pagination-pattern {
+  // 平板设备调整
+  @include resp.respond-to('md') {
+    .pagination-section {
+      margin-top: 2rem;
+
+      &::before {
+        top: -1rem;
+        width: 50px;
+        height: 3px;
+      }
+
+      .pagination {
+        .page-link {
+          padding: 0.4rem 0.6rem;
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    // 圆形分页响应式
+    .pagination-rounded {
+      .page-item .page-link {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  // 手机设备调整
+  @include resp.respond-to('sm') {
+    .pagination-section {
+      margin-top: 1.5rem;
+
+      &::before {
+        top: -0.8rem;
+        width: 40px;
+        height: 3px;
+      }
+
+      .pagination {
+        gap: 0.15rem;
+
+        .page-link {
+          padding: 0.3rem 0.5rem;
+          font-size: 0.85rem;
+          margin: 0 1px;
+        }
+
+        // 在手机上简化波纹效果
+        .page-item .page-link::before {
+          display: none;
+        }
+      }
+    }
+
+    // 圆形分页响应式
+    .pagination-rounded {
+      .page-item .page-link {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+        margin: 0 2px;
+      }
+    }
+
+    // 简约分页响应式
+    .pagination-minimal {
+      .page-item .page-link {
+        padding: 0.3rem 0.4rem;
+      }
+    }
+
+    // 阴影分页响应式
+    .pagination-shadow {
+      .page-item .page-link {
+        margin: 0 2px;
+      }
+    }
+  }
+}
+
+// 通用响应式模式 - 内容块
+@mixin responsive-content-block-pattern {
+  // 大屏幕设备调整
+  @include resp.respond-to('lg') {
+    .content-block {
+      padding: 1.25rem;
+
+      .block-title {
+        font-size: 1.25rem;
+      }
+    }
+  }
+
+  // 平板设备调整
+  @include resp.respond-to('md') {
+    .content-block {
+      padding: 1rem;
+
+      .block-title {
+        font-size: 1.15rem;
+      }
+    }
+  }
+
+  // 手机设备调整
+  @include resp.respond-to('sm') {
+    .content-block {
+      padding: 0.75rem;
+
+      .block-title {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+// 通用响应式模式 - 标题
+@mixin responsive-heading-pattern {
+  // 大屏幕设备调整
+  @include resp.respond-to('lg') {
+    h1, .h1 {
+      font-size: 2.25rem;
+    }
+
+    h2, .h2 {
+      font-size: 1.75rem;
+    }
+
+    h3, .h3 {
+      font-size: 1.5rem;
+    }
+  }
+
+  // 平板设备调整
+  @include resp.respond-to('md') {
+    h1, .h1 {
+      font-size: 2rem;
+    }
+
+    h2, .h2 {
+      font-size: 1.5rem;
+    }
+
+    h3, .h3 {
+      font-size: 1.25rem;
+    }
+  }
+
+  // 手机设备调整
+  @include resp.respond-to('sm') {
+    h1, .h1 {
+      font-size: 1.75rem;
+    }
+
+    h2, .h2 {
+      font-size: 1.35rem;
+    }
+
+    h3, .h3 {
+      font-size: 1.15rem;
+    }
+  }
+}
+
+// 通用响应式模式 - 按钮
+@mixin responsive-button-pattern {
+  // 平板设备调整
+  @include resp.respond-to('md') {
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.95rem;
+      min-height: 44px; // 确保移动端有足够的点击区域
+    }
+  }
+
+  // 手机设备调整
+  @include resp.respond-to('sm') {
+    .btn {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// 通用响应式模式 - 表单
+@mixin responsive-form-pattern {
+  // 平板设备调整
+  @include resp.respond-to('md') {
+    .form-control,
+    .form-select {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .form-label {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+  }
+
+  // 手机设备调整
+  @include resp.respond-to('sm') {
+    .form-control,
+    .form-select {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+    }
+
+    .form-label {
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+    }
+  }
+}
+
+// 通用响应式模式 - 网格
+@mixin responsive-grid-pattern($min-width-lg: 280px, $min-width-md: 220px, $min-width-sm: 180px, $gap-lg: 1.5rem, $gap-md: 1rem, $gap-sm: 0.75rem) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width-lg, 1fr));
+  gap: $gap-lg;
+
+  // 平板设备调整
+  @include resp.respond-to('md') {
+    grid-template-columns: repeat(auto-fit, minmax($min-width-md, 1fr));
+    gap: $gap-md;
+  }
+
+  // 手机设备调整
+  @include resp.respond-to('sm') {
+    grid-template-columns: repeat(auto-fit, minmax($min-width-sm, 1fr));
+    gap: $gap-sm;
+  }
+}
+
+// 通用响应式模式 - 间距
+@mixin responsive-spacing-pattern {
+  // 平板设备调整
+  @include resp.respond-to('md') {
+    .section-padding {
+      padding: 2rem 0;
+    }
+
+    .section-margin {
+      margin: 2rem 0;
+    }
+
+    .section-title {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  // 手机设备调整
+  @include resp.respond-to('sm') {
+    .section-padding {
+      padding: 1.5rem 0;
+    }
+
+    .section-margin {
+      margin: 1.5rem 0;
+    }
+
+    .section-title {
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+// 通用响应式模式 - 容器
+@mixin responsive-container-pattern {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+
+  @include resp.respond-to('min-sm') {
+    max-width: 540px;
+  }
+
+  @include resp.respond-to('min-md') {
+    max-width: 720px;
+  }
+
+  @include resp.respond-to('min-lg') {
+    max-width: 960px;
+  }
+
+  @include resp.respond-to('min-xl') {
+    max-width: 1140px;
+  }
+
+  @include resp.respond-to('min-xxl') {
+    max-width: 1320px;
+  }
+}

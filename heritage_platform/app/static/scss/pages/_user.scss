@@ -2,20 +2,23 @@
 @use '../base/variables' as *;
 @use '../base/mixins' as mix;
 @use '../base/responsive' as resp;
-
+@use '../base/responsive-patterns' as pattern;
+@use '../components/sections' as sections;
+@use '../components/cards' as cards;
+@use 'sass:color';
 
 // 用户个人资料页
 .profile-section {
   padding: 2rem 0;
 
+  // 个人资料头部卡片
   .profile-header {
-    background-color: white;
-    border-radius: $border-radius-lg;
-    box-shadow: $box-shadow;
+    @include mix.content-block; // 使用通用内容块混合器
     padding: 2rem;
     margin-bottom: 2rem;
     position: relative;
 
+    // 封面背景
     .profile-cover {
       position: absolute;
       top: 0;
@@ -23,7 +26,7 @@
       right: 0;
       height: 150px;
       background-color: $primary;
-      background-image: linear-gradient(135deg, $primary, darken($primary, 20%));
+      background-image: linear-gradient(135deg, $primary, color.adjust($primary, $lightness: -20%));
       border-top-left-radius: $border-radius-lg;
       border-top-right-radius: $border-radius-lg;
       overflow: hidden;
@@ -36,12 +39,14 @@
       }
     }
 
+    // 用户信息区
     .profile-info {
       position: relative;
       z-index: 1;
       margin-top: 80px;
       display: flex;
 
+      // 用户头像
       .profile-avatar {
         width: 120px;
         height: 120px;
@@ -51,6 +56,7 @@
         margin-right: 2rem;
       }
 
+      // 用户详细信息
       .profile-details {
         flex: 1;
 
@@ -71,6 +77,7 @@
           line-height: 1.6;
         }
 
+        // 元数据信息
         .profile-meta {
           display: flex;
           flex-wrap: wrap;
@@ -93,6 +100,7 @@
       }
     }
 
+    // 操作按钮区
     .profile-actions {
       position: absolute;
       top: 170px;
@@ -102,6 +110,7 @@
     }
   }
 
+  // 统计数据卡片
   .profile-stats {
     display: flex;
     gap: 1.5rem;
@@ -109,17 +118,10 @@
 
     .stat-card {
       flex: 1;
-      background-color: white;
-      border-radius: $border-radius-lg;
-      box-shadow: $box-shadow;
+      @include cards.card-base; // 使用卡片基础样式混合器
       padding: 1.5rem;
       text-align: center;
-      transition: $transition-base;
-
-      &:hover {
-        transform: translateY(-5px);
-        box-shadow: $box-shadow-lg;
-      }
+      @include mix.card-hover-effect(-5px, $box-shadow-lg); // 使用卡片悬停效果混合器
 
       i {
         font-size: 2rem;
@@ -139,11 +141,11 @@
     }
   }
 
+  // 标签页卡片
   .profile-tabs {
-    background-color: white;
-    border-radius: $border-radius-lg;
-    box-shadow: $box-shadow;
+    @include mix.content-block; // 使用通用内容块混合器
     margin-bottom: 2rem;
+    &:hover { box-shadow: $box-shadow; } // 覆盖悬停效果
 
     .nav-tabs {
       border-bottom: none;
@@ -173,13 +175,13 @@
     }
   }
 
+  // 内容区域
   .profile-content {
     .content-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
+      @include pattern.responsive-grid-pattern(300px, 250px, 200px); // 使用响应式网格模式
     }
 
+    // 空状态提示
     .empty-state {
       text-align: center;
       padding: 3rem;
@@ -208,6 +210,7 @@
 .settings-section {
   padding: 2rem 0;
 
+  // 设置页头部
   .settings-header {
     margin-bottom: 2rem;
 
@@ -217,18 +220,19 @@
     }
   }
 
+  // 设置页标签页
   .settings-tabs {
     display: flex;
     gap: 2rem;
 
+    // 侧边栏
     .settings-sidebar {
       width: 250px;
 
       .nav-pills {
-        background-color: white;
-        border-radius: $border-radius-lg;
-        box-shadow: $box-shadow;
+        @include mix.content-block; // 使用通用内容块混合器
         padding: 1.5rem;
+        &:hover { box-shadow: $box-shadow; } // 覆盖悬停效果
 
         .nav-link {
           padding: 0.75rem 1rem;
@@ -258,11 +262,10 @@
       }
     }
 
+    // 设置内容区
     .settings-content {
       flex: 1;
-      background-color: white;
-      border-radius: $border-radius-lg;
-      box-shadow: $box-shadow;
+      @include mix.content-block; // 使用通用内容块混合器
       padding: 2rem;
 
       .settings-title {
@@ -285,6 +288,7 @@
       .form-control {
         border-radius: $border-radius;
         padding: 0.75rem;
+        @include mix.form-control-focus; // 使用表单控件焦点混合器
       }
 
       .form-text {
@@ -293,6 +297,7 @@
         margin-top: 0.5rem;
       }
 
+      // 头像上传区域
       .avatar-upload {
         display: flex;
         align-items: center;
@@ -415,12 +420,6 @@
         .nav-link {
           padding: 0.75rem 1rem;
         }
-      }
-    }
-
-    .profile-content {
-      .content-grid {
-        grid-template-columns: 1fr;
       }
     }
   }

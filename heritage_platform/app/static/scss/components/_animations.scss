@@ -1,0 +1,87 @@
+// 动画组件
+@use '../base/variables' as *;
+
+// 淡入动画 - 更加克制的版本
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// 从左侧滑入 - 更加克制的版本
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// 从右侧滑入 - 更加克制的版本
+@keyframes slideInRight {
+  from {
+    transform: translateX(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// 从底部滑入 - 更加克制的版本
+@keyframes slideInUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// 从顶部滑入 - 更加克制的版本
+@keyframes slideInDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// 应用动画的类
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s ease-out forwards;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out forwards;
+}
+
+.slide-in-up {
+  animation: slideInUp 0.5s ease-out forwards;
+}
+
+.slide-in-down {
+  animation: slideInDown 0.5s ease-out forwards;
+}
+
+// 禁用动画的类（用于性能优化或可访问性）
+.no-animation * {
+  animation: none !important;
+  transition: none !important;
+}

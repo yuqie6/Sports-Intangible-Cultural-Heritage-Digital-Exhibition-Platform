@@ -2,44 +2,42 @@
 @use '../base/variables' as *;
 @use '../base/mixins' as mix;
 @use '../base/responsive' as resp;
-
+@use '../components/sections' as sections;
+@use '../components/filters' as filters;
+@use '../components/cards' as cards;
 
 // 内容列表区域
 .content-list-section {
   padding: 2rem 0;
 
   .section-title {
-    margin-bottom: 2rem;
+    font-size: 1.75rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1.5rem;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: $primary;
+      border-radius: $border-radius;
+    }
   }
 
-  // 内容头部
+  // 内容头部 - 使用渐变文本混合器
   .content-header {
     margin-bottom: 2.5rem;
 
     .gradient-text {
-      background: $primary-gradient;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent; // 标准属性，替代text-fill-color
-      font-weight: $font-weight-bold;
-      display: inline-block;
-      position: relative;
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -8px;
-        left: 0;
-        width: 60px;
-        height: 4px;
-        background: $primary-gradient;
-        border-radius: $border-radius;
-      }
+      @include mix.gradient-text-enhanced($primary-gradient, true);
     }
   }
 
-  // 筛选器样式
+  // 筛选器样式 - 使用筛选器按钮组混合器
   .filter-section {
     margin-bottom: 2rem;
 
@@ -58,57 +56,30 @@
         color: $secondary-dark;
         margin-bottom: 0.75rem;
       }
-
-      .filter-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-
-        .btn {
-          border-radius: $border-radius;
-          transition: $transition-fast;
-
-          &:hover {
-            transform: translateY(-2px);
-          }
-        }
-      }
     }
+
+    // 使用筛选器按钮组混合器
+    @include mix.filter-button-group;
   }
 
-  // 内容卡片样式
+  // 内容卡片样式 - 使用卡片基础混合器和悬停效果
   .content-card {
-    height: 100%;
-    border-radius: $border-radius-lg;
-    overflow: hidden;
-    box-shadow: $box-shadow;
-    transition: transform $transition-base, box-shadow $transition-base;
-    margin-bottom: 1.5rem;
-    will-change: transform, box-shadow; // 优化动画性能
-
+    // 使用卡片基础混合器
+    @include cards.content-card-base;
+    // 使用更加克制的悬停效果
     &:hover {
-      transform: translateY(-8px);
       box-shadow: $box-shadow-lg;
+
+      img {
+        transform: scale(1.02);
+      }
     }
 
     .card-img-top {
-      height: 200px;
-      object-fit: cover;
-      transition: transform 0.6s ease;
-      will-change: transform; // 优化动画性能
-    }
-
-    &:hover .card-img-top {
-      transform: scale(1.05);
-    }
-
-    .card-body {
-      padding: 1.25rem;
+      height: 200px; // 覆盖默认高度
     }
 
     .card-title {
-      font-weight: $font-weight-bold;
-      margin-bottom: 0.75rem;
       color: $dark;
       @include mix.text-truncate-lines(2); // 最多显示两行标题
     }
@@ -126,39 +97,10 @@
       justify-content: space-between;
       align-items: center;
     }
-
   }
 
-  // 分页样式
-  .pagination-section {
-    margin-top: 3rem;
-
-    .pagination {
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.25rem;
-
-      .page-item {
-        .page-link {
-          border-radius: $border-radius;
-          transition: $transition-fast;
-          font-weight: $font-weight-medium;
-          padding: 0.5rem 0.75rem;
-
-          &:hover {
-            background-color: rgba($primary, 0.1);
-            transform: translateY(-2px);
-          }
-        }
-
-        &.active .page-link {
-          background: $primary-gradient;
-          border-color: $primary;
-          box-shadow: $box-shadow-sm;
-        }
-      }
-    }
-  }
+  // 分页样式 - 使用通用分页样式
+  // 直接使用 _pagination.scss 中的 .pagination-section 类
 }
 
 // 内容详情页
@@ -169,6 +111,11 @@
     font-size: 2.5rem;
     font-weight: $font-weight-bold;
     margin-bottom: 1.5rem;
+
+    // 使用渐变文本混合器可选用于标题
+    &.gradient-title {
+      @include mix.gradient-text-enhanced($primary-gradient, false);
+    }
   }
 
   .content-meta {
@@ -196,15 +143,15 @@
     box-shadow: $box-shadow-lg;
     margin-bottom: 2rem;
 
+    // 使用更加克制的图片悬停效果
+    &:hover img {
+      transform: scale(1.02);
+    }
+
     img {
       width: 100%;
       height: 400px;
       object-fit: cover;
-      transition: transform 0.8s ease;
-    }
-
-    &:hover img {
-      transform: scale(1.05);
     }
   }
 
@@ -303,12 +250,7 @@
       padding: 0.25rem 0.75rem;
       border-radius: $border-radius-pill;
       font-size: 0.85rem;
-      transition: $transition-base;
-
-      &:hover {
-        background-color: $primary;
-        color: white;
-      }
+      // 移除标签悬停效果
     }
   }
 

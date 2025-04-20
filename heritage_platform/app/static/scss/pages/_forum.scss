@@ -2,14 +2,30 @@
 @use '../base/variables' as *;
 @use '../base/mixins' as mix;
 @use '../base/responsive' as resp;
-
+@use '../components/sections' as sections;
+@use '../components/filters' as filters;
+@use '../components/cards' as cards;
 
 // 论坛首页
 .forum-section {
   padding: 2rem 0;
 
   .section-title {
-    margin-bottom: 2rem;
+    font-size: 1.75rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1.5rem;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: $primary;
+      border-radius: $border-radius;
+    }
   }
 
   .forum-header {
@@ -29,34 +45,16 @@
     }
   }
 
-  // 论坛头部
+  // 论坛头部 - 使用渐变文本混合器
   .content-header {
     margin-bottom: 2.5rem;
 
     .gradient-text {
-      background: $primary-gradient;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent; // 标准属性，替代text-fill-color
-      font-weight: $font-weight-bold;
-      display: inline-block;
-      position: relative;
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -8px;
-        left: 0;
-        width: 60px;
-        height: 4px;
-        background: $primary-gradient;
-        border-radius: $border-radius;
-      }
+      @include mix.gradient-text-enhanced($primary-gradient, true);
     }
   }
 
-  // 论坛筛选器
+  // 论坛筛选器 - 使用筛选器按钮组混合器
   .filter-section {
     margin-bottom: 2rem;
 
@@ -75,30 +73,15 @@
         color: $secondary-dark;
         margin-bottom: 0.75rem;
       }
-
-      .filter-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-
-        .btn {
-          border-radius: $border-radius;
-          transition: $transition-fast;
-
-          &:hover {
-            transform: translateY(-2px);
-          }
-        }
-      }
     }
+
+    // 使用筛选器按钮组混合器
+    @include mix.filter-button-group;
   }
 
-  // 主题列表
+  // 主题列表 - 使用内容块混合器
   .card {
-    border-radius: $border-radius-lg;
-    box-shadow: $box-shadow;
-    overflow: hidden;
-    margin-bottom: 2rem;
+    @include mix.content-block;
 
     .card-header {
       background-color: rgba($primary, 0.05);
@@ -131,36 +114,8 @@
     }
   }
 
-  // 分页样式
-  .pagination-section {
-    margin-top: 3rem;
-
-    .pagination {
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.25rem;
-
-      .page-item {
-        .page-link {
-          border-radius: $border-radius;
-          transition: $transition-fast;
-          font-weight: $font-weight-medium;
-          padding: 0.5rem 0.75rem;
-
-          &:hover {
-            background-color: rgba($primary, 0.1);
-            transform: translateY(-2px);
-          }
-        }
-
-        &.active .page-link {
-          background: $primary-gradient;
-          border-color: $primary;
-          box-shadow: $box-shadow-sm;
-        }
-      }
-    }
-  }
+  // 分页样式 - 使用通用分页样式
+  // 直接使用 _pagination.scss 中的 .pagination-section 类
 }
 
 // 论坛分类列表
@@ -168,17 +123,8 @@
   margin-bottom: 2rem;
 
   .category-card {
-    background-color: white;
-    border-radius: $border-radius-lg;
-    box-shadow: $box-shadow;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    transition: $transition-base;
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: $box-shadow-lg;
-    }
+    @include mix.content-block;
+    @include mix.card-hover-effect(-5px);
 
     .category-header {
       display: flex;
@@ -233,17 +179,8 @@
   margin-bottom: 2rem;
 
   .topic-card {
-    background-color: white;
-    border-radius: $border-radius-lg;
-    box-shadow: $box-shadow;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    transition: $transition-base;
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: $box-shadow-lg;
-    }
+    @include mix.content-block;
+    @include mix.card-hover-effect(-5px);
 
     .topic-header {
       display: flex;
@@ -450,16 +387,7 @@
   padding: 2rem 0;
 
   .topic-header {
-    background-color: white;
-    border-radius: $border-radius-lg;
-    box-shadow: $box-shadow;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    transition: $transition-base;
-
-    &:hover {
-      box-shadow: $box-shadow-lg;
-    }
+    @include mix.content-block;
 
     .topic-title {
       font-size: 1.5rem;

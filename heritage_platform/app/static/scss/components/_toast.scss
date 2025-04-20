@@ -11,30 +11,41 @@
   right: 20px !important;
   z-index: $z-index-toast !important; // 确保弹出通知层级高于其他元素
   max-width: 350px;
+  pointer-events: none; // 防止阻止点击其下方元素
 }
 
 // Toast通知
 .toast {
-  background: white !important;
-  box-shadow: $box-shadow-lg !important;
-  border: none !important;
+  background: rgba(white, 0.95) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba($primary, 0.08) !important;
   border-radius: $border-radius-lg !important;
   opacity: 1 !important;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  backdrop-filter: blur(10px) !important;
+  pointer-events: auto; // 允许交互
+  transform: translateZ(0); // 确保硬件加速
 }
 
 // Toast头部
 .toast-header {
   border-bottom: none !important;
-  padding: 0.75rem 1rem !important;
+  padding: 0.85rem 1.2rem !important;
+  position: relative;
+  overflow: hidden;
 
   .me-auto {
-    font-weight: $font-weight-medium;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.01em;
+    position: relative;
+    z-index: 1;
   }
 
   small {
     color: $text-muted;
+    opacity: 0.8;
+    font-size: 0.8rem;
   }
 
   .btn-close {
@@ -42,39 +53,65 @@
     padding: 0.25rem;
     margin-right: -0.375rem;
     margin-left: 0.75rem;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  // 添加微妙的背景效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(to right, rgba($primary, 0.03), rgba($primary, 0));
+    z-index: 0;
   }
 }
 
 // Toast内容
 .toast-body {
-  padding: 0.75rem 1rem 1rem !important;
+  padding: 0.85rem 1.2rem 1.2rem !important;
   word-break: break-word;
+  line-height: 1.5;
+  font-size: 0.95rem;
+  position: relative;
 }
 
-// Toast颜色变体
+// Toast颜色变体 - 使用渐变背景增强视觉效果
 .toast-header.bg-primary {
-  background-color: $primary !important;
+  background: linear-gradient(45deg, $primary, lighten($primary, 10%)) !important;
   color: white;
+  box-shadow: 0 2px 5px rgba($primary, 0.2);
 }
 
 .toast-header.bg-success {
-  background-color: $success !important;
+  background: linear-gradient(45deg, $success, lighten($success, 10%)) !important;
   color: white;
+  box-shadow: 0 2px 5px rgba($success, 0.2);
 }
 
 .toast-header.bg-danger {
-  background-color: $danger !important;
+  background: linear-gradient(45deg, $danger, lighten($danger, 10%)) !important;
   color: white;
+  box-shadow: 0 2px 5px rgba($danger, 0.2);
 }
 
 .toast-header.bg-warning {
-  background-color: $warning !important;
+  background: linear-gradient(45deg, $warning, lighten($warning, 10%)) !important;
   color: $dark;
+  box-shadow: 0 2px 5px rgba($warning, 0.2);
 }
 
 .toast-header.bg-info {
-  background-color: $info !important;
+  background: linear-gradient(45deg, $info, lighten($info, 10%)) !important;
   color: $dark;
+  box-shadow: 0 2px 5px rgba($info, 0.2);
 }
 
 // Toast关闭按钮
@@ -82,29 +119,53 @@
   filter: invert(1) grayscale(100%) brightness(200%);
 }
 
-// Toast动画
+// Toast动画 - 增强动画效果
 .toast.showing {
   opacity: 0 !important;
 }
 
 .toast.show {
   opacity: 1 !important;
-  animation: toastFadeIn 0.3s ease-out;
+  animation: toastFadeIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: translateZ(0); // 确保硬件加速
 }
 
 .toast.hide {
   opacity: 0 !important;
-  transition: opacity 0.15s linear;
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: translateY(10px);
 }
 
 @keyframes toastFadeIn {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px) scale(0.9);
   }
-  to {
+  70% {
     opacity: 1;
+    transform: translateY(-5px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// 添加浮动效果
+.toast-container .toast:nth-child(odd) {
+  animation: toastFloat 5s ease-in-out infinite;
+}
+
+.toast-container .toast:nth-child(even) {
+  animation: toastFloat 6s ease-in-out infinite reverse;
+}
+
+@keyframes toastFloat {
+  0%, 100% {
     transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
   }
 }
 

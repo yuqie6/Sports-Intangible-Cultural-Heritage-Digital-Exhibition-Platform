@@ -5,6 +5,7 @@
 @use 'base/variables' as *;
 @use 'base/mixins' as mix;
 @use 'base/responsive' as resp;
+@use 'base/responsive-patterns' as pattern;
 @use 'base/reset';
 @use 'base/typography';
 
@@ -23,6 +24,8 @@
 @use 'components/avatars';
 @use 'components/filters';
 @use 'components/sections';
+@use 'components/empty-states';
+@use 'components/animations';
 
 // 布局样式
 @use 'layout/header';
@@ -39,3 +42,5 @@
 @use 'pages/message';
 @use 'pages/notification';
 @use 'pages/auth';
+@use 'pages/error';
+

@@ -1,13 +1,22 @@
 // 页面区域通用样式
-// 提供统一的页面区域样式，用于各种页面的标题、头部等
+// 提供统一的页面区域样式，用于各种页面的标题、头部、详情页等
+// 这个文件整合了多个页面中重复的样式，提高了代码的可维护性和一致性
 @use '../base/variables' as *;
 @use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+@use '../base/responsive-patterns' as pattern;
 
 // 页面内容头部
+// 用于各种页面的头部区域，包含渐变文本标题和副标题
+// 示例用法：
+// <div class="content-header">
+//   <h1 class="gradient-text">非遗文化遗产</h1>
+//   <p class="subtitle">传承中华文化，弘扬民族精神</p>
+// </div>
 .content-header {
   margin-bottom: 2.5rem;
-  
-  // 渐变文本标题
+
+  // 渐变文本标题 - 使用渐变色背景和下划线装饰
   .gradient-text {
     background: $primary-gradient;
     -webkit-background-clip: text;
@@ -17,7 +26,8 @@
     font-weight: $font-weight-bold;
     display: inline-block;
     position: relative;
-    
+
+    // 装饰性下划线，增强视觉效果
     &::after {
       content: '';
       position: absolute;
@@ -29,8 +39,8 @@
       border-radius: $border-radius;
     }
   }
-  
-  // 副标题
+
+  // 副标题 - 提供额外的上下文信息
   .subtitle {
     color: $text-muted;
     margin-top: 0.75rem;
@@ -39,15 +49,23 @@
 }
 
 // 页面区域
+// 用于各种页面的内容区域，包含标准的内边距和标题样式
+// 示例用法：
+// <section class="page-section">
+//   <h2 class="section-title">热门非遗项目</h2>
+//   <!-- 内容 -->
+// </section>
 .page-section {
   padding: 2rem 0;
-  
+
+  // 区域标题 - 带下划线装饰的标题样式
   .section-title {
     font-size: 1.75rem;
     font-weight: $font-weight-bold;
     margin-bottom: 1.5rem;
     position: relative;
-    
+
+    // 装饰性下划线，增强视觉层次
     &::after {
       content: '';
       position: absolute;
@@ -62,6 +80,13 @@
 }
 
 // 内容区块
+// 用于各种页面的内容卡片、评论区域、侧边栏模块等
+// 包含白色背景、圆角、阴影和悬停效果
+// 示例用法：
+// <div class="content-block">
+//   <h3 class="block-title">模块标题</h3>
+//   <!-- 模块内容 -->
+// </div>
 .content-block {
   background-color: white;
   border-radius: $border-radius-lg;
@@ -69,11 +94,13 @@
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   transition: $transition-base;
-  
+
+  // 悬停时增强阴影效果，提高交互反馈
   &:hover {
     box-shadow: $box-shadow-lg;
   }
-  
+
+  // 区块标题 - 用于内容区块内的标题
   .block-title {
     font-size: 1.25rem;
     font-weight: $font-weight-bold;
@@ -81,60 +108,235 @@
   }
 }
 
-// 响应式调整
-@media (max-width: map-get($breakpoints, 'lg')) {
+// 详情页通用样式 - 用于非遗项目、内容、论坛等详情页
+// 提供统一的详情页布局和样式，包含标题、元数据、封面、内容和相关内容区域
+// 示例用法：
+// <div class="detail-section">
+//   <h1 class="detail-title">详情页标题</h1>
+//   <div class="detail-meta"><!-- 元数据 --></div>
+//   <div class="detail-cover"><!-- 封面图 --></div>
+//   <div class="detail-content"><!-- 内容 --></div>
+// </div>
+.detail-section {
+  padding: 2rem 0;
+
+  // 详情页标题 - 大号粗体标题，支持渐变样式
+  .detail-title {
+    font-size: 2.5rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1.5rem;
+
+    // 渐变标题变体 - 使用渐变文本混合器
+    &.gradient-title {
+      @include mix.gradient-text-enhanced($primary-gradient, false);
+    }
+  }
+
+  // 详情页元数据
+  .detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      color: $text-muted;
+
+      i {
+        margin-right: 0.5rem;
+        color: $primary;
+      }
+    }
+  }
+
+  // 详情页封面
+  .detail-cover {
+    position: relative;
+    overflow: hidden;
+    border-radius: $border-radius-xl;
+    box-shadow: $box-shadow-lg;
+    margin-bottom: 2rem;
+
+    // 使用图片悬停效果混合器
+    @include mix.image-scale-hover(1.05, 0.8s);
+
+    img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+    }
+  }
+
+  // 详情页内容
+  .detail-content {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.75rem;
+      font-weight: $font-weight-bold;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: $font-weight-bold;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      line-height: 1.8;
+    }
+
+    ul, ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+
+      li {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: $border-radius;
+      margin: 1.5rem 0;
+    }
+
+    blockquote {
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-left: 4px solid $primary;
+      background-color: rgba($primary, 0.05);
+      font-style: italic;
+    }
+  }
+
+  // 相关内容区域
+  .related-content {
+    margin-top: 3rem;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: $font-weight-bold;
+      margin-bottom: 1.5rem;
+    }
+  }
+}
+
+// 列表页通用样式 - 用于非遗项目、内容、论坛等列表页
+.list-section {
+  padding: 2rem 0;
+
+  // 列表页标题
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: $font-weight-bold;
+    margin-bottom: 1.5rem;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: $primary;
+      border-radius: $border-radius;
+    }
+  }
+}
+
+// 响应式调整 - 使用通用响应式模式
+@include pattern.responsive-heading-pattern;
+@include pattern.responsive-content-block-pattern;
+
+// 内容头部的响应式调整
+@include resp.respond-to('lg') {
   .content-header {
     .gradient-text {
       font-size: 1.75rem;
-      
+
       &::after {
         width: 50px;
       }
     }
   }
-  
-  .page-section {
-    .section-title {
-      font-size: 1.5rem;
+
+  .detail-section {
+    .detail-title {
+      font-size: 2rem;
     }
-  }
-  
-  .content-block {
-    padding: 1.25rem;
-    
-    .block-title {
-      font-size: 1.15rem;
+
+    .detail-cover img {
+      height: 300px;
+    }
+
+    .detail-content {
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+      }
     }
   }
 }
 
-@media (max-width: map-get($breakpoints, 'md')) {
+@include resp.respond-to('md') {
   .content-header {
     margin-bottom: 2rem;
-    
+
     .gradient-text {
       font-size: 1.5rem;
-      
+
       &::after {
         width: 40px;
         height: 3px;
       }
     }
-    
+
     .subtitle {
       font-size: 1rem;
     }
   }
-  
-  .content-block {
-    padding: 1rem;
+
+  .detail-section {
+    .detail-title {
+      font-size: 1.75rem;
+    }
+
+    .detail-meta {
+      gap: 1rem;
+    }
+
+    .detail-cover img {
+      height: 250px;
+    }
   }
 }
 
-@media (max-width: map-get($breakpoints, 'sm')) {
+@include resp.respond-to('sm') {
   .content-header {
     .gradient-text {
       font-size: 1.35rem;
+    }
+  }
+
+  .detail-section {
+    .detail-title {
+      font-size: 1.5rem;
+    }
+
+    .detail-cover img {
+      height: 200px;
     }
   }
 }

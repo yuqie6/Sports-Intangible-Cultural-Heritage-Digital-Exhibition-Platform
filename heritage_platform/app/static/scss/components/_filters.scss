@@ -2,6 +2,8 @@
 // 提供统一的筛选器样式，用于各种页面的筛选功能
 @use '../base/variables' as *;
 @use '../base/mixins' as mix;
+@use '../base/responsive' as resp;
+@use '../base/responsive-patterns' as pattern;
 
 // 基础筛选器卡片
 .filter-card {
@@ -10,11 +12,11 @@
   transition: $transition-base;
   overflow: hidden;
   margin-bottom: 1.5rem;
-  
+
   .card-body {
     padding: 1.25rem;
   }
-  
+
   .form-label {
     font-weight: $font-weight-medium;
     color: $secondary-dark;
@@ -25,21 +27,21 @@
 // 筛选器区域
 .filter-section {
   margin-bottom: 2rem;
-  
+
   .card {
     @extend .filter-card;
   }
-  
+
   // 筛选器按钮组
   .filter-group {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    
+
     .btn {
       border-radius: $border-radius;
       transition: $transition-fast;
-      
+
       &:hover {
         transform: translateY(-2px);
       }
@@ -47,35 +49,5 @@
   }
 }
 
-// 响应式调整
-@media (max-width: map-get($breakpoints, 'md')) {
-  .filter-section {
-    .card .form-label {
-      margin-bottom: 0.5rem;
-    }
-    
-    .filter-group {
-      gap: 0.3rem;
-      
-      .btn {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.9rem;
-      }
-    }
-  }
-}
-
-@media (max-width: map-get($breakpoints, 'sm')) {
-  .filter-section {
-    .card .card-body {
-      padding: 1rem;
-    }
-    
-    .filter-group {
-      .btn {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.85rem;
-      }
-    }
-  }
-}
+// 响应式调整 - 使用通用响应式模式
+@include pattern.responsive-filter-pattern;

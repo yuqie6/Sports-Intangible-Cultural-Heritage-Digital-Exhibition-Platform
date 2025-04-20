@@ -23,6 +23,10 @@ $secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
 $secondary-gradient-hover: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
 $hero-gradient: linear-gradient(135deg, #0099f7, #0575E6);
 $button-gradient: linear-gradient(45deg, #00c6ff, #0072ff);
+$success-gradient: linear-gradient(135deg, #28a745, #20c997);
+$danger-gradient: linear-gradient(135deg, #dc3545, #c82333);
+$warning-gradient: linear-gradient(135deg, #ffc107, #ff9800);
+$info-gradient: linear-gradient(135deg, #17a2b8, #0dcaf0);
 
 // 文本颜色
 $text-color: #333;

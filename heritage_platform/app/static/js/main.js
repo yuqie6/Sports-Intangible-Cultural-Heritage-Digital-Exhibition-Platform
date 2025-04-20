@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
             timeElements.forEach(element => {
                 // 获取计算样式
                 const style = window.getComputedStyle(element);
-                
+
                 // 检查是否为固定定位或绝对定位
                 if (style.position === 'fixed' || style.position === 'absolute') {
                     // console.log('处理固定位置元素:', element); // 注释掉处理日志
@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!element.style.zIndex || parseInt(element.style.zIndex) >= 9000) {
                         element.style.zIndex = '1000';
                     }
-                    
+
                     // 如果元素在右下角，移动它以避免与通知区域重叠
-                    if ((style.bottom === '0px' || parseInt(style.bottom) < 100) && 
+                    if ((style.bottom === '0px' || parseInt(style.bottom) < 100) &&
                         (style.right === '0px' || parseInt(style.right) < 100)) {
                         element.style.bottom = '120px';
                     }
@@ -35,22 +35,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-    
+
     // 页面加载时运行一次
     checkFixedElements();
-    
+
     // 每10秒检查一次，捕获可能动态添加的元素
     setInterval(checkFixedElements, 10000);
 });
 
-// 更新未读通知数量的函数
+// 更新未读通知数量的函数 - 优化版本
 function updateNotificationCount() {
     fetch('/api/notifications/unread-count')
         .then(response => {
             if (!response.ok) {
                 if (response.status === 429) {
                     // 如果遇到频率限制,延迟重试
-                    // console.log('Rate limited, retrying in 5 seconds...'); // 注释掉频率限制日志
                     setTimeout(updateNotificationCount, 5000);
                     return;
                 }
@@ -60,13 +59,35 @@ function updateNotificationCount() {
         })
         .then(data => {
             if (!data) return; // 如果上面的代码返回了undefined(429情况),直接退出
-            const badge = document.getElementById('notification-badge');
-            if (badge) {
-                if (data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'inline';
-                } else {
-                    badge.style.display = 'none';
+
+            // 使用全局函数显示徽章，确保一致的行为
+            if (typeof showBadge === 'function') {
+                showBadge('notification-badge', data.count);
+                showBadge('mobile-notification-badge', data.count);
+            } else {
+                // 如果全局函数不可用，使用简化版本
+                const badge = document.getElementById('notification-badge');
+                if (badge) {
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'flex';
+                        badge.classList.add('show');
+                    } else {
+                        badge.classList.remove('show');
+                        badge.style.display = 'none';
+                    }
+                }
+
+                const mobileBadge = document.getElementById('mobile-notification-badge');
+                if (mobileBadge) {
+                    if (data.count > 0) {
+                        mobileBadge.textContent = data.count;
+                        mobileBadge.style.display = 'flex';
+                        mobileBadge.classList.add('show');
+                    } else {
+                        mobileBadge.classList.remove('show');
+                        mobileBadge.style.display = 'none';
+                    }
                 }
             }
         })

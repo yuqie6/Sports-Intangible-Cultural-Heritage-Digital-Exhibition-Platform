@@ -24,7 +24,11 @@
     <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') }}">
-                <i class="fas fa-dragon me-2"></i>
+                <!-- 使用内联SVG代替图标字体 -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 640 512" class="me-2" style="fill: #0d6efd;">
+                    <!-- Font Awesome Free 6.0.0-beta3 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) -->
+                    <path d="M18.43 255.8L192 224L100.8 292.6C90.67 302.3 97.8 320 112 320h222.7c-9.499-26.5-14.75-54.5-14.75-83.38V194.2L200.3 106.8C176.5 90.88 145 92.75 123.3 111.2l-117.5 116.4C-6.562 238 2.436 258 18.43 255.8zM575.2 289.9l-100.7-50.25c-16.25-8.125-26.5-24.75-26.5-43V160h63.99l28.12 22.62C546.1 188.6 554.2 192 562.7 192h30.1c11.1 0 23.12-6.875 28.5-17.75l14.37-28.62c5.374-10.87 4.25-23.75-2.999-33.5l-74.49-99.37C552.1 4.75 543.5 0 533.5 0H296C288.9 0 285.4 8.625 290.4 13.62L351.1 64L292.4 88.75c-5.874 3-5.874 11.37 0 14.37L351.1 128l-.0011 108.6c0 72 35.99 139.4 95.99 179.4c-195.6 6.75-344.4 41-434.1 60.88c-8.124 1.75-13.87 9-13.87 17.38C.0463 504 8.045 512 17.79 512h499.1c63.24 0 119.6-47.5 122.1-110.8C642.3 354 617.1 310.9 575.2 289.9zM489.1 66.25l45.74 11.38c-2.75 11-12.5 18.88-24.12 18.25C497.7 95.25 484.8 83.38 489.1 66.25z"/>
+                </svg>
                 <span>体育非遗数字平台</span>
             </a>
 
@@ -392,46 +396,57 @@
         return bsToast;
     }
 
-    // 显示徽章函数
+    // 显示徽章函数 - 优化版本，避免闪烁
     function showBadge(badgeId, count) {
         const badge = document.getElementById(badgeId);
         if (badge) {
             if (count > 0) {
                 // 有未读消息时显示
                 badge.textContent = count;
+
+                // 如果已经在显示中，只更新数字
+                if (badge.classList.contains('show')) {
+                    return;
+                }
+
+                // 先设置显示属性，再添加类，避免闪烁
                 badge.style.display = 'flex';
                 badge.style.visibility = 'visible';
-                // 添加show类以触发平滑过渡
-                setTimeout(() => {
-                    badge.classList.add('show');
-                }, 10);
-                // console.log(`显示徽章 ${badgeId}:`, count); // 注释掉显示徽章日志
+                badge.style.opacity = '0';
+
+                // 使用requestAnimationFrame确保浏览器先渲染初始状态
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        badge.classList.add('show');
+                    });
+                });
             } else {
                 // 没有未读消息时隐藏
-                badge.classList.remove('show');
-                // 等待过渡效果完成后隐藏元素
-                setTimeout(() => {
-                    badge.style.display = 'none';
-                    badge.style.visibility = 'hidden';
-                }, 200); // 与CSS过渡时间匹配
-                // console.log(`隐藏徽章 ${badgeId}`); // 注释掉隐藏徽章日志
+                hideBadge(badgeId);
             }
         } else {
             console.error(`徽章元素不存在: ${badgeId}`);
         }
     }
 
-    // 隐藏徽章函数
+    // 隐藏徽章函数 - 优化版本，避免闪烁
     function hideBadge(badgeId) {
         const badge = document.getElementById(badgeId);
         if (badge) {
+            // 如果已经隐藏，不做任何操作
+            if (!badge.classList.contains('show')) {
+                return;
+            }
+
+            // 先移除类，触发过渡
             badge.classList.remove('show');
+
             // 等待过渡效果完成后隐藏元素
             setTimeout(() => {
                 badge.style.display = 'none';
                 badge.style.visibility = 'hidden';
-            }, 200); // 与CSS过渡时间匹配
-            // console.log(`隐藏徽章 ${badgeId}`); // 注释掉隐藏徽章日志
+                badge.style.opacity = '0';
+            }, 300); // 稍微增加时间，确保过渡完成
         }
     }
 
@@ -439,32 +454,30 @@
     document.addEventListener('DOMContentLoaded', function() {
         // console.log('DOM加载完成，初始化通知系统'); // 注释掉初始化日志
 
-        // 页面加载时检查徽章元素是否存在及其初始显示状态
-        function checkBadges() {
-            // 检查桌面端通知徽章
-            const badge = document.getElementById('notification-badge');
-            if (badge) {
-                // 确保初始状态设置，如果有未读通知则显示
-                const count = parseInt(badge.textContent || '0');
-                if (count > 0) {
-                    showBadge('notification-badge', count);
-                } else {
-                    hideBadge('notification-badge');
-                }
-            } else {
-                console.error('通知徽章元素不存在');
-            }
+        // 页面加载时预处理徽章元素，避免闪烁
+        function initBadges() {
+            // 预处理所有徽章，确保初始状态为隐藏
+            const badgeIds = [
+                'notification-badge',
+                'mobile-notification-badge',
+                'message-badge',
+                'mobile-message-badge'
+            ];
 
-            // 同样处理移动端通知徽章
-            const mobileBadge = document.getElementById('mobile-notification-badge');
-            if (mobileBadge) {
-                const count = parseInt(mobileBadge.textContent || '0');
-                if (count > 0) {
-                    showBadge('mobile-notification-badge', count);
-                } else {
-                    hideBadge('mobile-notification-badge');
+            badgeIds.forEach(id => {
+                const badge = document.getElementById(id);
+                if (badge) {
+                    // 确保初始状态为隐藏
+                    badge.style.display = 'none';
+                    badge.style.visibility = 'hidden';
+                    badge.style.opacity = '0';
+                    badge.classList.remove('show');
                 }
-            }
+            });
+
+            // 页面加载后再获取最新数据更新徽章
+            setTimeout(updateBadgeCount, 300);
+        }
 
             // 检查消息徽章
             const msgBadge = document.getElementById('message-badge');
@@ -491,8 +504,8 @@
             }
         }
 
-        // 页面加载时立即检查
-        checkBadges();
+        // 页面加载时初始化徽章
+        initBadges();
 
         // 确保WebSocketClient存在并正确初始化
         if (typeof WebSocketClient !== 'undefined') {
@@ -569,29 +582,29 @@
             console.error('WebSocketClient未定义，无法接收实时通知');
         }
 
-        // 从服务器获取最新的未读通知和消息数量
+        // 从服务器获取最新的未读通知和消息数量 - 优化版本
         function updateBadgeCount() {
-            fetch('/api/notifications/unread-count')
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.hasOwnProperty('count')) {
-                        // 更新通知徽章
-                        showBadge('notification-badge', data.count);
-                        showBadge('mobile-notification-badge', data.count);
-                    }
-                })
-                .catch(error => console.error('获取未读通知数量失败:', error));
+            // 使用Promise.all并行请求，减少等待时间
+            Promise.all([
+                fetch('/api/notifications/unread-count').then(res => res.json()),
+                fetch('/api/messages/unread-count').then(res => res.json())
+            ])
+            .then(([notificationData, messageData]) => {
+                // 更新通知徽章
+                if (notificationData && notificationData.hasOwnProperty('count')) {
+                    showBadge('notification-badge', notificationData.count);
+                    showBadge('mobile-notification-badge', notificationData.count);
+                }
 
-            fetch('/api/messages/unread-count')
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.hasOwnProperty('count')) {
-                        // 更新消息徽章
-                        showBadge('message-badge', data.count);
-                        showBadge('mobile-message-badge', data.count);
-                    }
-                })
-                .catch(error => console.error('获取未读消息数量失败:', error));
+                // 更新消息徽章
+                if (messageData && messageData.hasOwnProperty('count')) {
+                    showBadge('message-badge', messageData.count);
+                    showBadge('mobile-message-badge', messageData.count);
+                }
+            })
+            .catch(error => {
+                console.error('获取未读消息数量失败:', error);
+            });
         }
 
         // 页面加载时获取最新数量
@@ -628,12 +641,18 @@
     {% block scripts %}{% endblock %}
 
     <script>
-        // 返回顶部按钮
+        // 返回顶部按钮和导航栏滚动效果
         const backToTopButton = document.getElementById('back-to-top');
+        const navbar = document.querySelector('.navbar');
 
         window.onscroll = function() {
+            // 返回顶部按钮效果
             if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
                 backToTopButton.classList.add("show"); // 添加show类以启用新的动画效果
+                // 导航栏滚动效果
+                if (navbar) {
+                    navbar.classList.add("scrolled");
+                }
             } else {
                 backToTopButton.classList.remove("show"); // 移除show类
                 setTimeout(() => {
@@ -641,6 +660,11 @@
                         backToTopButton.style.display = "none";
                     }
                 }, 300); // 等待动画完成后隐藏
+
+                // 导航栏恢复原状态
+                if (navbar) {
+                    navbar.classList.remove("scrolled");
+                }
             }
         };
 
@@ -666,6 +690,15 @@
                 card.style.animationDelay = (index * 0.1) + 's';
             });
 
+            // 卡片悬停效果已移至SCSS中实现，这里不再添加3D旋转效果
+            // 保留简单的悬停效果，不再使用3D旋转
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                // 移除可能已经添加的鼠标移动事件监听器
+                card.removeEventListener('mousemove', null);
+                card.removeEventListener('mouseleave', null);
+            });
+
             // 平滑滚动到锚点
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
@@ -688,6 +721,30 @@
             dropdownMenus.forEach(menu => {
                 menu.style.transition = 'all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)';
                 menu.style.transformOrigin = 'top center';
+            });
+
+            // 添加按钮波纹效果
+            const enhancedButtons = document.querySelectorAll('.btn-primary, .btn-outline-primary');
+            enhancedButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Create ripple element
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('btn-ripple');
+                    this.appendChild(ripple);
+
+                    // Position the ripple
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+                    ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+
+                    // Remove ripple after animation
+                    ripple.classList.add('active');
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
             });
 
             // 改进导航栏响应式行为

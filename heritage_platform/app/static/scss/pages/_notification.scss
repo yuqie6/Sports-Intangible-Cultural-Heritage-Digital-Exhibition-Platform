@@ -1,165 +1,514 @@
 // 通知页面样式
+// 提供通知列表、通知详情和通知设置的样式
 @use '../base/variables' as *;
 @use '../base/mixins' as mix;
 @use '../base/responsive' as resp;
+@use '../base/responsive-patterns' as pattern;
+@use '../components/sections' as sections;
+@use '../components/empty-states' as empty;
+@use 'sass:color';
+@use 'sass:math';
 
-
-// 通知中心
+//------------------------------------------------------
+// 通知中心主容器
+//------------------------------------------------------
 .notification-section {
   padding: 2rem 0;
-  
+  animation: fadeIn $animation-duration-normal ease-out;
+  position: relative;
+
+  // 背景装饰元素
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba($primary, 0.1) 0%, rgba($primary, 0) 70%);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.6;
+    animation: float 15s infinite ease-in-out;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -150px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba($info, 0.08) 0%, rgba($info, 0) 70%);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.5;
+    animation: float 20s infinite ease-in-out reverse;
+  }
+
+  //------------------------------------------------------
+  // 通知页头部 - 标题和操作按钮
+  //------------------------------------------------------
   .notification-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    
+    position: relative;
+
+    // 标题文本
     h1 {
       font-size: 2rem;
       font-weight: $font-weight-bold;
+      position: relative;
+      @include mix.gradient-text-enhanced($primary-gradient);
+
+      // 装饰性下划线
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -0.5rem;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: $primary-gradient;
+        border-radius: 2px;
+        animation: slideInLeft $animation-duration-normal ease-out;
+      }
     }
-    
+
+    // 操作按钮组
     .notification-actions {
       display: flex;
       gap: 1rem;
+
+      .btn {
+        transition: $transition-fast;
+        position: relative;
+        overflow: hidden;
+
+        // 按钮悬停效果
+        @include mix.button-hover-effect(-2px);
+
+        // 波纹效果
+        &::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          background: rgba(white, 0.2);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          transition: width 0.4s ease, height 0.4s ease;
+          z-index: 0;
+          pointer-events: none;
+        }
+
+        &:active::before {
+          width: 150px;
+          height: 150px;
+        }
+
+        // 图标动画
+        i {
+          transition: transform 0.2s ease;
+        }
+
+        &:hover i {
+          transform: rotate(180deg);
+        }
+      }
     }
   }
-  
+
+  //------------------------------------------------------
+  // 通知标签页 - 分类导航标签
+  //------------------------------------------------------
   .notification-tabs {
-    background-color: white;
-    border-radius: $border-radius-lg;
-    box-shadow: $box-shadow;
+    @include mix.content-block; // 使用通用内容块混合器
     margin-bottom: 2rem;
-    
+    transition: $transition-fast;
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+
+    // 卡片悬停效果
+    @include mix.card-hover-effect(0, $box-shadow-lg);
+
+    // 标签导航
     .nav-tabs {
       border-bottom: none;
       padding: 0 1.5rem;
-      
+      background: linear-gradient(to right, rgba($light, 0.5), rgba(white, 0.8));
+      backdrop-filter: blur(5px);
+
+      // 导航链接
       .nav-link {
         border: none;
         padding: 1rem 1.5rem;
         font-weight: $font-weight-medium;
         color: $text-muted;
         position: relative;
-        
+        transition: $transition-fast;
+        overflow: hidden;
+        z-index: 1;
+
+        // 活动状态
         &.active {
           color: $primary;
           background-color: transparent;
           border-bottom: 2px solid $primary;
+
+          // 活动标签下划线动画
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: $primary-gradient;
+            animation: slideInLeft $animation-duration-fast ease-out;
+          }
         }
-        
+
+        // 悬停效果
         &:hover:not(.active) {
           color: $text-color;
           border-bottom: 2px solid $border-color;
+          background-color: rgba($primary, 0.03);
         }
-        
+
+        // 波纹效果
+        &::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          background: rgba($primary, 0.1);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          transition: width 0.4s ease, height 0.4s ease;
+          z-index: -1;
+          pointer-events: none;
+        }
+
+        &:active::before {
+          width: 150px;
+          height: 150px;
+        }
+
+        // 通知数量徽章
         .badge {
           margin-left: 0.5rem;
+          @include mix.badge-hover-effect; // 使用徽章悬停效果混合器
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+          // 徽章颜色变体
+          &.bg-primary {
+            background: $primary-gradient !important;
+          }
+
+          &.bg-info {
+            background: linear-gradient(45deg, $info, lighten($info, 15%)) !important;
+          }
+
+          &.bg-danger {
+            background: linear-gradient(45deg, $danger, lighten($danger, 15%)) !important;
+          }
         }
       }
     }
   }
-  
+
+  //------------------------------------------------------
+  // 通知列表 - 显示所有通知项
+  //------------------------------------------------------
   .notification-list {
-    background-color: white;
-    border-radius: $border-radius-lg;
-    box-shadow: $box-shadow;
+    @include mix.content-block; // 使用通用内容块混合器
     overflow: hidden;
-    
+    border-radius: $border-radius-lg;
+    transition: $transition-fast;
+    position: relative;
+    backdrop-filter: blur(10px);
+    background-color: rgba(white, 0.95);
+    border: 1px solid rgba($primary, 0.1);
+
+    // 卡片悬停效果
+    @include mix.card-hover-effect(0, $box-shadow-lg);
+
+    // 添加自定义滚动条
+    max-height: 800px;
+    overflow-y: auto;
+    @include mix.custom-scrollbar;
+
+    // 装饰性边框光效
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: $primary-gradient;
+      opacity: 0.8;
+      z-index: 1;
+    }
+
+    // 通知项
     .notification-item {
       display: flex;
       padding: 1.5rem;
       border-bottom: 1px solid $border-color-light;
-      transition: $transition-base;
-      
+      transition: all $transition-fast;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp $animation-duration-normal ease-out;
+
+      // 每个项的动画延迟
+      @for $i from 1 through 10 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.05}s;
+        }
+      }
+
       &:last-child {
         border-bottom: none;
       }
-      
+
+      // 悬停效果 - 更加微妙和平滑
       &:hover {
-        background-color: rgba($primary, 0.05);
+        background-color: rgba($primary, 0.03);
+        transform: translateX(3px); // 减小平移距离，使动画更微妙
+        box-shadow: inset 0 0 0 1px rgba($primary, 0.08);
       }
-      
+
+      // 未读通知样式
       &.unread {
         background-color: rgba($primary, 0.05);
-        
+
+        // 未读指示器 - 增强视觉效果
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 4px;
+          background: $primary-gradient;
+          animation: fadeInLeft $animation-duration-fast ease-out, pulse 2s infinite ease-in-out;
+          border-radius: 0 2px 2px 0;
+          box-shadow: 0 0 8px rgba($primary, 0.3);
+        }
+
         .notification-content {
           font-weight: $font-weight-medium;
         }
+
+        // 添加微妙的光晕效果
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, rgba($primary, 0.03) 0%, rgba($primary, 0) 50%);
+          pointer-events: none;
+        }
       }
-      
+
+      // 通知图标 - 增强视觉效果
       .notification-icon {
         width: 50px;
         height: 50px;
         border-radius: 50%;
         background-color: rgba($primary, 0.1);
         color: $primary;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        @include mix.flex-center;
         margin-right: 1.5rem;
-        
+        transition: all $transition-fast;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        position: relative;
+        z-index: 1;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(white, 0.2);
+
+        // 图标背景效果 - 更丰富的渐变
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: 50%;
+          background: $primary-gradient;
+          opacity: 0.2;
+          z-index: -1;
+          transition: opacity 0.3s ease;
+        }
+
         i {
           font-size: 1.5rem;
+          transition: transform 0.3s ease;
+          filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
         }
-        
+
+        // 图标悬停效果 - 更微妙的动画
+        &:hover {
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+          transform: translateY(-2px);
+
+          &::before {
+            opacity: 0.3;
+          }
+
+          i {
+            transform: scale(1.15);
+            animation: pulse 2s infinite;
+          }
+        }
+
+        // 不同类型的通知图标颜色
         &.system {
           background-color: rgba($info, 0.1);
           color: $info;
+
+          &::before {
+            background: linear-gradient(45deg, $info, lighten($info, 15%));
+          }
         }
-        
+
         &.success {
           background-color: rgba($success, 0.1);
           color: $success;
+
+          &::before {
+            background: linear-gradient(45deg, $success, lighten($success, 15%));
+          }
         }
-        
+
         &.warning {
           background-color: rgba($warning, 0.1);
           color: $warning;
+
+          &::before {
+            background: linear-gradient(45deg, $warning, lighten($warning, 15%));
+          }
         }
-        
+
         &.danger {
           background-color: rgba($danger, 0.1);
           color: $danger;
+
+          &::before {
+            background: linear-gradient(45deg, $danger, lighten($danger, 15%));
+          }
         }
       }
-      
+
+      // 通知内容
       .notification-content {
         flex: 1;
-        
+        min-width: 0; // 确保文本可以正确截断
+
+        // 通知标题
         .notification-title {
           margin-bottom: 0.5rem;
-          
+          position: relative;
+
           a {
             color: $text-color;
             text-decoration: none;
-            
+            transition: $transition-fast;
+            position: relative;
+            display: inline-block;
+
+            // 下划线动画效果
+            &::after {
+              content: '';
+              position: absolute;
+              bottom: -2px;
+              left: 0;
+              width: 0;
+              height: 1px;
+              background-color: $primary;
+              transition: width 0.3s ease;
+            }
+
             &:hover {
               color: $primary;
-              text-decoration: underline;
+
+              &::after {
+                width: 100%;
+              }
             }
           }
         }
-        
+
+        // 通知元数据
         .notification-meta {
           display: flex;
           justify-content: space-between;
-          
+          align-items: center;
+
+          // 时间戳
           .notification-time {
             font-size: 0.85rem;
             color: $text-muted;
+            display: flex;
+            align-items: center;
+
+            &::before {
+              content: '\f017'; // 时钟图标
+              font-family: 'Font Awesome 5 Free';
+              margin-right: 0.3rem;
+              font-size: 0.8rem;
+              opacity: 0.7;
+            }
           }
-          
+
+          // 通知操作
           .notification-actions {
             display: flex;
             gap: 1rem;
-            
+
             a {
               font-size: 0.85rem;
               color: $text-muted;
-              
+              transition: $transition-fast;
+              position: relative;
+              padding: 0.2rem 0.5rem;
+              border-radius: $border-radius-sm;
+
+              &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: currentColor;
+                opacity: 0;
+                border-radius: $border-radius-sm;
+                transition: opacity 0.2s ease;
+                z-index: -1;
+              }
+
               &:hover {
                 color: $primary;
+
+                &::before {
+                  opacity: 0.1;
+                }
+              }
+
+              &:active {
+                transform: translateY(1px);
               }
             }
           }
@@ -167,97 +516,391 @@
       }
     }
   }
-  
+
+  //------------------------------------------------------
+  // 空通知状态 - 无通知时显示
+  //------------------------------------------------------
   .notification-empty {
-    background-color: white;
+    @extend .empty-state !optional; // 使用通用空状态组件
+
+    // 如果扩展失败，使用自定义样式
+    text-align: center;
+    padding: 3.5rem;
+    background-color: rgba(white, 0.95);
     border-radius: $border-radius-lg;
     box-shadow: $box-shadow;
-    padding: 3rem;
-    text-align: center;
-    
-    i {
-      font-size: 4rem;
-      color: $text-muted;
-      margin-bottom: 1.5rem;
+    transition: all $transition-base;
+    animation: fadeIn $animation-duration-normal ease-out;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba($primary, 0.08);
+    position: relative;
+    overflow: hidden;
+
+    // 悬停效果增强
+    &:hover {
+      box-shadow: $box-shadow-lg;
+      transform: translateY(-3px);
     }
-    
+
+    // 装饰性背景元素
+    &::before, &::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      z-index: -1;
+      opacity: 0.4;
+    }
+
+    &::before {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba($info, 0.1) 0%, rgba($info, 0) 70%);
+      top: -100px;
+      right: -50px;
+      animation: float 15s infinite ease-in-out;
+    }
+
+    &::after {
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba($primary, 0.08) 0%, rgba($primary, 0) 70%);
+      bottom: -120px;
+      left: -70px;
+      animation: float 20s infinite ease-in-out reverse;
+    }
+
+    // 使用信息类型的图标颜色 - 增强视觉效果
+    i {
+      font-size: 3.5rem;
+      color: $info;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+      animation: empty-state-pulse 2s infinite;
+      background: linear-gradient(45deg, $info, lighten($info, 15%));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      filter: drop-shadow(0 3px 5px rgba($info, 0.4));
+      position: relative;
+    }
+
     h3 {
       font-size: 1.5rem;
       font-weight: $font-weight-bold;
       margin-bottom: 1rem;
+      color: $text-color;
+      position: relative;
+      display: inline-block;
+
+      // 装饰性下划线
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: $info-gradient;
+        border-radius: 1.5px;
+        opacity: 0.7;
+      }
     }
-    
+
     p {
       color: $text-muted;
       margin-bottom: 1.5rem;
       max-width: 500px;
       margin-left: auto;
       margin-right: auto;
+      line-height: 1.6;
+      font-size: 1.05rem;
+    }
+
+    .btn {
+      @include mix.gradient-button(linear-gradient(45deg, $info, lighten($info, 15%)));
+      transition: all 0.3s ease;
+      padding: 0.6rem 1.5rem;
+      font-weight: $font-weight-medium;
+      letter-spacing: 0.02em;
+      position: relative;
+      overflow: hidden;
+
+      // 波纹效果
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(white, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.4s ease, height 0.4s ease;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      &:active::before {
+        width: 300px;
+        height: 300px;
+      }
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba($info, 0.3);
+      }
+
+      &:active {
+        transform: translateY(-1px);
+      }
     }
   }
-  
+
+  //------------------------------------------------------
+  // 分页区域 - 通知列表分页
+  //------------------------------------------------------
   .notification-pagination {
-    margin-top: 2rem;
-    display: flex;
-    justify-content: center;
+    @extend .pagination-section !optional; // 使用通用分页区域样式
+
+    // 如果扩展失败，使用自定义样式
+    margin-top: 3rem;
+    position: relative;
+    animation: fadeIn $animation-duration-normal ease-out;
+
+    // 装饰性分隔线
+    &::before {
+      content: '';
+      position: absolute;
+      top: -1.5rem;
+      left: 50%;
+      width: 60px;
+      height: 4px;
+      background: $primary-gradient;
+      border-radius: 2px;
+      transform: translateX(-50%);
+      opacity: 0.7;
+      animation: pulse 2s infinite;
+    }
+
+    // 分页容器
+    .pagination {
+      justify-content: center;
+      gap: 0.5rem;
+
+      // 分页项
+      .page-item {
+        .page-link {
+          border-radius: $border-radius;
+          transition: $transition-fast;
+          position: relative;
+          overflow: hidden;
+
+          // 波纹效果
+          &::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba($primary, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+            z-index: 0;
+            pointer-events: none;
+          }
+
+          &:active::before {
+            width: 120px;
+            height: 120px;
+          }
+        }
+
+        // 活动页
+        &.active .page-link {
+          background: $primary-gradient;
+          border-color: $primary;
+          box-shadow: 0 2px 5px rgba($primary, 0.3);
+          transform: translateY(-1px);
+        }
+
+        // 禁用页
+        &.disabled .page-link {
+          opacity: 0.6;
+        }
+      }
+    }
   }
 }
 
-// 通知设置
+//------------------------------------------------------
+// 通知设置 - 用户通知偏好设置
+//------------------------------------------------------
 .notification-settings {
-  background-color: white;
-  border-radius: $border-radius-lg;
-  box-shadow: $box-shadow;
+  @include mix.content-block; // 使用通用内容块混合器
   padding: 2rem;
-  
+  border-radius: $border-radius-lg;
+  transition: $transition-fast;
+  animation: fadeIn $animation-duration-normal ease-out;
+
+  // 卡片悬停效果
+  @include mix.card-hover-effect(0, $box-shadow-lg);
+
+  // 设置标题
   .settings-title {
     font-size: 1.5rem;
     font-weight: $font-weight-bold;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid $border-color-light;
+    position: relative;
+    @include mix.gradient-text-enhanced($primary-gradient);
+
+    // 装饰性下划线
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 80px;
+      height: 3px;
+      background: $primary-gradient;
+      border-radius: 1.5px;
+      animation: slideInLeft $animation-duration-normal ease-out;
+    }
   }
-  
+
+  // 设置组
   .settings-group {
     margin-bottom: 2rem;
-    
+    animation: fadeInUp $animation-duration-normal ease-out;
+
+    // 每个组的动画延迟
+    @for $i from 1 through 5 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.1}s;
+      }
+    }
+
     &:last-child {
       margin-bottom: 0;
     }
-    
+
+    // 组标题
     .group-title {
       font-size: 1.25rem;
       font-weight: $font-weight-bold;
       margin-bottom: 1rem;
+      color: $text-color;
+      display: flex;
+      align-items: center;
+
+      // 添加图标
+      &::before {
+        content: '\f0c9'; // 列表图标
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        margin-right: 0.5rem;
+        color: $primary;
+        font-size: 0.9em;
+      }
     }
-    
+
+    // 设置项
     .settings-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem 0;
       border-bottom: 1px solid $border-color-light;
-      
+      transition: $transition-fast;
+      position: relative;
+      overflow: hidden;
+
       &:last-child {
         border-bottom: none;
       }
-      
+
+      // 悬停效果
+      &:hover {
+        background-color: rgba($primary, 0.02);
+        padding-left: 0.5rem;
+        border-radius: $border-radius-sm;
+        box-shadow: inset 0 0 0 1px rgba($primary, 0.05);
+      }
+
+      // 波纹效果
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 3px;
+        height: 0;
+        background: $primary-gradient;
+        opacity: 0;
+        transition: height 0.3s ease, opacity 0.3s ease;
+        transform: translateY(-50%);
+      }
+
+      &:hover::before {
+        height: 70%;
+        opacity: 1;
+      }
+
+      // 项目信息
       .item-info {
         flex: 1;
-        
+        padding-right: 1rem;
+
+        // 项目标题
         .item-title {
           font-weight: $font-weight-medium;
           margin-bottom: 0.25rem;
+          transition: color 0.2s ease;
+
+          .settings-item:hover & {
+            color: $primary;
+          }
         }
-        
+
+        // 项目描述
         .item-description {
           font-size: 0.85rem;
           color: $text-muted;
+          transition: opacity 0.2s ease;
+
+          .settings-item:hover & {
+            opacity: 0.9;
+          }
+        }
+      }
+
+      // 开关和控件
+      .form-check-input {
+        width: 2.5rem;
+        height: 1.25rem;
+        cursor: pointer;
+        position: relative;
+        transition: $transition-fast;
+
+        &:checked {
+          background-color: $primary;
+          border-color: $primary;
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
         }
       }
     }
   }
-  
+
+  // 设置操作区
   .settings-actions {
     margin-top: 2rem;
     padding-top: 1.5rem;
@@ -265,40 +908,149 @@
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
+    animation: fadeInUp $animation-duration-normal ease-out;
+    animation-delay: 0.5s;
+
+    // 按钮样式
+    .btn-primary {
+      @include mix.gradient-button($primary-gradient);
+      @include mix.button-hover-effect(-3px);
+    }
+
+    .btn-outline-secondary {
+      @include mix.outline-button($secondary);
+      transition: $transition-fast;
+
+      &:hover {
+        background-color: rgba($secondary, 0.05);
+        color: $secondary;
+      }
+    }
   }
 }
 
+//------------------------------------------------------
 // 响应式调整
+//------------------------------------------------------
+
+// 应用响应式模式
+@include pattern.responsive-spacing-pattern;
+
+// 大屏幕设备调整 (992px 及以下)
 @include resp.respond-to('lg') {
   .notification-section {
+    padding: 1.5rem 0;
+
+    // 头部调整
     .notification-header {
       flex-direction: column;
       align-items: flex-start;
-      
+      margin-bottom: 1.5rem;
+
+      h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+      }
+
       .notification-actions {
         margin-top: 1rem;
         align-self: flex-end;
       }
     }
-    
+
+    // 标签页调整
     .notification-tabs {
       .nav-tabs {
+        padding: 0 1rem;
+
         .nav-link {
           padding: 0.75rem 1rem;
+          font-size: 0.95rem;
+        }
+      }
+    }
+
+    // 通知列表调整
+    .notification-list {
+      .notification-item {
+        padding: 1.25rem;
+
+        .notification-icon {
+          width: 45px;
+          height: 45px;
+          margin-right: 1rem;
+
+          i {
+            font-size: 1.25rem;
+          }
         }
       }
     }
   }
+
+  // 设置页面调整
+  .notification-settings {
+    padding: 1.5rem;
+
+    .settings-title {
+      font-size: 1.35rem;
+    }
+
+    .settings-group .group-title {
+      font-size: 1.15rem;
+    }
+  }
 }
 
+// 平板设备调整 (768px 及以下)
 @include resp.respond-to('md') {
   .notification-section {
+    padding: 1rem 0;
+
+    // 头部调整
+    .notification-header {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    // 标签页调整
+    .notification-tabs {
+      .nav-tabs {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        @include mix.custom-scrollbar(4px);
+
+        .nav-link {
+          white-space: nowrap;
+          padding: 0.6rem 0.8rem;
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    // 通知列表调整
     .notification-list {
       .notification-item {
+        padding: 1rem;
+
+        .notification-icon {
+          width: 40px;
+          height: 40px;
+          margin-right: 0.75rem;
+
+          i {
+            font-size: 1.1rem;
+          }
+        }
+
+        // 元数据调整
         .notification-content {
           .notification-meta {
             flex-direction: column;
-            
+            align-items: flex-start;
+
             .notification-actions {
               margin-top: 0.5rem;
             }
@@ -306,17 +1058,212 @@
         }
       }
     }
-    
-    .notification-settings {
+
+    // 空状态调整
+    .notification-empty {
+      padding: 2rem 1rem;
+
+      i {
+        font-size: 3rem;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+      }
+    }
+
+    // 分页调整
+    .notification-pagination {
+      margin-top: 2rem;
+    }
+  }
+
+  // 设置页面调整
+  .notification-settings {
+    padding: 1.25rem;
+
+    .settings-title {
+      font-size: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    // 设置项调整
+    .settings-group {
+      margin-bottom: 1.5rem;
+
       .settings-item {
         flex-direction: column;
         align-items: flex-start;
-        
+        padding: 0.75rem 0;
+
         .item-info {
           margin-bottom: 1rem;
+          width: 100%;
         }
       }
     }
+
+    // 操作区调整
+    .settings-actions {
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// 手机设备调整 (576px 及以下)
+@include resp.respond-to('sm') {
+  .notification-section {
+    // 头部调整
+    .notification-header {
+      h1 {
+        font-size: 1.35rem;
+      }
+
+      .notification-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    // 通知列表调整
+    .notification-list {
+      .notification-item {
+        &:hover {
+          transform: none; // 移动端禁用平移动画
+        }
+
+        .notification-content {
+          .notification-title {
+            font-size: 0.95rem;
+          }
+
+          .notification-meta {
+            .notification-time {
+              font-size: 0.8rem;
+            }
+
+            .notification-actions a {
+              font-size: 0.8rem;
+              padding: 0.15rem 0.3rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+//------------------------------------------------------
+// 动画定义
+//------------------------------------------------------
+
+// 淡入动画
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// 从底部淡入动画
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 从左侧淡入动画
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// 从左到右滑入动画
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+// 脉冲动画
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// 空状态脉冲动画
+@keyframes empty-state-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+// 浮动动画
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-10px) translateX(10px);
+  }
+  50% {
+    transform: translateY(0) translateX(20px);
+  }
+  75% {
+    transform: translateY(10px) translateX(10px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+// 闪光效果动画
+@keyframes shine {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 

@@ -2,6 +2,7 @@
 // 提供统一的媒体查询断点和便捷的混合器
 @use 'variables' as *;
 @use 'sass:map';
+@use 'sass:math';
 
 // 使用变量中定义的断点
 // $breakpoints 在 _variables.scss 中定义

@@ -1,10 +1,10 @@
-// 分页样式
+// 分页样式 - 提供统一的分页样式，用于各种页面的列表和详情页
 @use '../base/variables' as *;
 @use '../base/mixins' as mix;
 @use '../base/responsive' as resp;
+@use '../base/responsive-patterns' as pattern;
 
-
-// 分页容器
+// 分页容器 - 提供基本的分页样式
 .pagination {
   display: flex;
   padding-left: 0;
@@ -29,6 +29,22 @@
     border-color: $primary;
     color: white;
     z-index: 3;
+    position: relative;
+    overflow: hidden;
+
+    // 添加脉动效果
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 120%;
+      height: 120%;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      animation: pulse-animation 1.5s infinite;
+    }
   }
 
   &.disabled .page-link {
@@ -36,6 +52,7 @@
     pointer-events: none;
     background-color: white;
     border-color: $border-color;
+    opacity: 0.6;
   }
 }
 
@@ -50,18 +67,27 @@
   text-decoration: none;
   background-color: white;
   border: 1px solid $border-color;
-  transition: $transition-fast;
+  transition: all 0.3s ease;
+  will-change: transform, box-shadow, background-color;
 
   &:hover {
-    background-color: $light;
-    border-color: $border-color;
+    background-color: rgba($primary, 0.08);
+    border-color: rgba($primary, 0.3);
     color: $primary;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
   &:focus {
     z-index: 3;
     outline: 0;
     box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+  }
+
+  // 添加图标的样式
+  i, .fas, .far, .fab {
+    margin-right: 0.25rem;
+    font-size: 0.85em;
   }
 }
 
@@ -113,9 +139,24 @@
   justify-content: flex-end;
 }
 
-// 分页区域
+// 分页区域 - 增强版
 .pagination-section {
   margin-top: 3rem;
+  position: relative;
+
+  // 装饰线
+  &::before {
+    content: '';
+    position: absolute;
+    top: -1.5rem;
+    left: 50%;
+    width: 60px;
+    height: 4px;
+    background: $primary-gradient;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    opacity: 0.7;
+  }
 
   .pagination {
     justify-content: center;
@@ -125,13 +166,37 @@
     .page-item {
       .page-link {
         border-radius: $border-radius;
-        transition: $transition-fast;
+        transition: all 0.3s ease;
         font-weight: $font-weight-medium;
         padding: 0.5rem 0.75rem;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+
+        // 添加波纹效果
+        &::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          background: rgba($primary, 0.1);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          z-index: -1;
+          transition: width 0.6s ease, height 0.6s ease;
+        }
 
         &:hover {
-          background-color: rgba($primary, 0.1);
-          transform: translateY(-2px);
+          background-color: rgba($primary, 0.08);
+          transform: translateY(-3px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
+          &::before {
+            width: 300%;
+            height: 300%;
+          }
         }
       }
 
@@ -139,39 +204,103 @@
         background: $primary-gradient;
         border-color: $primary;
         box-shadow: $box-shadow-sm;
+        transform: translateY(-1px);
       }
     }
   }
 }
 
-// 响应式调整
-@include resp.respond-to('md') {
-  .pagination {
-    flex-wrap: wrap;
-  }
+// 圆形分页样式
+.pagination-rounded {
+  .page-item {
+    .page-link {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin: 0 3px;
 
-  .pagination .page-link {
-    padding: 0.4rem 0.6rem;
-    font-size: $font-size-sm;
-  }
+      &:hover {
+        transform: translateY(-2px) scale(1.05);
+      }
+    }
 
-  .pagination-section {
-    .pagination {
-      .page-link {
-        padding: 0.4rem 0.6rem;
-        font-size: 0.9rem;
+    &.active .page-link {
+      transform: scale(1.1);
+    }
+  }
+}
+
+// 简约风格分页
+.pagination-minimal {
+  .page-item {
+    .page-link {
+      border: none;
+      background: transparent;
+      color: $text-muted;
+      font-weight: $font-weight-medium;
+
+      &:hover {
+        color: $primary;
+        background: transparent;
+        transform: translateY(-2px);
+        box-shadow: none;
+      }
+    }
+
+    &.active .page-link {
+      background: transparent;
+      color: $primary;
+      font-weight: $font-weight-bold;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 25%;
+        width: 50%;
+        height: 3px;
+        background: $primary-gradient;
+        border-radius: 3px;
       }
     }
   }
 }
 
-@include resp.respond-to('sm') {
-  .pagination-section {
-    .pagination {
-      .page-link {
-        padding: 0.3rem 0.5rem;
-        font-size: 0.85rem;
+// 带阴影的分页
+.pagination-shadow {
+  .page-item {
+    .page-link {
+      border: none;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+      margin: 0 4px;
+
+      &:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
       }
+    }
+
+    &.active .page-link {
+      box-shadow: 0 5px 15px rgba($primary, 0.3);
     }
   }
 }
+
+// 动画关键帧
+@keyframes pulse-animation {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+// 响应式调整 - 使用通用响应式模式
+@include pattern.responsive-pagination-pattern;

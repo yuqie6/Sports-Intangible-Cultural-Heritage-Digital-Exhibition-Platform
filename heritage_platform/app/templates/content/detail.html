@@ -12,7 +12,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{ content.title }}</li>
         </ol>
     </nav>
-    
+
     <div class="card mb-4">
         <div class="card-header bg-light">
             <div class="d-flex justify-content-between align-items-center">
@@ -35,8 +35,8 @@
 
         <div class="content-cover-wrapper">
         {% if content.cover_image %}
-        <div class="content-cover-image fade-in">
-            <img src="{{ url_for('static', filename=content.cover_image) }}" 
+        <div class="content-cover-image">
+            <img src="{{ url_for('static', filename=content.cover_image) }}"
                  alt="{{ content.title }}的封面图"
                  class="content-cover cover-mode"
                  id="coverImage">
@@ -51,11 +51,11 @@
         </div>
         {% endif %}
     </div>
-        
+
         <div class="card-body content-body">
             <!-- 装饰性分隔元素 -->
             <div class="content-divider"></div>
-            <div class="content-meta slide-in-left">
+            <div class="content-meta">
                 <div class="content-author">
                     <div class="content-avatar">
                         {% if content.author.avatar %}
@@ -82,9 +82,9 @@
                     <span class="badge bg-secondary">{{ content.heritage.name }}</span>
                 </div>
             </div>
-            
+
             <!-- 优化后的内容显示区域 -->
-            <div class="content-display fade-in">
+            <div class="content-display">
                 {% if content.content_type == 'article' %}
                     <div class="article-content markdown-body">
                         {{ content.text_content|markdown|safe }}
@@ -98,7 +98,7 @@
                                 </a>
                             </div>
                         {% endif %}
-                        
+
                         {% if content.images and content.images.count() > 0 %}
                             <div class="gallery-grid">
                                 {% for image in content.images %}
@@ -139,9 +139,9 @@
                     </div>
                 {% endif %}
             </div>
-            
+
             <!-- 优化后的互动工具栏 -->
-            <div class="content-actions slide-in-right">
+            <div class="content-actions">
                 <div class="content-stats">
                     <span class="stat-item"><i class="far fa-eye"></i> {{ content.views }}</span>
                     <span class="stat-item"><i class="far fa-comment"></i> {{ content.comments.count() }}</span>
@@ -152,14 +152,14 @@
                     <form method="POST" action="{{ url_for('content.like', id=content.id) }}" class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-sm {% if has_liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                            <i class="{% if has_liked %}fas{% else %}far{% endif %} fa-heart me-1"></i> 
+                            <i class="{% if has_liked %}fas{% else %}far{% endif %} fa-heart me-1"></i>
                             {% if has_liked %}已点赞{% else %}点赞{% endif %}
                         </button>
                     </form>
                     <form method="POST" action="{{ url_for('content.favorite', id=content.id) }}" class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-sm {% if has_favorited %}btn-warning{% else %}btn-outline-warning{% endif %}">
-                            <i class="{% if has_favorited %}fas{% else %}far{% endif %} fa-star me-1"></i> 
+                            <i class="{% if has_favorited %}fas{% else %}far{% endif %} fa-star me-1"></i>
                             {% if has_favorited %}已收藏{% else %}收藏{% endif %}
                         </button>
                     </form>
@@ -170,7 +170,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 评论区 -->
     <div class="card mb-4">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
@@ -203,7 +203,7 @@
                 请<a href="{{ url_for('auth.login', next=request.path) }}">登录</a>后发表评论
             </div>
             {% endif %}
-            
+
             <!-- 评论列表 -->
             {% if comments %}
                 <div class="list-group">
@@ -283,7 +283,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                
+
                 <!-- 评论分页 -->
                 {% if pagination and pagination.pages > 1 %}
                 <nav class="mt-4" aria-label="评论分页">
@@ -297,7 +297,7 @@
                             <a class="page-link" href="#" tabindex="-1" aria-disabled="true">上一页</a>
                         </li>
                         {% endif %}
-                        
+
                         {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
                             {% if p %}
                                 {% if p == pagination.page %}
@@ -315,7 +315,7 @@
                             </li>
                             {% endif %}
                         {% endfor %}
-                        
+
                         {% if pagination.has_next %}
                         <li class="page-item">
                             <a class="page-link" href="{{ url_for('content.detail', id=content.id, page=pagination.next_num) }}">下一页</a>
@@ -335,7 +335,7 @@
             {% endif %}
         </div>
     </div>
-    
+
     <!-- 相关内容推荐 -->
     {% if related_contents %}
     <h4 class="mb-3">相关内容推荐</h4>
@@ -343,8 +343,8 @@
         {% for related in related_contents %}
         <div class="col">
             <div class="card h-100">
-                <img src="{% if related.cover_image %}{{ url_for('static', filename=related.cover_image) }}{% else %}{{ url_for('static', filename='img/default-content.jpg') }}{% endif %}" 
-                     class="card-img-top" 
+                <img src="{% if related.cover_image %}{{ url_for('static', filename=related.cover_image) }}{% else %}{{ url_for('static', filename='img/default-content.jpg') }}{% endif %}"
+                     class="card-img-top"
                      style="height: 150px; object-fit: cover;"
                      alt="{{ related.title }}">
                 <div class="card-body">
@@ -384,7 +384,7 @@
         modal.style.padding = '20px';
         modal.style.overflow = 'auto';
         modal.style.textAlign = 'center';
-        
+
         // 创建内部元素
         modal.innerHTML = `
             <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: center;">
@@ -398,9 +398,9 @@
                 <div id="image-counter" style="color: white; position: absolute; bottom: 20px; width: 100%; text-align: center;"></div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         // 获取模态框元素
         const modalImage = document.getElementById('modal-image');
         const modalCaption = document.getElementById('modal-caption');
@@ -408,14 +408,14 @@
         const prevButton = document.getElementById('prev-button');
         const nextButton = document.getElementById('next-button');
         const imageCounter = document.getElementById('image-counter');
-        
+
         // 存储图片集合
         let images = [];
         let currentIndex = 0;
-        
+
         // 获取所有带有data-lightbox属性的链接
         const imageLinks = document.querySelectorAll('a[data-lightbox="gallery"]');
-        
+
         // 获取所有图片数据
         imageLinks.forEach(link => {
             images.push({
@@ -423,17 +423,17 @@
                 title: link.getAttribute('data-title') || ''
             });
         });
-        
+
         // 显示当前图片
         function showImage(index) {
             if (index < 0) index = images.length - 1;
             if (index >= images.length) index = 0;
-            
+
             currentIndex = index;
             modalImage.src = images[index].src;
             modalCaption.textContent = images[index].title;
             imageCounter.textContent = `图片 ${index + 1} of ${images.length}`;
-            
+
             // 只有当有多张图片时才显示导航按钮
             if (images.length > 1) {
                 prevButton.style.display = 'block';
@@ -445,7 +445,7 @@
                 imageCounter.style.display = 'none';
             }
         }
-        
+
         // 为每个图片链接添加点击事件
         imageLinks.forEach((link, index) => {
             link.onclick = function(e) {
@@ -455,13 +455,13 @@
                 showImage(index);
             };
         });
-        
+
         // 关闭模态框
         closeButton.onclick = function() {
             modal.style.display = 'none';
             document.body.style.overflow = ''; // 恢复背景滚动
         };
-        
+
         // 点击模态框背景也可以关闭
         modal.onclick = function(e) {
             if (e.target === modal) {
@@ -469,18 +469,18 @@
                 document.body.style.overflow = '';
             }
         };
-        
+
         // 上一张/下一张图片
         prevButton.onclick = function(e) {
             e.stopPropagation();
             showImage(currentIndex - 1);
         };
-        
+
         nextButton.onclick = function(e) {
             e.stopPropagation();
             showImage(currentIndex + 1);
         };
-        
+
         // 键盘导航
         document.addEventListener('keydown', function(e) {
             if (modal.style.display === 'block') {
@@ -501,18 +501,18 @@
         const image = document.getElementById('coverImage');
         const coverBtn = document.getElementById('coverBtn');
         const fitBtn = document.getElementById('fitBtn');
-        
+
         // 检查元素是否存在，增加健壮性
         if (!image || !coverBtn || !fitBtn) {
             console.error('Cover image or control buttons not found.');
             return;
         }
-        
+
         // 移除所有模式类
         image.classList.remove('cover-mode', 'fit-mode');
         coverBtn.classList.remove('active');
         fitBtn.classList.remove('active');
-        
+
         // 添加新的模式类
         if (mode === 'cover') {
             image.classList.add('cover-mode');
@@ -556,7 +556,7 @@
     word-wrap: break-word;
 }
 
-.markdown-body h1, .markdown-body h2, .markdown-body h3, 
+.markdown-body h1, .markdown-body h2, .markdown-body h3,
 .markdown-body h4, .markdown-body h5, .markdown-body h6 {
     margin-top: 24px;
     margin-bottom: 16px;

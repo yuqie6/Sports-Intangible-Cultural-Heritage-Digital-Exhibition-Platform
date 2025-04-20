@@ -2,6 +2,7 @@
 @use '../base/variables' as *;
 @use '../base/mixins' as mix;
 @use '../base/responsive' as resp;
+@use '../base/responsive-patterns' as pattern;
 
 // --- 通用卡片类型 ---
 
@@ -71,12 +72,41 @@
 // --- Mixins for Card Optimizations ---
 
 // Mixin for common card hover effect (translateY + box-shadow)
-@mixin card-hover-effect($y-translate: -5px, $hover-shadow: $box-shadow-lg) {
+// 提供三种悬停效果强度：subtle（微妙）、moderate（适中）、strong（强烈）
+@mixin card-hover-effect($intensity: 'subtle', $custom-y-translate: null, $custom-shadow: null) {
   transition: transform $transition-base, box-shadow $transition-base;
   will-change: transform, box-shadow; // Optimize animation performance
-  &:hover {
-    transform: translateY($y-translate);
-    box-shadow: $hover-shadow;
+
+  @if $intensity == 'subtle' {
+    // 微妙效果：仅增强阴影，几乎不移动
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+  } @else if $intensity == 'moderate' {
+    // 适中效果：适度上移和阴影
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: $box-shadow-lg;
+    }
+  } @else if $intensity == 'strong' {
+    // 强烈效果：明显上移和强阴影
+    &:hover {
+      transform: translateY(-10px);
+      box-shadow: $box-shadow-xl;
+    }
+  } @else if $custom-y-translate != null and $custom-shadow != null {
+    // 自定义效果
+    &:hover {
+      transform: translateY($custom-y-translate);
+      box-shadow: $custom-shadow;
+    }
+  } @else {
+    // 默认效果（向后兼容）
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: $box-shadow;
+    }
   }
 }
 
@@ -99,7 +129,7 @@
   border-radius: $border-radius-lg;
   overflow: hidden; // 重要，用于图片等子元素
   animation: fadeIn $animation-duration-slow ease-out;
-  @include card-hover-effect(); // Apply common hover effect
+  @include card-hover-effect('subtle'); // 使用微妙悬停效果
 }
 
 // 卡片头部
@@ -150,8 +180,8 @@
     transition: opacity 0.3s ease;
   }
 
-  // Apply hover effect with custom parameters
-  @include card-hover-effect(-10px, $box-shadow-lg);
+  // Apply hover effect with moderate intensity
+  @include card-hover-effect('moderate');
 
   &:hover {
     // Additional hover styles specific to this card type
@@ -213,8 +243,8 @@
   box-shadow: $box-shadow;
   transition: box-shadow $transition-slow, transform $transition-slow; // Combine transitions
 
-  @include image-scale-hover(1.08, 0.8s); // Apply image scale hover
-  @include card-hover-effect(-8px, $box-shadow-lg); // Apply card hover
+  @include image-scale-hover(1.05, 0.8s); // Apply image scale hover with more subtle effect
+  @include card-hover-effect('moderate'); // Apply moderate hover effect
 
   .card-img-top {
     height: 200px;
@@ -260,8 +290,8 @@
   // transition: $transition-slow; // Replaced by mixin
   margin-bottom: 1.5rem; // Spacing between cards
 
-  @include card-hover-effect(-10px, $box-shadow-xl); // Apply hover effect
-  @include image-scale-hover(1.05, 0.8s); // Apply image scale hover
+  @include card-hover-effect('moderate'); // Apply moderate hover effect
+  @include image-scale-hover(1.03, 0.8s); // Apply more subtle image scale hover
 
   // &:hover { // Replaced by mixin
   //   transform: translateY(-10px);
@@ -344,7 +374,7 @@
   // transition: $transition-base; // Replaced by mixin
   height: 100%; // Ensure consistent height
   box-shadow: $box-shadow;
-  @include card-hover-effect(); // Apply common hover effect
+  @include card-hover-effect('subtle'); // Apply subtle hover effect
 
   // &:hover { // Replaced by mixin
   //   transform: translateY(-5px);
@@ -380,8 +410,8 @@
   overflow: hidden;
   // transition: $transition-slow; // Replaced by mixins
 
-  @include card-hover-effect(-10px, $box-shadow-xl); // Apply hover effect
-  @include image-scale-hover(1.1, 0.6s); // Apply image scale hover
+  @include card-hover-effect('moderate'); // Apply moderate hover effect
+  @include image-scale-hover(1.05, 0.6s); // Apply more subtle image scale hover
 
   // &:hover { // Replaced by mixin
   //   transform: translateY(-10px);
@@ -399,42 +429,6 @@
   // }
 }
 
-// --- Responsive Adjustments ---
-@include resp.respond-to('md') {
-  // Medium devices (tablets, smaller desktops)
-  .card-body,
-  .card-header {
-    padding: 1rem; // Reduce padding
-  }
-
-  .content-card,
-  .feature-card,
-  .media-grid .card {
-    .card-img-top {
-      height: 150px; // Adjust image height
-    }
-  }
-
-  .content-card .card-title {
-    font-size: 1rem; // Adjust title size
-  }
-
-  .feature-icon-card {
-    padding: 1.5rem 1rem; // Adjust padding
-  }
-}
-
-@include resp.respond-to('xs') {
-  // Extra small devices (phones)
-  .feature-icon-card {
-    padding: 1.25rem 1rem;
-  }
-
-  .feature-icon-card .card-title {
-    font-size: 1.1rem;
-  }
-
-  .card-body {
-    padding: 0.75rem;
-  }
-}
+// --- 响应式调整 ---
+// 使用通用响应式模式
+@include pattern.responsive-card-pattern;

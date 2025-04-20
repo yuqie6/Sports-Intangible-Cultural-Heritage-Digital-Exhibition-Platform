@@ -149,7 +149,7 @@
     border-radius: $width / 2;
 
     &:hover {
-      background: darken($thumb-color, 10%);
+      background: color.adjust($thumb-color, $blackness: 10%);
     }
   }
 }
@@ -263,6 +263,21 @@
   border-radius: 50%;
 }
 
+// 徽章悬停效果
+// 为徽章添加悬停时的缩放和跳动效果
+@mixin badge-hover-effect {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+
+  &:hover {
+    transform: scale(1.2);
+    opacity: 0.9;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
 // 提醒变体样式
 // Generates text, background, and border colors for an alert based on a base color.
 // Uses sass:color functions for adjustments.
@@ -329,16 +344,64 @@
 }
 
 // 卡片悬停效果混合器
-// $y-translate: 悬停时垂直移动的距离
+// $y-translate: 悬停时垂直移动的距离或效果类型('subtle')
 // $hover-shadow: 悬停时应用的阴影
 @mixin card-hover-effect($y-translate: -5px, $hover-shadow: $box-shadow-lg) {
   transition: transform $transition-base, box-shadow $transition-base;
   will-change: transform, box-shadow; // 优化动画性能
 
   &:hover {
-    transform: translateY($y-translate);
-    @if $hover-shadow {
-      box-shadow: $hover-shadow;
+    @if $y-translate == 'subtle' {
+      // 更加克制的悬停效果
+      transform: translateY(-2px);
+      box-shadow: $box-shadow;
+    } @else {
+      transform: translateY($y-translate);
+      @if $hover-shadow {
+        box-shadow: $hover-shadow;
+      }
+    }
+  }
+}
+
+// 高级卡片悬停效果
+// 包含多种悬停效果，如上浮、缩放、边框高亮等
+// $effect-type: 效果类型（float、scale、border、glow）
+// $params: 效果参数
+@mixin advanced-card-hover($effect-type: 'float', $params: ()) {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  @if $effect-type == 'float' {
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+  } @else if $effect-type == 'scale' {
+    &:hover {
+      transform: scale(1.03);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+  } @else if $effect-type == 'border' {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: inherit;
+      border: 2px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+
+    &:hover::before {
+      border-color: $primary;
+    }
+  } @else if $effect-type == 'glow' {
+    &:hover {
+      box-shadow: 0 0 20px rgba($primary, 0.4);
     }
   }
 }
@@ -353,7 +416,12 @@
     transition: transform $duration ease;
     will-change: transform; // 优化动画性能
 
-    &:hover {
+    // 使用父元素悬停时触发图片缩放，而不是图片本身悬停
+    // 这样可以避免用户鼠标移动到图片上时的抖动效果
+  }
+
+  &:hover {
+    img, .img-fluid, .card-img-top {
       transform: scale($scale);
     }
   }
@@ -416,6 +484,72 @@
   }
 }
 
+// 高级渐变按钮混合器
+// $gradient: 按钮的渐变背景
+// $hover-gradient: 悬停时的渐变背景
+// $shadow-color: 阴影颜色
+@mixin gradient-button($gradient: $primary-gradient, $hover-gradient: null, $shadow-color: rgba($primary, 0.3)) {
+  background: $gradient;
+  border: none;
+  color: white;
+  border-radius: 50px;
+  padding: 0.75rem 1.8rem;
+  font-weight: $font-weight-medium;
+  box-shadow: 0 4px 15px rgba($shadow-color, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: $hover-gradient;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba($shadow-color, 0.4);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+// 3D按钮效果
+// $color: 按钮的背景颜色
+// $depth: 3D效果的深度
+@mixin button-3d($color: $primary, $depth: 4px) {
+  background-color: $color;
+  border: none;
+  color: white;
+  border-radius: $border-radius;
+  padding: 0.75rem 1.5rem;
+  font-weight: $font-weight-medium;
+  position: relative;
+  box-shadow: 0 $depth 0 darken($color, 10%);
+  transform: translateY(0);
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 ($depth + 2px) 0 darken($color, 10%);
+  }
+
+  &:active {
+    transform: translateY($depth);
+    box-shadow: 0 0 0 darken($color, 10%);
+  }
+}
+
 // --- Specific Animation Keyframes ---
 // (Consider moving to a dedicated _animations.scss if many are added)
 
@@ -427,5 +561,38 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@include keyframes(fadeInUp) {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@include keyframes(fadeInLeft) {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@include keyframes(fadeInRight) {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

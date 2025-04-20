@@ -1,10 +1,14 @@
 // 表单样式
-// 表单样式
+// 提供各种表单元素的样式，包括输入框、选择框、复选框、单选框等
 @use '../base/variables' as *;
-@use '../base/mixins' as mix; // Import global mixins
+@use '../base/mixins' as mix;
 @use '../base/responsive' as resp;
+@use 'sass:color';
+@use 'sass:math';
 
-// --- Base Form Styles ---
+//------------------------------------------------------
+// 基础表单样式
+//------------------------------------------------------
 
 // 基础表单控件 (input, textarea, select)
 .form-control {
@@ -20,30 +24,114 @@
   border: 1px solid $input-border-color;
   appearance: none; // 移除默认外观
   border-radius: $border-radius;
-  transition: border-color $transition-fast, box-shadow $transition-fast;
-  @include mix.form-control-focus(); // 应用通用焦点样式
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+
+  // 悬停状态 - 更加克制
+  &:hover:not(:focus):not(:disabled):not([readonly]) {
+    border-color: darken($input-border-color, 15%);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    // 移除上移效果，使表单元素更稳定
+  }
+
+  // 焦点状态 - 增强版（更加克制）
+  &:focus {
+    border-color: $primary-light;
+    box-shadow: 0 0 0 $input-focus-width rgba($primary, 0.25), 0 3px 10px rgba($primary, 0.08);
+    outline: 0;
+    // 移除上移效果，使表单元素更稳定
+    background-color: white;
+  }
 
   // 禁用状态
   &:disabled,
   &[readonly] {
     background-color: $input-disabled-bg;
-    opacity: 1; // 覆盖 Bootstrap 的默认透明度
+    opacity: 0.8;
+    cursor: not-allowed;
+    box-shadow: none;
   }
 
   // Placeholder 样式
   &::placeholder {
     color: $input-placeholder-color;
     opacity: 1; // Firefox 需要
+    transition: opacity 0.2s ease;
+  }
+
+  // 输入时隐藏 placeholder
+  &:focus::placeholder {
+    opacity: 0.5;
+  }
+
+  // 添加微动画
+  &.animate-focus {
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    will-change: transform, border-color, box-shadow;
   }
 }
 
 // 表单标签
 .form-label {
-  // 表单字段的标签
   margin-bottom: $form-label-margin-bottom;
   font-size: $form-label-font-size;
   font-weight: $form-label-font-weight;
   color: $form-label-color;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+  position: relative;
+
+  // 添加带下划线的标签变体
+  &.form-label-underline {
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      width: 0;
+      height: 2px;
+      background: $primary-gradient;
+      transition: width 0.3s ease;
+    }
+
+    // 当相关输入框获得焦点时显示下划线
+    .form-control:focus + & {
+      color: $primary;
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+
+  // 添加带图标的标签变体
+  &.form-label-icon {
+    padding-left: 1.5rem;
+    position: relative;
+
+    i {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-muted;
+      transition: color 0.2s ease;
+    }
+
+    // 当相关输入框获得焦点时改变图标颜色
+    .form-control:focus ~ & i {
+      color: $primary;
+    }
+  }
+
+  // 必填字段标记
+  .required-field &::after {
+    content: '*';
+    color: $danger;
+    margin-left: 0.25rem;
+  }
 }
 
 // --- Specific Form Components ---
@@ -206,25 +294,37 @@
 .form-floating {
   // 实现标签在输入框内浮动的效果
   position: relative;
+  margin-bottom: 1.5rem;
 
   > .form-control,
   > .form-select {
     height: calc(3.5rem + 2px); // 固定高度以容纳标签
     line-height: 1.25; // 调整行高
-    padding: 1rem $input-padding-x; // 默认内边距
+    padding: 1.25rem $input-padding-x 0.5rem; // 调整内边距以留出更多空间给标签
+    background-color: $input-bg;
+    border-radius: $border-radius;
+    transition: all 0.3s ease;
 
     // 当输入框有内容或获得焦点时，调整内边距给标签留出空间
     &:focus,
     &:not(:placeholder-shown):not([type="date"]):not([type="time"]) { // 排除某些输入类型，它们始终显示内容
-      padding-top: $input-padding-y * 2 + $form-label-margin-bottom; // 计算顶部内边距
-      padding-bottom: $input-padding-y;
+      padding-top: 1.5rem; // 调整顶部内边距
+      padding-bottom: 0.5rem;
+      border-color: $primary-light;
     }
 
     // 当输入框有内容或获得焦点时，移动并缩小标签
     &:focus ~ label,
     &:not(:placeholder-shown):not([type="date"]):not([type="time"]) ~ label {
-      opacity: 0.65; // 标签变淡
-      transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem); // 向上移动并缩小
+      opacity: 0.8; // 标签变淡
+      transform: scale(0.85) translateY(-1rem); // 向上移动并缩小
+      color: $primary; // 焦点时标签变为主色
+    }
+
+    // 焦点状态增强（更加克制）
+    &:focus {
+      box-shadow: 0 3px 10px rgba($primary, 0.08);
+      border-color: $primary-light;
     }
   }
 
@@ -237,7 +337,51 @@
     pointer-events: none; // 允许点击穿透标签到输入框
     border: 1px solid transparent; // 占位边框，防止布局移动
     transform-origin: 0 0; // 设置变换原点
-    transition: opacity $transition-fast, transform $transition-fast; // 添加过渡效果
+    transition: all 0.3s ease; // 添加过渡效果
+    font-weight: $font-weight-medium;
+    color: $text-muted;
+  }
+
+  // 浮动标签变体 - 珠光效果
+  &.form-floating-shine {
+    > .form-control:focus ~ label,
+    > .form-control:not(:placeholder-shown) ~ label,
+    > .form-select:focus ~ label,
+    > .form-select:not(:placeholder-shown) ~ label {
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      opacity: 1;
+    }
+  }
+
+  // 浮动标签变体 - 带图标
+  &.form-floating-icon {
+    > .form-control,
+    > .form-select {
+      padding-left: 3rem; // 留出空间给图标
+    }
+
+    > label {
+      padding-left: 3rem;
+    }
+
+    > i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-muted;
+      transition: color 0.3s ease;
+      z-index: 2;
+    }
+
+    > .form-control:focus ~ i,
+    > .form-select:focus ~ i {
+      color: $primary;
+    }
   }
 }
 
@@ -248,20 +392,49 @@
   min-height: $form-check-min-height;
   padding-left: $form-check-padding-start;
   margin-bottom: $form-check-margin-bottom;
+  position: relative;
+  transition: all 0.2s ease;
 
   // 输入框本身 (checkbox/radio)
   .form-check-input {
     float: left; // 左浮动
     margin-left: -#{$form-check-padding-start}; // 负 margin 使其与标签对齐
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
 
     // 选中状态
     &:checked {
       background-color: $primary;
       border-color: $primary;
+      box-shadow: 0 0 0 1px rgba($primary, 0.1);
+
+      // 选中时的动画效果
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(white, 0.3);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        animation: checkbox-ripple 0.4s ease-out;
+      }
     }
 
     // 焦点状态
-    @include mix.form-control-focus();
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+      border-color: $primary-light;
+    }
+
+    // 悬停状态
+    &:hover:not(:checked):not(:disabled) {
+      border-color: darken($input-border-color, 15%);
+    }
   }
 
   // 标签文本
@@ -269,6 +442,14 @@
     color: $form-check-label-color;
     cursor: pointer; // 添加手型光标
     margin-bottom: 0; // 移除默认 margin
+    transition: color 0.2s ease;
+    position: relative;
+    padding: 0.1rem 0; // 增加上下内边距以增大点击区域
+
+    // 悬停效果
+    &:hover {
+      color: $primary;
+    }
   }
 
   // 行内排列
@@ -276,10 +457,70 @@
     display: inline-block;
     margin-right: $form-check-inline-margin-end;
     padding-left: 0; // 重置 padding
+
     .form-check-input {
       float: none;
       margin-left: 0;
       margin-right: 0.3125rem; // 输入框和标签间距
+    }
+  }
+
+  // 添加动画效果
+  &.animate-check {
+    .form-check-input:checked {
+      animation: checkbox-pop 0.3s ease-out;
+    }
+  }
+
+  // 强调样式变体
+  &.form-check-emphasis {
+    padding: 0.5rem 0.5rem 0.5rem 2.5rem;
+    border-radius: $border-radius;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba($primary, 0.05);
+    }
+
+    .form-check-input:checked ~ .form-check-label {
+      color: $primary;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  // 卡片式复选框/单选框
+  &.form-check-card {
+    padding: 0;
+    margin-bottom: 1rem;
+
+    .form-check-input {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      margin: 0;
+      z-index: 2;
+    }
+
+    .form-check-label {
+      display: block;
+      padding: 1rem 1rem 1rem 2.5rem;
+      background-color: white;
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
+      transition: all 0.3s ease;
+      box-shadow: $box-shadow-sm;
+
+      &:hover {
+        border-color: $primary-light;
+        box-shadow: 0 5px 15px rgba($primary, 0.1);
+        transform: translateY(-2px);
+      }
+    }
+
+    .form-check-input:checked ~ .form-check-label {
+      border-color: $primary;
+      box-shadow: 0 5px 15px rgba($primary, 0.15);
+      background-color: rgba($primary, 0.03);
     }
   }
 }
@@ -288,6 +529,7 @@
 .form-switch {
   // 基于 .form-check 的开关变体
   padding-left: $form-switch-padding-start;
+  position: relative;
 
   .form-check-input {
     // 开关输入框特定样式
@@ -296,7 +538,9 @@
     background-image: escape-svg($form-switch-bg-image); // 使用变量和转义函数
     background-position: left center;
     border-radius: $form-switch-border-radius;
-    transition: background-position $transition-fast; // 使用变量
+    transition: all 0.3s ease; // 使用变量
+    height: 1.5rem; // 增加高度使开关更明显
+    cursor: pointer;
 
     // 选中状态
     &:checked {
@@ -304,9 +548,95 @@
       background-image: escape-svg($form-switch-checked-bg-image);
       background-color: $primary; // 选中时背景变为主色
       border-color: $primary;
+      box-shadow: 0 0 0 1px rgba($primary, 0.1), 0 2px 5px rgba($primary, 0.2);
     }
 
-    // 焦点状态 (继承 .form-check-input)
+    // 焦点状态
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+    }
+
+    // 悬停状态
+    &:hover:not(:checked):not(:disabled) {
+      border-color: darken($input-border-color, 15%);
+      background-color: rgba($primary, 0.05);
+    }
+
+    // 禁用状态
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // 开关标签
+  .form-check-label {
+    cursor: pointer;
+    padding-left: 0.5rem;
+    user-select: none;
+    transition: color 0.2s ease;
+  }
+
+  // 开关大小变体 - 大
+  &.form-switch-lg {
+    padding-left: 3.5rem;
+    min-height: 2rem;
+
+    .form-check-input {
+      width: 3rem;
+      height: 1.75rem;
+      margin-left: -3.5rem;
+      border-radius: 2rem;
+    }
+
+    .form-check-label {
+      padding-top: 0.25rem;
+      font-size: 1.1rem;
+    }
+  }
+
+  // 开关大小变体 - 小
+  &.form-switch-sm {
+    padding-left: 2.5rem;
+    min-height: 1.25rem;
+
+    .form-check-input {
+      width: 2rem;
+      height: 1.25rem;
+      margin-left: -2.5rem;
+      border-radius: 1.25rem;
+    }
+
+    .form-check-label {
+      padding-top: 0.125rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  // 开关颜色变体
+  &.form-switch-primary .form-check-input:checked {
+    background-color: $primary;
+    border-color: $primary;
+  }
+
+  &.form-switch-success .form-check-input:checked {
+    background-color: $success;
+    border-color: $success;
+  }
+
+  &.form-switch-danger .form-check-input:checked {
+    background-color: $danger;
+    border-color: $danger;
+  }
+
+  &.form-switch-warning .form-check-input:checked {
+    background-color: $warning;
+    border-color: $warning;
+  }
+
+  &.form-switch-info .form-check-input:checked {
+    background-color: $info;
+    border-color: $info;
   }
 }
 
@@ -318,13 +648,48 @@
   padding: 0; // 移除默认内边距
   background-color: transparent; // 透明背景
   appearance: none; // 移除默认外观
+  cursor: pointer;
+  position: relative;
+
+  // 添加当前值指示器
+  &.form-range-with-value {
+    margin-bottom: 2rem;
+
+    &::after {
+      content: attr(data-value);
+      position: absolute;
+      left: var(--value-percent, 0%);
+      bottom: -2rem;
+      transform: translateX(-50%);
+      padding: 0.25rem 0.5rem;
+      background: $primary-gradient;
+      color: white;
+      border-radius: $border-radius-sm;
+      font-size: 0.85rem;
+      font-weight: $font-weight-medium;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover::after,
+    &:focus::after {
+      opacity: 1;
+    }
+  }
 
   // 焦点状态 (应用于滑块按钮)
   &:focus {
     outline: 0; // 移除默认 outline
+
     // 焦点阴影通过伪元素应用
-    &::-webkit-slider-thumb { box-shadow: $form-range-thumb-focus-box-shadow; }
-    &::-moz-range-thumb { box-shadow: $form-range-thumb-focus-box-shadow; }
+    &::-webkit-slider-thumb {
+      box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+      transform: scale(1.2);
+    }
+    &::-moz-range-thumb {
+      box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+      transform: scale(1.2);
+    }
   }
 
   // Webkit (Chrome, Safari) 滑块按钮
@@ -332,15 +697,23 @@
     width: $form-range-thumb-width;
     height: $form-range-thumb-height;
     margin-top: ($form-range-track-height - $form-range-thumb-height) / 2; // 垂直居中
-    background-color: $primary;
+    background: $primary-gradient;
     border: $form-range-thumb-border;
     border-radius: $form-range-thumb-border-radius;
     appearance: none;
-    transition: background-color $transition-fast, border-color $transition-fast, box-shadow $transition-fast;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba($primary, 0.3);
 
     // 按下状态
     &:active {
       background-color: $form-range-thumb-active-bg;
+      transform: scale(1.1);
+    }
+
+    // 悬停状态
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 3px 8px rgba($primary, 0.4);
     }
   }
 
@@ -353,20 +726,29 @@
     background-color: $form-range-track-bg;
     border-color: transparent;
     border-radius: $form-range-track-border-radius;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   // Firefox 滑块按钮
   &::-moz-range-thumb {
     width: $form-range-thumb-width;
     height: $form-range-thumb-height;
-    background-color: $primary;
+    background: $primary-gradient;
     border: $form-range-thumb-border;
     border-radius: $form-range-thumb-border-radius;
     appearance: none;
-    transition: background-color $transition-fast, border-color $transition-fast, box-shadow $transition-fast;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba($primary, 0.3);
 
     &:active {
       background-color: $form-range-thumb-active-bg;
+      transform: scale(1.1);
+    }
+
+    // 悬停状态
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 3px 8px rgba($primary, 0.4);
     }
   }
 
@@ -379,12 +761,60 @@
     background-color: $form-range-track-bg;
     border-color: transparent;
     border-radius: $form-range-track-border-radius;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  // 进度条样式 - 仅适用于 Firefox
+  &::-moz-range-progress {
+    height: $form-range-track-height;
+    background: $primary-gradient;
+    border-radius: $form-range-track-border-radius;
   }
 
   // 禁用状态
   &:disabled {
-    &::-webkit-slider-thumb { background-color: $form-range-thumb-disabled-bg; }
-    &::-moz-range-thumb { background-color: $form-range-thumb-disabled-bg; }
+    opacity: 0.6;
+    cursor: not-allowed;
+
+    &::-webkit-slider-thumb {
+      background-color: $form-range-thumb-disabled-bg;
+      box-shadow: none;
+    }
+    &::-moz-range-thumb {
+      background-color: $form-range-thumb-disabled-bg;
+      box-shadow: none;
+    }
+  }
+
+  // 颜色变体
+  &.form-range-primary {
+    &::-webkit-slider-thumb { background: $primary-gradient; }
+    &::-moz-range-thumb { background: $primary-gradient; }
+    &::-moz-range-progress { background: $primary-gradient; }
+  }
+
+  &.form-range-success {
+    &::-webkit-slider-thumb { background: $success-gradient; }
+    &::-moz-range-thumb { background: $success-gradient; }
+    &::-moz-range-progress { background: $success-gradient; }
+  }
+
+  &.form-range-danger {
+    &::-webkit-slider-thumb { background: $danger-gradient; }
+    &::-moz-range-thumb { background: $danger-gradient; }
+    &::-moz-range-progress { background: $danger-gradient; }
+  }
+
+  &.form-range-warning {
+    &::-webkit-slider-thumb { background: $warning-gradient; }
+    &::-moz-range-thumb { background: $warning-gradient; }
+    &::-moz-range-progress { background: $warning-gradient; }
+  }
+
+  &.form-range-info {
+    &::-webkit-slider-thumb { background: $info-gradient; }
+    &::-moz-range-thumb { background: $info-gradient; }
+    &::-moz-range-progress { background: $info-gradient; }
   }
 }
 
@@ -399,7 +829,14 @@
   background-repeat: no-repeat;
   background-position: right $input-padding-x center;
   background-size: $input-height-inner-half $input-height-inner-half;
-  @include mix.form-control-focus($success, rgba($success, 0.25)); // 应用带颜色的焦点样式
+  box-shadow: 0 0 0 1px rgba($success, 0.1), 0 2px 5px rgba($success, 0.1);
+  animation: form-validation-success 0.3s ease-in-out;
+
+  // 焦点状态
+  &:focus {
+    border-color: darken($success, 10%);
+    box-shadow: 0 0 0 0.25rem rgba($success, 0.25), 0 5px 15px rgba($success, 0.1);
+  }
 }
 
 // 无效状态
@@ -411,7 +848,14 @@
   background-repeat: no-repeat;
   background-position: right $input-padding-x center;
   background-size: $input-height-inner-half $input-height-inner-half;
-  @include mix.form-control-focus($danger, rgba($danger, 0.25));
+  box-shadow: 0 0 0 1px rgba($danger, 0.1), 0 2px 5px rgba($danger, 0.1);
+  animation: form-validation-error 0.3s ease-in-out;
+
+  // 焦点状态
+  &:focus {
+    border-color: darken($danger, 10%);
+    box-shadow: 0 0 0 0.25rem rgba($danger, 0.25), 0 5px 15px rgba($danger, 0.1);
+  }
 }
 
 // 验证反馈文本 (.valid-feedback, .invalid-feedback)
@@ -421,19 +865,457 @@
   width: 100%;
   margin-top: $form-feedback-margin-top;
   font-size: $form-feedback-font-size;
+  font-weight: $font-weight-medium;
+  padding: 0.5rem 0.75rem;
+  border-radius: $border-radius-sm;
+  animation: fadeInUp 0.3s ease-out;
 }
-.valid-feedback { color: $success; }
-.invalid-feedback { color: $danger; }
+
+.valid-feedback {
+  color: darken($success, 10%);
+  background-color: rgba($success, 0.1);
+  border-left: 3px solid $success;
+}
+
+.invalid-feedback {
+  color: darken($danger, 10%);
+  background-color: rgba($danger, 0.1);
+  border-left: 3px solid $danger;
+}
 
 // 当输入无效时显示反馈
 .was-validated :invalid ~ .invalid-feedback,
 .is-invalid ~ .invalid-feedback {
   display: block;
 }
+
 // 当输入有效时显示反馈 (如果需要)
 .was-validated :valid ~ .valid-feedback,
 .is-valid ~ .valid-feedback {
   display: block;
+}
+
+// 验证图标动画
+@keyframes form-validation-success {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes form-validation-error {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-5px);
+  }
+  40%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+//------------------------------------------------------
+// 特殊表单组件
+//------------------------------------------------------
+
+// 文件上传组件
+.form-file-upload {
+  position: relative;
+  margin-bottom: 1.5rem;
+
+  // 隐藏原生文件输入框
+  input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  // 自定义文件上传区域
+  .file-upload-area {
+    padding: 2rem;
+    border: 2px dashed $border-color;
+    border-radius: $border-radius;
+    text-align: center;
+    transition: all 0.3s ease;
+    background-color: rgba($light, 0.5);
+    position: relative;
+    z-index: 1;
+
+    // 悬停状态（更加克制）
+    &:hover {
+      border-color: $primary-light;
+      background-color: rgba($primary, 0.03);
+    }
+
+    // 拖放状态（更加克制）
+    &.dragover {
+      border-color: $primary;
+      background-color: rgba($primary, 0.08);
+      transform: scale(1.005); // 缩小缩放效果
+      box-shadow: 0 3px 10px rgba($primary, 0.08);
+    }
+
+    // 图标
+    i {
+      font-size: 2.5rem;
+      color: $primary;
+      margin-bottom: 1rem;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    // 文本
+    h5 {
+      margin-bottom: 0.5rem;
+      font-weight: $font-weight-medium;
+    }
+
+    p {
+      color: $text-muted;
+      margin-bottom: 0;
+    }
+
+    // 选择文件按钮
+    .btn {
+      margin-top: 1rem;
+      @include mix.gradient-button($primary-gradient);
+    }
+  }
+
+  // 预览区域
+  .file-preview {
+    margin-top: 1rem;
+    display: none; // 默认隐藏
+    animation: fadeInUp 0.3s ease-out;
+
+    &.show {
+      display: block;
+    }
+
+    // 预览卡片
+    .file-preview-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      background-color: white;
+      border-radius: $border-radius;
+      box-shadow: $box-shadow-sm;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: $box-shadow;
+        transform: translateY(-1px); // 减小上移效果
+      }
+
+      // 文件图标
+      .file-icon {
+        width: 40px;
+        height: 40px;
+        @include mix.flex-center;
+        background: rgba($primary, 0.1);
+        border-radius: $border-radius-sm;
+        margin-right: 1rem;
+
+        i {
+          color: $primary;
+          font-size: 1.25rem;
+        }
+      }
+
+      // 文件信息
+      .file-info {
+        flex: 1;
+
+        .file-name {
+          font-weight: $font-weight-medium;
+          margin-bottom: 0.25rem;
+          @include mix.text-truncate;
+        }
+
+        .file-size {
+          font-size: 0.85rem;
+          color: $text-muted;
+        }
+      }
+
+      // 删除按钮
+      .file-remove {
+        color: $danger;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: rgba($danger, 0.1);
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+}
+
+// 标签输入组件
+.form-tags-input {
+  position: relative;
+  margin-bottom: 1.5rem;
+
+  // 标签容器
+  .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid $input-border-color;
+    border-radius: $border-radius;
+    min-height: 3.5rem;
+    background-color: $input-bg;
+    transition: all 0.3s ease;
+    cursor: text;
+
+    &:focus-within {
+      border-color: $primary-light;
+      box-shadow: 0 0 0 $input-focus-width rgba($primary, 0.25);
+    }
+
+    // 单个标签
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.75rem;
+      background: $primary-gradient;
+      color: white;
+      border-radius: $border-radius-pill;
+      font-size: 0.85rem;
+      font-weight: $font-weight-medium;
+      box-shadow: 0 2px 5px rgba($primary, 0.2);
+      animation: fadeIn 0.3s ease-out;
+
+      // 删除按钮
+      .tag-remove {
+        margin-left: 0.5rem;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    // 输入框
+    input {
+      flex: 1;
+      min-width: 100px;
+      border: none;
+      outline: none;
+      padding: 0.5rem;
+      background: transparent;
+      font-size: $font-size-base;
+    }
+  }
+
+  // 建议列表
+  .tags-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid $border-color;
+    border-top: none;
+    border-radius: 0 0 $border-radius $border-radius;
+    box-shadow: $box-shadow;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+    display: none;
+
+    &.show {
+      display: block;
+      animation: fadeInDown 0.3s ease-out;
+    }
+
+    // 建议项
+    .suggestion-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba($primary, 0.05);
+      }
+
+      &.active {
+        background-color: rgba($primary, 0.1);
+        color: $primary;
+      }
+    }
+  }
+}
+
+// 评分组件
+.form-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+
+  // 评分项
+  .rating-item {
+    font-size: 1.5rem;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 0 0.25rem;
+    transition: all 0.2s ease;
+
+    &:hover,
+    &:hover ~ .rating-item,
+    &.active,
+    &.active ~ .rating-item {
+      color: $warning;
+      transform: scale(1.2);
+    }
+  }
+
+  // 大小变体
+  &.rating-lg .rating-item {
+    font-size: 2rem;
+  }
+
+  &.rating-sm .rating-item {
+    font-size: 1.25rem;
+  }
+}
+
+// 带图标的输入框
+.form-icon-input {
+  position: relative;
+
+  // 前缀图标
+  .input-icon-prefix {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-muted;
+    transition: color 0.2s ease;
+    z-index: 2;
+  }
+
+  // 后缀图标
+  .input-icon-suffix {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-muted;
+    transition: color 0.2s ease;
+    z-index: 2;
+    cursor: pointer;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+
+  // 调整输入框内边距
+  .form-control {
+    &.has-prefix {
+      padding-left: 2.5rem;
+    }
+
+    &.has-suffix {
+      padding-right: 2.5rem;
+    }
+
+    &:focus ~ .input-icon-prefix,
+    &:focus ~ .input-icon-suffix {
+      color: $primary;
+    }
+  }
+}
+
+// 数量选择器
+.form-quantity {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 150px;
+  margin-bottom: 1.5rem;
+
+  // 减少按钮
+  .quantity-decrease,
+  .quantity-increase {
+    width: 40px;
+    height: 40px;
+    @include mix.flex-center;
+    background-color: $light;
+    border: 1px solid $border-color;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+
+    &:hover {
+      background-color: rgba($primary, 0.1);
+      border-color: $primary-light;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .quantity-decrease {
+    border-radius: $border-radius 0 0 $border-radius;
+  }
+
+  .quantity-increase {
+    border-radius: 0 $border-radius $border-radius 0;
+  }
+
+  // 数量输入框
+  .quantity-input {
+    flex: 1;
+    width: 50px;
+    height: 40px;
+    text-align: center;
+    border: 1px solid $border-color;
+    border-left: none;
+    border-right: none;
+    font-weight: $font-weight-medium;
+
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    // 移除数字输入框的上下箭头
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &[type=number] {
+      -webkit-appearance: textfield;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+  }
 }
 
 // --- Responsive Adjustments ---
@@ -442,6 +1324,7 @@
   // 调整表单元素间距和大小
   .form-label {
     margin-bottom: 0.3rem; // 减小标签底部间距
+    font-size: 0.95rem;
   }
 
   .form-control,
@@ -451,8 +1334,116 @@
     font-size: $font-size-sm; // 减小字体大小
   }
 
+  // 浮动标签调整
+  .form-floating > label {
+    padding: 0.8rem $input-padding-x;
+    font-size: 0.9rem;
+  }
+
+  // 复选框和单选框调整
+  .form-check-label {
+    font-size: 0.9rem;
+  }
+
+  // 开关调整
+  .form-switch .form-check-input {
+    height: 1.4rem;
+  }
+
+  // 文件上传组件调整
+  .form-file-upload .file-upload-area {
+    padding: 1.5rem;
+
+    i {
+      font-size: 2rem;
+    }
+  }
+
   // 隐藏导航栏折叠后的顶部搜索框 (通常在移动端有单独的搜索入口)
   .navbar-collapse .search-form {
     display: none !important; // 强制隐藏
+  }
+}
+
+// 手机设备调整
+@include resp.respond-to('sm') {
+  // 表单元素进一步调整
+  .form-control,
+  .form-select {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  // 浮动标签进一步调整
+  .form-floating {
+    > .form-control,
+    > .form-select {
+      height: calc(3.2rem + 2px);
+      padding-top: 1.1rem;
+    }
+
+    > label {
+      padding: 0.7rem 0.75rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  // 文件上传组件进一步调整
+  .form-file-upload .file-upload-area {
+    padding: 1.25rem;
+
+    i {
+      font-size: 1.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    h5 {
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+    }
+
+    .btn {
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  // 评分组件调整
+  .form-rating .rating-item {
+    font-size: 1.25rem;
+  }
+}
+
+//------------------------------------------------------
+// 动画关键帧
+//------------------------------------------------------
+
+// 复选框波纹动画
+@keyframes checkbox-ripple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.5;
+  }
+  100% {
+    width: 200%;
+    height: 200%;
+    opacity: 0;
+  }
+}
+
+// 复选框弹出动画
+@keyframes checkbox-pop {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
   }
 }
