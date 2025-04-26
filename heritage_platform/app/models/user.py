@@ -126,4 +126,15 @@ class User(UserMixin, db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
+    """Flask-Login用户加载函数
+
+    根据用户ID加载用户对象，供Flask-Login使用。
+    这个函数是Flask-Login的必要组件，用于从会话中恢复用户。
+
+    Args:
+        user_id: 用户ID，通常是字符串形式
+
+    Returns:
+        User: 找到的用户对象，如果不存在则返回None
+    """
     return User.query.get(int(user_id))
