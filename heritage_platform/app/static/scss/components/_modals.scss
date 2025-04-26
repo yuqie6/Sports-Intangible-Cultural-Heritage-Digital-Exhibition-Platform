@@ -4,7 +4,7 @@
 @use '../base/responsive' as resp;
 
 
-// 模态框背景
+// 模态框背景 - 增强版
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -12,18 +12,26 @@
   z-index: $z-index-modal-backdrop;
   width: 100vw;
   height: 100vh;
-  background-color: $dark;
+  // 使用渐变背景而非纯色，增强深度感
+  background: radial-gradient(
+    circle at center,
+    rgba($dark, 0.7) 0%,
+    rgba($dark, 0.9) 100%
+  );
+
+  // 添加平滑过渡
+  transition: opacity 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 
   &.fade {
     opacity: 0;
   }
 
   &.show {
-    opacity: 0.5;
+    opacity: 0.75; // 增强不透明度，提高对比度
   }
 }
 
-// 模态框容器
+// 模态框容器 - 增强版
 .modal {
   position: fixed;
   top: 0;
@@ -35,26 +43,33 @@
   overflow-x: hidden;
   overflow-y: auto;
   outline: 0;
+  // 添加透视效果，增强深度感
+  perspective: 1200px;
 
+  // 添加更平滑的过渡效果
   &.fade .modal-dialog {
-    transition: transform 0.3s ease-out;
-    transform: translateY(-50px);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transform: translateY(-30px) scale(0.95);
+    opacity: 0;
   }
 
   &.show .modal-dialog {
-    transform: none;
+    transform: translateY(0) scale(1);
+    opacity: 1;
   }
 }
 
-// 模态框对话框
+// 模态框对话框 - 增强版
 .modal-dialog {
   position: relative;
   width: auto;
   margin: 0.5rem;
   pointer-events: none;
+  // 添加过渡效果
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-// 模态框内容
+// 模态框内容 - 增强版
 .modal-content {
   position: relative;
   display: flex;
@@ -63,56 +78,142 @@
   pointer-events: auto;
   background-color: white;
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: $border-radius-lg;
+  // 使用半透明边框增强玻璃态效果
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $border-radius-xl; // 使用更大的圆角
   outline: 0;
-  box-shadow: $box-shadow-lg;
+  // 增强阴影效果
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+  // 添加过渡效果
+  transition: all 0.3s ease;
+  // 添加微妙的背景渐变
+  background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+  // 尝试添加玻璃态效果（如果浏览器支持）
+  @include mix.backdrop-blur(10px);
+
+  // 悬停效果
+  &:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 0 10px 20px rgba(0, 0, 0, 0.15);
+  }
 }
 
-// 模态框头部
+// 模态框头部 - 增强版
 .modal-header {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  border-bottom: 1px solid $border-color;
-  border-top-left-radius: calc($border-radius-lg - 1px);
-  border-top-right-radius: calc($border-radius-lg - 1px);
+  padding: 1.25rem 1.5rem; // 增加内边距，提高可读性
+  // 使用半透明边框增强玻璃态效果
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  // 与内容匹配的圆角
+  border-top-left-radius: calc($border-radius-xl - 1px);
+  border-top-right-radius: calc($border-radius-xl - 1px);
+  // 添加微妙的背景渐变
+  background: linear-gradient(to right, rgba($primary, 0.02), rgba($primary, 0.05));
 
   .modal-title {
     margin-bottom: 0;
     line-height: 1.5;
     font-weight: $font-weight-bold;
+    // 添加渐变文本效果
+    background: linear-gradient(to right, $primary, darken($primary, 15%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    // 为不支持渐变文本的浏览器提供回退方案
+    @supports not (background-clip: text) {
+      color: $primary;
+    }
   }
 
+  // 关闭按钮 - 玻璃态效果
   .btn-close {
-    padding: 0.5rem;
-    margin: -0.5rem -0.5rem -0.5rem auto;
+    padding: 0.75rem;
+    margin: -0.75rem -0.75rem -0.75rem auto;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+    position: relative;
+    z-index: 1;
+
+    // 添加悬停效果
+    &:hover, &:focus {
+      opacity: 1;
+      transform: rotate(90deg);
+      box-shadow: none;
+    }
+
+    // 添加聚焦效果
+    &:focus {
+      box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+    }
   }
 }
 
-// 模态框主体
+// 模态框主体 - 增强版
 .modal-body {
   position: relative;
   flex: 1 1 auto;
-  padding: 1rem;
+  padding: 1.5rem; // 增加内边距，提高可读性
+  // 添加微妙的背景渐变
+  background: linear-gradient(to bottom, rgba(white, 1), rgba($light, 0.5));
+  // 添加滑入动画
+  animation: fadeIn 0.3s ease-out;
+
+  // 添加滑动条样式
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba($light, 0.5);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba($primary, 0.2);
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba($primary, 0.4);
+    }
+  }
 }
 
-// 模态框底部
+// 模态框底部 - 增强版
 .modal-footer {
   display: flex;
   flex-wrap: wrap;
   flex-shrink: 0;
   align-items: center;
   justify-content: flex-end;
-  padding: 0.75rem;
-  border-top: 1px solid $border-color;
-  border-bottom-right-radius: calc($border-radius-lg - 1px);
-  border-bottom-left-radius: calc($border-radius-lg - 1px);
+  padding: 1.25rem 1.5rem; // 增加内边距，与头部保持一致
+  // 使用半透明边框增强玻璃态效果
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  // 与内容匹配的圆角
+  border-bottom-right-radius: calc($border-radius-xl - 1px);
+  border-bottom-left-radius: calc($border-radius-xl - 1px);
+  // 添加微妙的背景渐变
+  background: linear-gradient(to left, rgba($light, 0.5), rgba(white, 1));
 
   > * {
     margin: 0.25rem;
+  }
+
+  // 按钮组样式
+  .btn {
+    transition: all 0.2s ease;
+
+    // 主按钮增强
+    &.btn-primary {
+      @include mix.button-hover-effect(-2px, 0 5px 15px rgba($primary, 0.3));
+    }
+
+    // 次要按钮增强
+    &.btn-secondary {
+      @include mix.button-hover-effect(-2px, 0 5px 15px rgba($secondary, 0.3));
+    }
   }
 }
 
@@ -170,11 +271,13 @@
   }
 }
 
-// 响应式调整
+// 响应式调整 - 增强版
 @include resp.respond-to('min-sm') {
   .modal-dialog {
     max-width: 500px;
     margin: 1.75rem auto;
+    // 添加过渡效果
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   }
 
   .modal-dialog-scrollable {
@@ -185,6 +288,7 @@
     min-height: calc(100% - 3.5rem);
   }
 
+  // 全屏模态框响应式调整
   .modal-fullscreen-sm-down {
     width: 100vw;
     max-width: none;
@@ -195,15 +299,32 @@
       height: 100%;
       border: 0;
       border-radius: 0;
+      // 全屏模式下的背景渐变
+      background: linear-gradient(135deg, rgba(white, 1), rgba($light, 0.95));
     }
 
     .modal-header {
       border-radius: 0;
+      // 全屏模式下的头部样式
+      background: linear-gradient(to right, rgba($primary, 0.05), rgba($primary, 0.1));
+      padding: 1.5rem 2rem; // 增加内边距
     }
 
     .modal-body {
       overflow-y: auto;
+      padding: 2rem; // 增加内边距
     }
+
+    .modal-footer {
+      // 全屏模式下的底部样式
+      background: linear-gradient(to left, rgba($primary, 0.05), rgba($primary, 0.02));
+      padding: 1.5rem 2rem; // 增加内边距
+    }
+  }
+
+  // 添加模态框进入动画
+  .modal.fade.show .modal-dialog {
+    animation: modalFadeIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   }
 }
 
@@ -273,6 +394,27 @@
     .modal-body {
       overflow-y: auto;
     }
+  }
+}
+
+// 模态框动画关键帧
+@keyframes modalFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 

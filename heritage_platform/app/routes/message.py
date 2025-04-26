@@ -1,9 +1,24 @@
+"""
+消息系统路由模块
+
+本模块实现了平台的消息系统功能，包括：
+1. 私信功能：发送、接收、回复、删除私信
+2. 群组功能：创建、管理群组，发送群组消息
+3. 广播功能：管理员和教师向多个用户群发消息
+
+消息系统支持以下特性：
+- 软删除：消息被删除时不会立即从数据库移除，而是标记为已删除
+- 已读状态：跟踪消息的已读/未读状态
+- 实时通知：通过WebSocket向在线用户推送新消息通知
+- 权限控制：基于用户角色和群组成员身份的权限控制
+"""
+
 from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request, jsonify, abort
 from flask_login import login_required, current_user
 from app.models.message import Message, MessageGroup, UserGroup, MessageReadStatus
 from app.models.user import User
 from app.forms.message import (
-    MessageForm, ReplyMessageForm, GroupMessageForm, 
+    MessageForm, ReplyMessageForm, GroupMessageForm,
     BroadcastMessageForm, CreateGroupForm, AddMembersForm
 )
 from app import db, csrf
@@ -11,12 +26,26 @@ from sqlalchemy import or_, and_
 from app.utils.decorators import role_required
 import datetime
 
+# 创建消息系统蓝图
 bp = Blueprint('message', __name__)
 
 @bp.route('/messages')
 @login_required
 def message_list():
-    """显示私信列表，包括发出的和收到的"""
+    """显示私信列表页面
+
+    展示当前用户的所有私信，包括：
+    1. 发送的私信（未被自己删除的）
+    2. 接收的私信（未被自己删除的）
+    3. 用户所在的所有群组及其最新消息
+
+    Returns:
+        render_template: 渲染消息列表页面，传递以下上下文：
+            - sent_messages: 发送的私信列表
+            - received_messages: 接收的私信列表
+            - user_groups: 用户所在的群组列表
+            - group_last_messages: 每个群组的最新消息及已读状态
+    """
     # 查询当前用户发送或接收的消息，且未被删除的消息
     sent_messages = Message.query.filter(
         Message.sender_id == current_user.id,
@@ -40,29 +69,29 @@ def message_list():
     user_groups = MessageGroup.query.join(MessageGroup.members).filter(
         UserGroup.user_id == current_user.id
     ).all()
-    
+
     # 获取所有群组的最后一条消息
     group_last_messages = {}
     for group in user_groups:
         last_message = Message.query.filter(
             Message.group_id == group.id
         ).order_by(Message.created_at.desc()).first()
-        
+
         if last_message:
             # 检查该消息对当前用户的已读状态
             read_status = MessageReadStatus.query.filter(
                 MessageReadStatus.message_id == last_message.id,
                 MessageReadStatus.user_id == current_user.id
             ).first()
-            
+
             is_read = read_status and read_status.is_read
             group_last_messages[group.id] = {
                 'message': last_message,
                 'is_read': is_read
             }
-    
-    return render_template('message/list.html', 
-                          sent_messages=sent_messages, 
+
+    return render_template('message/list.html',
+                          sent_messages=sent_messages,
                           received_messages=received_messages,
                           user_groups=user_groups,
                           group_last_messages=group_last_messages)
@@ -70,25 +99,44 @@ def message_list():
 @bp.route('/messages/compose', methods=['GET', 'POST'])
 @login_required
 def compose():
-    """发送新私信"""
+    """发送新私信页面和处理函数
+
+    GET请求：显示发送私信的表单页面，支持通过URL参数预填收件人
+    POST请求：处理表单提交，创建新私信并保存到数据库
+
+    特性：
+    - 验证收件人是否存在
+    - 防止给自己发送私信
+    - 支持WebSocket实时通知
+    - 完善的错误处理
+
+    Args:
+        无直接参数，但支持URL查询参数：
+        - receiver: 预填的收件人用户名
+
+    Returns:
+        GET: 渲染发送私信表单页面
+        POST成功: 重定向到消息列表页面
+        POST失败: 返回表单页面并显示错误信息
+    """
     form = MessageForm()
-    
+
     # 如果URL中有receiver参数，预填收件人
     if request.method == 'GET' and request.args.get('receiver'):
         form.receiver.data = request.args.get('receiver')
-    
+
     if form.validate_on_submit():
         # 根据用户名查找收件人
         receiver = User.query.filter_by(username=form.receiver.data).first()
         if not receiver:
             flash('收件人不存在', 'danger')
             return render_template('message/compose.html', form=form)
-            
+
         # 不能给自己发私信
         if receiver.id == current_user.id:
             flash('不能给自己发送私信', 'warning')
             return render_template('message/compose.html', form=form)
-        
+
         # 创建私信
         message = Message(
             sender_id=current_user.id,
@@ -96,15 +144,15 @@ def compose():
             content=form.content.data,
             message_type='personal'
         )
-        
+
         try:
             db.session.add(message)
             db.session.commit()
-            
+
             # 添加WebSocket实时通知功能
             try:
                 from app.socket_events import socketio
-                
+
                 # 准备消息数据
                 message_data = {
                     'id': message.id,
@@ -115,28 +163,44 @@ def compose():
                     'receiver_id': message.receiver_id,
                     'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 }
-                
+
                 # 发送到接收者的WebSocket
                 receiver_room = f"user_{receiver.id}"
                 socketio.emit('new_private_message', message_data, to=receiver_room)
-                
+
             except Exception as e:
                 current_app.logger.error(f"发送WebSocket实时私信失败: {str(e)}")
                 # 即使WebSocket发送失败，也不影响私信已保存到数据库
-            
+
             flash('私信已发送', 'success')
             return redirect(url_for('message.message_list'))
         except Exception as e:
             db.session.rollback()
             current_app.logger.error(f"发送私信失败: {str(e)}")
             flash('发送失败，请重试', 'danger')
-    
+
     return render_template('message/compose.html', form=form)
 
 @bp.route('/messages/<int:id>')
 @login_required
 def view(id):
-    """查看私信详情"""
+    """查看私信详情页面
+
+    显示指定ID的私信详情，并提供回复功能。
+    自动将未读消息标记为已读。
+    确保只有发送者或接收者可以查看私信。
+
+    Args:
+        id (int): 要查看的私信ID
+
+    Returns:
+        render_template: 渲染私信详情页面，包含以下上下文：
+            - message: 私信对象
+            - form: 回复表单，预填了接收者ID
+
+    Raises:
+        404: 如果私信不存在或当前用户无权查看
+    """
     # 确保当前用户是发送者或接收者
     message = Message.query.filter(
         Message.id == id,
@@ -149,12 +213,12 @@ def view(id):
             Message.message_type == 'broadcast'  # 允许查看群发消息
         )
     ).first_or_404()
-    
+
     # 如果当前用户是接收者且消息未读，则标记为已读
     if message.receiver_id == current_user.id and not message.is_read:
         message.is_read = True
         db.session.commit()
-    
+
     # 准备回复表单
     reply_form = ReplyMessageForm()
     if message.sender_id == current_user.id:
@@ -163,7 +227,7 @@ def view(id):
     else:
         # 否则设置回复对象为发送者
         reply_form.receiver_id.data = message.sender_id
-    
+
     return render_template('message/view.html', message=message, form=reply_form)
 
 @bp.route('/message/messages/<int:id>')
@@ -189,15 +253,15 @@ def view_message_alternate(id):
 def reply():
     """回复私信"""
     form = ReplyMessageForm()
-    
+
     if form.validate_on_submit():
         receiver_id = int(form.receiver_id.data)
         receiver = User.query.get(receiver_id)
-        
+
         if not receiver:
             flash('收件人不存在', 'danger')
             return redirect(url_for('message.message_list'))
-        
+
         # 创建私信
         message = Message(
             sender_id=current_user.id,
@@ -205,15 +269,15 @@ def reply():
             content=form.content.data,
             message_type='personal'
         )
-        
+
         try:
             db.session.add(message)
             db.session.commit()
-            
+
             # 添加WebSocket实时通知功能
             try:
                 from app.socket_events import socketio
-                
+
                 # 准备消息数据
                 message_data = {
                     'id': message.id,
@@ -224,21 +288,21 @@ def reply():
                     'receiver_id': message.receiver_id,
                     'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 }
-                
+
                 # 发送到接收者的WebSocket
                 receiver_room = f"user_{receiver_id}"
                 socketio.emit('new_private_message', message_data, to=receiver_room)
-                
+
             except Exception as e:
                 current_app.logger.error(f"发送WebSocket实时私信回复失败: {str(e)}")
                 # 即使WebSocket发送失败，也不影响私信已保存到数据库
-            
+
             flash('回复已发送', 'success')
         except Exception as e:
             db.session.rollback()
             current_app.logger.error(f"回复私信失败: {str(e)}")
             flash('发送失败，请重试', 'danger')
-    
+
     return redirect(url_for('message.message_list'))
 
 @bp.route('/messages/<int:id>/delete', methods=['POST'])
@@ -247,32 +311,32 @@ def reply():
 def delete(id):
     """删除私信"""
     message = Message.query.get_or_404(id)
-    
+
     # 检查权限
     if message.sender_id != current_user.id and message.receiver_id != current_user.id:
         flash('无权限删除该私信', 'danger')
         return redirect(url_for('message.message_list'))
-    
+
     try:
         # 根据用户角色（发送者或接收者）设置相应的删除标志
         if message.sender_id == current_user.id:
             message.sender_deleted = True
         if message.receiver_id == current_user.id:
             message.receiver_deleted = True
-        
+
         # 只有当发送者和接收者都删除了私信，或者是群组消息，才真正从数据库删除
         if (message.message_type == 'personal' and message.sender_deleted and message.receiver_deleted) or message.message_type != 'personal':
             db.session.delete(message)
         else:
             db.session.add(message)
-            
+
         db.session.commit()
         flash('私信已删除', 'success')
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"删除私信失败: {str(e)}")
         flash('删除失败，请重试', 'danger')
-    
+
     # 始终返回到消息列表页面，避免用户尝试返回到已删除的消息
     return redirect(url_for('message.message_list'))
 
@@ -284,12 +348,12 @@ def group_list():
     user_groups = MessageGroup.query.join(MessageGroup.members).filter(
         UserGroup.user_id == current_user.id
     ).all()
-    
+
     # 获取当前用户创建的群组
     created_groups = MessageGroup.query.filter_by(creator_id=current_user.id).all()
-    
-    return render_template('message/groups.html', 
-                           user_groups=user_groups, 
+
+    return render_template('message/groups.html',
+                           user_groups=user_groups,
                            created_groups=created_groups)
 
 @bp.route('/groups/create', methods=['GET', 'POST'])
@@ -298,7 +362,7 @@ def group_list():
 def create_group():
     """创建新消息群组"""
     form = CreateGroupForm()
-    
+
     if form.validate_on_submit():
         try:
             # 创建新群组
@@ -310,7 +374,7 @@ def create_group():
             )
             db.session.add(group)
             db.session.flush()  # 获取group.id
-            
+
             # 创建者自动成为管理员
             creator_membership = UserGroup(
                 user_id=current_user.id,
@@ -318,7 +382,7 @@ def create_group():
                 role='admin'
             )
             db.session.add(creator_membership)
-            
+
             # 添加选择的成员
             for member_id in form.members.data:
                 member = UserGroup(
@@ -327,7 +391,7 @@ def create_group():
                     role='member'
                 )
                 db.session.add(member)
-            
+
             db.session.commit()
             flash(f'群组 "{form.name.data}" 创建成功', 'success')
             return redirect(url_for('message.group_list'))
@@ -335,26 +399,51 @@ def create_group():
             db.session.rollback()
             current_app.logger.error(f"创建群组失败: {str(e)}")
             flash('创建群组失败，请重试', 'danger')
-    
+
     return render_template('message/create_group.html', form=form)
 
 @bp.route('/groups/<int:id>')
 @login_required
 def view_group(id):
-    """查看群组详情和消息"""
+    """查看群组详情和消息页面
+
+    显示指定群组的详细信息、成员列表和消息历史。
+    自动将所有未读消息标记为已读。
+    提供发送新消息的表单。
+
+    实现了以下功能：
+    - 权限检查：确保只有群组成员可以访问
+    - 消息加载：按时间顺序显示所有群组消息
+    - 已读状态管理：自动将未读消息标记为已读
+    - 成员列表：显示所有群组成员
+
+    Args:
+        id (int): 群组ID
+
+    Returns:
+        render_template: 渲染群组详情页面，包含以下上下文：
+            - group: 群组对象
+            - messages: 群组消息列表
+            - members: 群组成员列表
+            - form: 发送消息表单
+            - membership: 当前用户的成员身份信息
+
+    Raises:
+        404: 如果群组不存在或当前用户不是群组成员
+    """
     # 确保当前用户是群组成员
     membership = UserGroup.query.filter_by(
         user_id=current_user.id,
         group_id=id
     ).first_or_404()
-    
+
     group = MessageGroup.query.get_or_404(id)
-    
+
     # 查询群组消息，按时间升序排列，以便最早的消息显示在上方
     messages = Message.query.filter_by(
         group_id=id
     ).order_by(Message.created_at.asc()).all()
-    
+
     # 将所有未读消息标记为已读
     unread_statuses = MessageReadStatus.query.filter_by(
         user_id=current_user.id,
@@ -362,30 +451,30 @@ def view_group(id):
     ).join(MessageReadStatus.message).filter(
         Message.group_id == id
     ).all()
-    
+
     for status in unread_statuses:
         status.is_read = True
         status.read_at = datetime.datetime.now()
-    
+
     # 获取群组成员列表
     members = User.query.join(UserGroup).filter(
         UserGroup.group_id == id
     ).all()
-    
+
     # 准备发送消息表单
     form = GroupMessageForm()
     form.group_id.data = id  # 预选当前群组
-    
+
     try:
         db.session.commit()  # 提交已读状态变更
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"更新消息已读状态失败: {str(e)}")
-    
-    return render_template('message/view_group.html', 
-                           group=group, 
-                           messages=messages, 
-                           members=members, 
+
+    return render_template('message/view_group.html',
+                           group=group,
+                           messages=messages,
+                           members=members,
                            form=form,
                            membership=membership)
 
@@ -398,10 +487,10 @@ def send_group_message(id):
         user_id=current_user.id,
         group_id=id
     ).first_or_404()
-    
+
     form = GroupMessageForm()
     form.group_id.data = id  # 设置群组ID
-    
+
     if form.validate_on_submit():
         try:
             # 创建群组消息
@@ -413,14 +502,14 @@ def send_group_message(id):
             )
             db.session.add(message)
             db.session.flush()  # 获取message.id
-            
+
             # 为每个群组成员创建阅读状态记录
             group = MessageGroup.query.get(id)
             for member in group.members:
                 # 发送者自动标记为已读
                 is_read = member.user_id == current_user.id
                 read_at = datetime.datetime.now() if is_read else None
-                
+
                 status = MessageReadStatus(
                     message_id=message.id,
                     user_id=member.user_id,
@@ -428,14 +517,14 @@ def send_group_message(id):
                     read_at=read_at
                 )
                 db.session.add(status)
-            
+
             db.session.commit()
             flash('消息已发送到群组', 'success')
         except Exception as e:
             db.session.rollback()
             current_app.logger.error(f"发送群组消息失败: {str(e)}")
             flash('发送失败，请重试', 'danger')
-    
+
     return redirect(url_for('message.view_group', id=id))
 
 @bp.route('/groups/<int:id>/members')
@@ -448,22 +537,22 @@ def group_members(id):
         group_id=id,
         role='admin'
     ).first_or_404()
-    
+
     group = MessageGroup.query.get_or_404(id)
-    
+
     # 获取成员信息
     members = db.session.query(User, UserGroup).join(
         UserGroup, User.id == UserGroup.user_id
     ).filter(
         UserGroup.group_id == id
     ).all()
-    
+
     # 准备添加成员表单
     form = AddMembersForm(group_id=id)
-    
-    return render_template('message/group_members.html', 
-                           group=group, 
-                           members=members, 
+
+    return render_template('message/group_members.html',
+                           group=group,
+                           members=members,
                            form=form)
 
 @bp.route('/groups/<int:id>/members/add', methods=['POST'])
@@ -476,9 +565,9 @@ def add_members(id):
         group_id=id,
         role='admin'
     ).first_or_404()
-    
+
     form = AddMembersForm(group_id=id)
-    
+
     if form.validate_on_submit():
         try:
             # 添加所选成员到群组
@@ -489,7 +578,7 @@ def add_members(id):
                     user_id=user_id,
                     group_id=id
                 ).first()
-                
+
                 if not existing:
                     member = UserGroup(
                         user_id=user_id,
@@ -498,7 +587,7 @@ def add_members(id):
                     )
                     db.session.add(member)
                     added_count += 1
-            
+
             if added_count > 0:
                 db.session.commit()
                 flash(f'成功添加 {added_count} 名成员', 'success')
@@ -508,7 +597,7 @@ def add_members(id):
             db.session.rollback()
             current_app.logger.error(f"添加群组成员失败: {str(e)}")
             flash('添加成员失败，请重试', 'danger')
-    
+
     return redirect(url_for('message.group_members', id=id))
 
 @bp.route('/groups/<int:group_id>/members/<int:user_id>/remove', methods=['POST'])
@@ -522,19 +611,19 @@ def remove_member(group_id, user_id):
         group_id=group_id,
         role='admin'
     ).first_or_404()
-    
+
     # 不能移除自己
     if user_id == current_user.id:
         flash('不能移除自己，如果要离开群组，请使用退出群组功能', 'warning')
         return redirect(url_for('message.group_members', id=group_id))
-    
+
     try:
         # 查找并删除成员关系
         member = UserGroup.query.filter_by(
             user_id=user_id,
             group_id=group_id
         ).first()
-        
+
         if member:
             db.session.delete(member)
             db.session.commit()
@@ -545,7 +634,7 @@ def remove_member(group_id, user_id):
         db.session.rollback()
         current_app.logger.error(f"移除群组成员失败: {str(e)}")
         flash('移除成员失败，请重试', 'danger')
-    
+
     return redirect(url_for('message.group_members', id=group_id))
 
 @bp.route('/groups/<int:id>/leave', methods=['POST'])
@@ -558,10 +647,10 @@ def leave_group(id):
         user_id=current_user.id,
         group_id=id
     ).first_or_404()
-    
+
     # 获取群组信息
     group = MessageGroup.query.get_or_404(id)
-    
+
     # 如果是创建者，需要特殊处理
     if group.creator_id == current_user.id:
         # 查找其他管理员
@@ -570,11 +659,11 @@ def leave_group(id):
             UserGroup.role == 'admin',
             UserGroup.user_id != current_user.id
         ).first()
-        
+
         if not other_admin:
             flash('您是群组创建者，请先指定新的管理员', 'warning')
             return redirect(url_for('message.view_group', id=id))
-    
+
     try:
         db.session.delete(membership)
         db.session.commit()
@@ -583,7 +672,7 @@ def leave_group(id):
         db.session.rollback()
         current_app.logger.error(f"退出群组失败: {str(e)}")
         flash('退出群组失败，请重试', 'danger')
-    
+
     return redirect(url_for('message.group_list'))
 
 @bp.route('/groups/<int:id>/edit', methods=['GET', 'POST'])
@@ -596,20 +685,20 @@ def edit_group(id):
         group_id=id,
         role='admin'
     ).first_or_404()
-    
+
     group = MessageGroup.query.get_or_404(id)
-    
+
     form = CreateGroupForm(obj=group)
-    
+
     # 移除members字段的验证，因为在编辑时不修改成员
     delattr(form, 'members')
-    
+
     if form.validate_on_submit():
         try:
             group.name = form.name.data
             group.description = form.description.data
             group.group_type = form.group_type.data
-            
+
             db.session.commit()
             flash('群组信息已更新', 'success')
             return redirect(url_for('message.view_group', id=id))
@@ -617,23 +706,46 @@ def edit_group(id):
             db.session.rollback()
             current_app.logger.error(f"更新群组信息失败: {str(e)}")
             flash('更新失败，请重试', 'danger')
-    
+
     return render_template('message/edit_group.html', form=form, group=group)
 
 @bp.route('/broadcast', methods=['GET', 'POST'])
 @login_required
 @role_required(['admin', 'teacher'])
 def broadcast():
-    """群发消息功能"""
+    """群发消息功能
+
+    允许管理员和教师向多个用户同时发送消息。
+    支持以下接收者类型：
+    - 所有用户
+    - 所有学生
+    - 所有教师
+    - 所有管理员
+    - 特定群组的成员
+
+    特性：
+    - 角色权限控制：仅管理员和教师可访问
+    - 动态加载群组选项：根据当前用户角色显示可选群组
+    - 批量消息创建：高效处理大量接收者
+    - 自动排除发送者：避免给自己发送消息
+
+    Args:
+        无直接参数
+
+    Returns:
+        GET: 渲染群发消息表单页面
+        POST成功: 重定向到消息列表页面
+        POST失败: 返回表单页面并显示错误信息
+    """
     form = BroadcastMessageForm()
-    
+
     if form.validate_on_submit():
         recipient_type = form.recipient_type.data
         content = form.content.data
-        
+
         # 确定接收者列表
         recipients = []
-        
+
         if recipient_type == 'all':
             recipients = User.query.all()
         elif recipient_type == 'students':
@@ -652,10 +764,10 @@ def broadcast():
                             user = User.query.get(member.user_id)
                             if user not in recipients:
                                 recipients.append(user)
-        
+
         # 排除自己
         recipients = [r for r in recipients if r.id != current_user.id]
-        
+
         try:
             # 发送私信给每个接收者
             for recipient in recipients:
@@ -666,7 +778,7 @@ def broadcast():
                     message_type='broadcast'
                 )
                 db.session.add(message)
-            
+
             db.session.commit()
             flash(f'群发消息已发送给 {len(recipients)} 位用户', 'success')
             return redirect(url_for('message.message_list'))
@@ -674,7 +786,7 @@ def broadcast():
             db.session.rollback()
             current_app.logger.error(f"群发消息失败: {str(e)}")
             flash('发送失败，请重试', 'danger')
-    
+
     return render_template('message/broadcast.html', form=form)
 
 @bp.route('/groups/<int:group_id>/members/<int:user_id>/promote', methods=['POST'])
@@ -688,19 +800,19 @@ def promote_to_admin(group_id, user_id):
         group_id=group_id,
         role='admin'
     ).first_or_404()
-    
+
     # 不能提升自己（因为已经是管理员了）
     if user_id == current_user.id:
         flash('您已经是管理员', 'info')
         return redirect(url_for('message.group_members', id=group_id))
-    
+
     try:
         # 查找该成员
         member = UserGroup.query.filter_by(
             user_id=user_id,
             group_id=group_id
         ).first_or_404()
-        
+
         # 如果已经是管理员，不需要操作
         if member.role == 'admin':
             flash('该成员已经是管理员', 'info')
@@ -708,7 +820,7 @@ def promote_to_admin(group_id, user_id):
             # 修改角色为管理员
             member.role = 'admin'
             db.session.commit()
-            
+
             # 获取用户信息以在消息中显示
             user = User.query.get(user_id)
             flash(f'已成功将 {user.username} 设置为群组管理员', 'success')
@@ -716,5 +828,5 @@ def promote_to_admin(group_id, user_id):
         db.session.rollback()
         current_app.logger.error(f"提升管理员失败: {str(e)}")
         flash('操作失败，请重试', 'danger')
-    
+
     return redirect(url_for('message.group_members', id=group_id))

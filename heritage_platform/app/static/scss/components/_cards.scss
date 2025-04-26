@@ -14,6 +14,10 @@
   border-radius: $border-radius-lg;
   overflow: hidden; // 重要，用于图片等子元素
   animation: fadeIn $animation-duration-slow ease-out;
+  position: relative; // 为伪元素和装饰效果做准备
+  transform: translateZ(0); // 启用GPU加速
+  backface-visibility: hidden; // 防止3D变换中的闪烁
+  isolation: isolate; // 创建新的堆叠上下文
 }
 
 // 内容卡片基础样式
@@ -22,25 +26,99 @@
   @include card-base;
   border-radius: $border-radius-xl;
   margin-bottom: 1.5rem; // 卡片之间的间距
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  // 添加卡片边缘光效
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $primary, rgba($primary, 0.3));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
 
   .card-img-top {
     height: 180px;
     object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
   }
 
   .card-body {
-    padding: 1.25rem;
+    padding: 1.5rem;
+    position: relative;
+    z-index: 2;
   }
 
   .card-title {
     font-weight: $font-weight-bold;
     margin-bottom: 0.75rem;
+    transition: color 0.3s ease;
+    position: relative;
+    display: inline-block;
+
+    // 添加标题下划线效果
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: $primary;
+      transition: width 0.3s ease;
+    }
+  }
+
+  &:hover .card-title::after {
+    width: 100%;
+  }
+
+  .card-text {
+    color: $text-muted;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
   }
 
   .card-footer {
-    padding: 1rem 1.25rem;
+    padding: 1rem 1.5rem;
     background: transparent;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  // 添加卡片角落装饰
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 30px 30px 0;
+    border-color: transparent rgba($primary, 0.1) transparent transparent;
+    transition: border-color 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -52,20 +130,123 @@
   display: flex;
   flex-direction: column;
   border-radius: $border-radius-xl;
+  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+              box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+
+  // 添加卡片光效边框
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0; // 简写形式，相当于 top: 0; right: 0; bottom: 0; left: 0;
+    border: 1px solid rgba($primary, 0.1);
+    border-radius: inherit;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &:hover::before {
+    border-color: rgba($primary, 0.3);
+    box-shadow: 0 0 0 4px rgba($primary, 0.05);
+  }
 
   .card-img-top {
-    height: 200px;
+    height: 220px; // 增加高度，提供更好的视觉效果
     object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    position: relative;
+    z-index: 0;
+
+    // 添加图片渐变遮罩
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 50%);
+      z-index: 1;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+  }
+
+  &:hover .card-img-top {
+    transform: scale(1.05);
+
+    &::after {
+      opacity: 0.4; // 悬停时减少遮罩强度
+    }
   }
 
   .card-body {
     flex: 1; // 确保主体占据剩余空间
+    padding: 1.75rem;
+    position: relative;
+    z-index: 2;
+    background: white;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover .card-body {
+    transform: translateY(-5px);
   }
 
   .card-title {
     font-weight: $font-weight-bold;
     color: $dark;
     margin-bottom: 1rem;
+    font-size: 1.35rem;
+    position: relative;
+    padding-bottom: 0.75rem;
+
+    // 添加标题下划线
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: $primary;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+  }
+
+  &:hover .card-title::after {
+    width: 60px;
+  }
+
+  .card-text {
+    color: $text-muted;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .card-footer {
+    background: transparent;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  // 添加角落装饰
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle at bottom right, rgba($primary, 0.1) 0%, rgba($primary, 0) 70%);
+    border-radius: 0 0 $border-radius-xl 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
   }
 }
 
@@ -74,50 +255,134 @@
 // Mixin for common card hover effect (translateY + box-shadow)
 // 提供三种悬停效果强度：subtle（微妙）、moderate（适中）、strong（强烈）
 @mixin card-hover-effect($intensity: 'subtle', $custom-y-translate: null, $custom-shadow: null) {
-  transition: transform $transition-base, box-shadow $transition-base;
-  will-change: transform, box-shadow; // Optimize animation performance
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+              box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  will-change: transform, box-shadow; // 优化动画性能
+
+  // 添加悬停时的光效边框
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
 
   @if $intensity == 'subtle' {
     // 微妙效果：仅增强阴影，几乎不移动
     &:hover {
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.01);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+
+      &::before {
+        box-shadow: 0 0 0 1px rgba($primary, 0.1);
+        opacity: 1;
+      }
     }
   } @else if $intensity == 'moderate' {
     // 适中效果：适度上移和阴影
     &:hover {
-      transform: translateY(-5px);
+      transform: translateY(-5px) scale(1.02);
       box-shadow: $box-shadow-lg;
+
+      &::before {
+        box-shadow: 0 0 0 2px rgba($primary, 0.15);
+        opacity: 1;
+      }
     }
   } @else if $intensity == 'strong' {
     // 强烈效果：明显上移和强阴影
     &:hover {
-      transform: translateY(-10px);
+      transform: translateY(-10px) scale(1.03);
       box-shadow: $box-shadow-xl;
+
+      &::before {
+        box-shadow: 0 0 0 3px rgba($primary, 0.2);
+        opacity: 1;
+      }
     }
   } @else if $custom-y-translate != null and $custom-shadow != null {
     // 自定义效果
     &:hover {
       transform: translateY($custom-y-translate);
       box-shadow: $custom-shadow;
+
+      &::before {
+        box-shadow: 0 0 0 2px rgba($primary, 0.15);
+        opacity: 1;
+      }
     }
   } @else {
     // 默认效果（向后兼容）
     &:hover {
-      transform: translateY(-3px);
-      box-shadow: $box-shadow;
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: $box-shadow-lg;
+
+      &::before {
+        box-shadow: 0 0 0 1px rgba($primary, 0.1);
+        opacity: 1;
+      }
     }
+  }
+
+  // 添加点击效果
+  &:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: $box-shadow-sm;
+    transition-duration: 0.1s;
   }
 }
 
 // Mixin for common image scale hover effect
-@mixin image-scale-hover($scale: 1.05, $duration: 0.8s) {
+@mixin image-scale-hover($scale: 1.05, $duration: 0.8s, $add-overlay: false, $overlay-color: rgba(0, 0, 0, 0.3)) {
   .card-img-top {
-    transition: transform $duration ease;
+    transition: transform $duration cubic-bezier(0.165, 0.84, 0.44, 1);
     will-change: transform;
+    position: relative;
+    overflow: hidden;
+
+    @if $add-overlay {
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, $overlay-color 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1;
+      }
+    }
   }
+
   &:hover .card-img-top {
     transform: scale($scale);
+
+    @if $add-overlay {
+      &::after {
+        opacity: 1;
+      }
+    }
+  }
+
+  // 添加图片上的内容定位
+  .card-img-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    z-index: 2;
+    color: white;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform $duration/2 ease, opacity $duration/2 ease;
+  }
+
+  &:hover .card-img-content {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
@@ -129,156 +394,491 @@
   border-radius: $border-radius-lg;
   overflow: hidden; // 重要，用于图片等子元素
   animation: fadeIn $animation-duration-slow ease-out;
+  position: relative;
+  background-color: white;
   @include card-hover-effect('subtle'); // 使用微妙悬停效果
+
+  // 添加卡片边缘装饰
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, $primary, rgba($primary, 0.3));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
 }
 
 // 卡片头部
 .card-header {
   // 卡片头部样式
-  border-bottom: none; // Remove default Bootstrap border
+  border-bottom: none; // 移除默认Bootstrap边框
   padding: 1.25rem 1.5rem;
+  background-color: rgba($light, 0.5);
+  font-weight: $font-weight-medium;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  // 头部图标样式
+  i {
+    color: $primary;
+    margin-right: 0.5rem;
+  }
+
+  // 头部标题样式
+  h5, .card-title {
+    margin-bottom: 0;
+    font-weight: $font-weight-bold;
+    color: $dark;
+  }
+
+  // 头部操作区
+  .card-actions {
+    display: flex;
+    gap: 0.5rem;
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba($light, 0.8);
+      color: $secondary;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: $primary;
+        color: white;
+        transform: translateY(-2px);
+      }
+    }
+  }
 }
 
 // 卡片内容
 .card-body {
   // 卡片主体内容区域
-  padding: 1.5rem;
+  padding: 1.75rem;
+  position: relative;
+  z-index: 1;
+
+  // 卡片标题增强
+  .card-title {
+    font-weight: $font-weight-bold;
+    margin-bottom: 1rem;
+    color: $dark;
+    position: relative;
+    display: inline-block;
+
+    // 标题下划线效果
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: $primary;
+      transition: width 0.3s ease;
+    }
+  }
+
+  // 卡片悬停时标题下划线动画
+  .card:hover & .card-title::after {
+    width: 60px;
+  }
+
+  // 卡片文本增强
+  .card-text {
+    color: $text-muted;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  // 卡片内容分隔线
+  hr {
+    margin: 1.25rem 0;
+    opacity: 0.1;
+    background: linear-gradient(to right, transparent, $primary, transparent);
+    height: 1px;
+    border: none;
+  }
 }
 
 // 卡片底部
 .card-footer {
   // 卡片底部样式
-  background: transparent; // Often used for meta info or actions
-  border-top: 1px solid rgba(0, 0, 0, 0.05); // Subtle separator
-  padding: 1rem 1.25rem;
+  background: transparent; // 通常用于元信息或操作
+  border-top: 1px solid rgba(0, 0, 0, 0.05); // 微妙分隔线
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  // 底部元信息
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: $text-muted;
+    font-size: 0.875rem;
+
+    i {
+      color: $primary;
+      margin-right: 0.25rem;
+    }
+  }
+
+  // 底部操作按钮
+  .card-actions {
+    display: flex;
+    gap: 0.5rem;
+
+    .btn {
+      padding: 0.4rem 1rem;
+      font-size: 0.875rem;
+    }
+  }
 }
 
 // --- Specific Card Variations ---
 
 // 功能图标卡片 (通常用于展示服务或特性)
 .feature-icon-card {
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 1.75rem;
   text-align: center;
-  // transition: transform 0.3s ease, box-shadow 0.3s ease; // Replaced by mixin
   border-radius: $border-radius-xl;
   background: white;
-  position: relative; // For pseudo-element positioning
+  position: relative; // 用于伪元素定位
   z-index: 1;
   overflow: hidden;
-  // will-change: transform; // Handled by mixin
-  contain: content; // Performance optimization for layout boundaries
-  transition: background-color $transition-base, color $transition-base; // Add transition for text color change
+  contain: content; // 优化布局边界性能
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+              box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: $box-shadow;
+  border: 1px solid rgba($primary, 0.1);
 
-  &::before {
-    // Background gradient revealed on hover
+  // 装饰性圆形元素
+  &::after {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, $primary 0%, $dark 100%);
-    opacity: 0;
-    z-index: -1; // Behind content
-    transition: opacity 0.3s ease;
+    top: -50px;
+    right: -50px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba($primary, 0.1);
+    z-index: 0;
+    transition: transform 0.5s ease;
   }
 
-  // Apply hover effect with moderate intensity
-  @include card-hover-effect('moderate');
-
+  // 应用适中强度的悬停效果
   &:hover {
-    // Additional hover styles specific to this card type
-    &::before {
-      opacity: 1; // Show gradient background
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 15px rgba($primary, 0.2);
+    background-color: $primary; // 直接使用主色作为背景色
+    border-color: $primary;
+
+    &::after {
+      transform: scale(1.5);
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .card-title,
-    .card-text,
-    i {
-      color: white !important; // Change text and icon color
+    .card-text {
+      color: white; // 文字颜色为白色
+      font-weight: $font-weight-bold; // 增加字重
+    }
+
+    .icon-wrapper {
+      transform: translateY(-10px) scale(1.1);
+      background-color: white;
+      border: 2px solid white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .icon-wrapper i {
+      color: $primary; // 图标颜色为主色
+      font-weight: $font-weight-bold; // 增加字重
     }
 
     .btn-outline-primary {
-      // Invert button colors on hover
+      // 悬停时反转按钮颜色
       background-color: white;
-      color: $primary;
+      color: $primary; // 使用主色变量
       border-color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      font-weight: $font-weight-bold;
     }
   }
 
+  // 图标包装器
+  .icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: rgba($primary, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba($primary, 0.15);
+    border: 1px solid rgba($primary, 0.1);
+    position: relative;
+    z-index: 2; // 确保图标在背景上面
+  }
+
   i {
-    // Icon styling
-    font-size: 3rem;
-    margin-bottom: 1.5rem;
+    // 图标样式
+    font-size: 2.5rem;
     color: $primary;
-    transition: color $transition-base; // Transition color change
+    transition: color 0.4s ease, transform 0.4s ease; // 颜色和变形过渡
   }
 
   .card-title {
-    // Card title styling
+    // 卡片标题样式
     font-weight: $font-weight-bold;
     margin-bottom: 1rem;
-    transition: color $transition-base; // Transition color change
+    transition: color 0.4s ease, transform 0.3s ease; // 颜色和变形过渡
+    font-size: 1.25rem;
+    position: relative;
+    z-index: 2; // 确保标题在背景上面
   }
 
   .card-text {
-    // Card text styling
+    // 卡片文本样式
     font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-    transition: color $transition-base; // Transition color change
+    margin-bottom: 1.75rem;
+    transition: color 0.4s ease, transform 0.3s ease; // 颜色和变形过渡
+    line-height: 1.6;
+    position: relative;
+    z-index: 2; // 确保文本在背景上面
   }
 
   .btn {
-    // Button styling within the card
+    // 卡片内按钮样式
     border-radius: $border-radius-pill;
-    padding: 0.5rem 1.5rem;
-    transition: background-color $transition-base, color $transition-base, border-color $transition-base;
+    padding: 0.6rem 1.75rem;
+    transition: all 0.4s ease;
+    font-weight: $font-weight-medium;
+    position: relative;
+    overflow: hidden;
+    z-index: 2; // 确保按钮在背景上面
+
+    // 添加按钮光效
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.7s ease;
+    }
+
+    &:hover::before {
+      left: 100%;
+    }
+  }
+
+  // 添加点击效果
+  &:active {
+    transform: translateY(-2px);
+    transition-duration: 0.1s;
   }
 }
 
 // 特色内容卡片 (通常带图片和摘要)
 .feature-card {
-  height: 100%; // Ensure consistent height in grids
+  height: 100%; // 确保在网格中高度一致
   display: flex;
   flex-direction: column;
   border-radius: $border-radius-xl;
   overflow: hidden;
   box-shadow: $box-shadow;
-  transition: box-shadow $transition-slow, transform $transition-slow; // Combine transitions
+  position: relative;
+  background-color: white;
+  transition: box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 
-  @include image-scale-hover(1.05, 0.8s); // Apply image scale hover with more subtle effect
-  @include card-hover-effect('moderate'); // Apply moderate hover effect
+  // 使用增强版图片缩放悬停效果，带遮罩
+  @include image-scale-hover(1.05, 0.8s, true, rgba(0, 0, 0, 0.4));
 
-  .card-img-top {
-    height: 200px;
-    object-fit: cover;
-    // transition handled by mixin
+  // 卡片边框光效
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba($primary, 0.1);
+    border-radius: inherit;
+    z-index: 3;
+    pointer-events: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
   }
 
-  // &:hover .card-img-top { // Replaced by mixin
-  //   transform: scale(1.08);
-  // }
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+
+    &::before {
+      border-color: rgba($primary, 0.3);
+      box-shadow: 0 0 0 4px rgba($primary, 0.05);
+    }
+  }
+
+  .card-img-top {
+    height: 220px;
+    object-fit: cover;
+    position: relative;
+  }
+
+  // 图片上的内容区
+  .card-img-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    z-index: 2;
+    color: white;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+
+    .badge {
+      margin-bottom: 0.75rem;
+      background: rgba($primary, 0.8);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-weight: $font-weight-medium;
+      padding: 0.5em 1em;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    h4 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  &:hover .card-img-content {
+    transform: translateY(0);
+    opacity: 1;
+  }
 
   .card-body {
-    // Ensure body takes remaining space
+    // 确保主体占据剩余空间
     flex: 1;
+    padding: 1.75rem;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover .card-body {
+    transform: translateY(-5px);
   }
 
   .card-title {
-    // Title styling
+    // 标题样式
     font-weight: $font-weight-bold;
     color: $dark;
     margin-bottom: 1rem;
+    font-size: 1.25rem;
+    position: relative;
+    display: inline-block;
+
+    // 添加标题下划线效果
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: $primary;
+      transition: width 0.3s ease;
+    }
+  }
+
+  &:hover .card-title::after {
+    width: 100%;
+  }
+
+  .card-text {
+    color: $text-muted;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
   }
 
   .card-footer {
-    // Footer specific styles
+    // 底部特定样式
     background: transparent;
-    padding-top: 0; // Adjust padding if needed
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      color: $text-muted;
+      font-size: 0.875rem;
+
+      i {
+        color: $primary;
+        margin-right: 0.5rem;
+      }
+    }
+
+    .btn {
+      padding: 0.4rem 1.25rem;
+      font-size: 0.875rem;
+      border-radius: $border-radius-pill;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba($primary, 0.2);
+      }
+    }
   }
 
-  .badge {
-    // Badge styling within the card
-    padding: 0.5em 1em;
-    font-weight: $font-weight-medium;
-    letter-spacing: 0.5px;
+  // 添加角落装饰
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle at bottom right, rgba($primary, 0.1) 0%, rgba($primary, 0) 70%);
+    border-radius: 0 0 $border-radius-xl 0;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
   }
 }
 
@@ -287,146 +887,718 @@
   border-radius: $border-radius-xl;
   overflow: hidden;
   box-shadow: $box-shadow;
-  // transition: $transition-slow; // Replaced by mixin
-  margin-bottom: 1.5rem; // Spacing between cards
+  margin-bottom: 1.5rem; // 卡片之间的间距
+  position: relative;
+  background-color: white;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+              box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 
-  @include card-hover-effect('moderate'); // Apply moderate hover effect
-  @include image-scale-hover(1.03, 0.8s); // Apply more subtle image scale hover
+  // 使用增强版图片缩放悬停效果，带遮罩
+  @include image-scale-hover(1.03, 0.8s, true, rgba(0, 0, 0, 0.3));
 
-  // &:hover { // Replaced by mixin
-  //   transform: translateY(-10px);
-  //   box-shadow: $box-shadow-xl;
-  // }
+  // 卡片边框光效
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba($primary, 0.05);
+    border-radius: inherit;
+    z-index: 3;
+    pointer-events: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+
+    &::before {
+      border-color: rgba($primary, 0.2);
+      box-shadow: 0 0 0 3px rgba($primary, 0.05);
+    }
+  }
 
   .card-img-top {
     height: 180px;
     object-fit: cover;
-    // transition handled by mixin
+    position: relative;
   }
 
-  // &:hover .card-img-top { // Replaced by mixin
-  //   transform: scale(1.05);
-  // }
+  // 图片上的内容区
+  .card-img-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+
+    .badge {
+      background: rgba($primary, 0.8);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-weight: $font-weight-medium;
+      padding: 0.4em 0.8em;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .date-badge {
+      background: rgba(255, 255, 255, 0.9);
+      color: $dark;
+      padding: 0.4em 0.8em;
+      border-radius: $border-radius;
+      font-size: 0.75rem;
+      font-weight: $font-weight-medium;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(4px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+  }
+
+  &:hover .card-img-content {
+    .badge, .date-badge {
+      transform: translateY(2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+  }
 
   .card-body {
-    // Body styling
-    padding: 1.25rem;
+    // 主体样式
+    padding: 1.5rem;
+    position: relative;
+    z-index: 2; // 增加z-index值，确保内容始终在背景渐变上面
+    transition: transform 0.3s ease;
+  }
+
+  &:hover .card-body {
+    transform: translateY(-5px);
   }
 
   .card-title {
-    // Title styling with ellipsis for overflow
+    // 带省略号的标题样式
     font-weight: $font-weight-bold;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     margin-bottom: 0.75rem;
-    white-space: nowrap; // Prevent wrapping
-    overflow: hidden; // Hide overflow
-    text-overflow: ellipsis; // Show ellipsis (...)
+    white-space: nowrap; // 防止换行
+    overflow: hidden; // 隐藏溢出
+    text-overflow: ellipsis; // 显示省略号 (...)
+    color: $dark;
+    transition: color 0.3s ease;
+    position: relative;
+    display: inline-block;
+
+    // 添加标题下划线效果
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: $primary;
+      transition: width 0.3s ease;
+    }
+  }
+
+  &:hover .card-title {
+    color: $primary;
+
+    &::after {
+      width: 100%;
+    }
+  }
+
+  .card-text {
+    color: $text-muted;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; // 非标准属性以实现兼容性
+    line-clamp: 3; // 标准属性以实现兼容性
+    -webkit-box-orient: vertical; // 非标准属性以实现兼容性
+    box-orient: vertical; // 标准属性以实现兼容性
+    box-orient: vertical; // 标准属性以实现兼容性
+    box-orient: vertical; // 标准属性以实现兼容性
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .card-footer {
-    // Footer styling
-    padding: 1rem 1.25rem;
+    // 底部样式
+    padding: 1rem 1.5rem;
     background: transparent;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      color: $text-muted;
+      font-size: 0.8rem;
+
+      i {
+        color: $primary;
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    .btn-link {
+      color: $primary;
+      font-size: 0.9rem;
+      font-weight: $font-weight-medium;
+      text-decoration: none;
+      padding: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+
+      i {
+        margin-left: 0.5rem;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        color: darken($primary, 10%);
+
+        i {
+          transform: translateX(3px);
+        }
+      }
+    }
+  }
+
+  // 添加角落装饰
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle at bottom right, rgba($primary, 0.05) 0%, rgba($primary, 0) 70%);
+    border-radius: 0 0 $border-radius-xl 0;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
   }
 }
 
 // 视频卡片 (带播放按钮覆盖)
 .video-card {
-  position: relative; // For absolute positioning of overlay/icon
+  position: relative; // 用于覆盖层/图标的绝对定位
   overflow: hidden;
-  border-radius: $border-radius-lg; // Add border-radius consistent with other cards
+  border-radius: $border-radius-lg; // 与其他卡片一致的圆角
+  box-shadow: $box-shadow;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+              box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  // 视频缩略图
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
 
   &::after {
-    // Gradient overlay for better text visibility
+    // 渐变覆盖层，提高文本可见度
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5));
-    z-index: 1; // Above image, below icon
+    inset: 0; // 简写形式，相当于 top: 0; right: 0; bottom: 0; left: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 1; // 在图片之上，在图标之下
+    opacity: 0.8;
+    transition: opacity 0.4s ease;
+  }
+
+  // 播放按钮容器
+  .play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2; // 在覆盖层之上
+    width: 60px;
+    height: 60px;
+    background: rgba($primary, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    // 创建脉动效果
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      animation: pulse 2s infinite;
+      z-index: -1;
+    }
   }
 
   .play-icon {
-    // Play button icon
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
+    // 播放按钮图标
     color: white;
-    font-size: 3rem;
-    z-index: 2; // Above overlay
-    opacity: 0.8;
-    transition: transform $transition-base, opacity $transition-base;
-    will-change: transform, opacity;
+    font-size: 1.5rem;
+    margin-left: 4px; // 微调使三角形居中
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease, color 0.3s ease;
   }
 
-  &:hover .play-icon {
-    // Scale up icon on hover
-    transform: translate(-50%, -50%) scale(1.2);
+  // 视频信息区
+  .video-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.25rem;
+    z-index: 2;
+    color: white;
+    transition: transform 0.4s ease;
+
+    .video-title {
+      font-weight: $font-weight-bold;
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .video-meta {
+      display: flex;
+      align-items: center;
+      font-size: 0.85rem;
+      opacity: 0.9;
+
+      i {
+        margin-right: 0.5rem;
+      }
+
+      span {
+        margin-right: 1rem;
+      }
+    }
+  }
+
+  &:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+
+    img {
+      transform: scale(1.05);
+    }
+
+    &::after {
+      opacity: 0.9;
+    }
+
+    .play-button {
+      transform: translate(-50%, -50%) scale(1.1);
+      background: rgba($primary, 0.9);
+      box-shadow: 0 0 30px rgba($primary, 0.5);
+    }
+
+    .play-icon {
+      transform: scale(1.1);
+    }
+
+    .video-info {
+      transform: translateY(-5px);
+    }
+  }
+
+  // 点击效果
+  &:active {
+    transform: translateY(-2px) scale(0.98);
+    transition-duration: 0.1s;
+
+    .play-button {
+      transform: translate(-50%, -50%) scale(0.9);
+      transition-duration: 0.1s;
+    }
+  }
+}
+
+// 脉动动画
+@keyframes pulse {
+  0% {
+    transform: scale(1);
     opacity: 1;
+  }
+  70% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
   }
 }
 
 // 统计卡片 (显示数字和标签)
 .stats-card {
-  border-radius: $border-radius;
-  padding: 1.5rem;
+  border-radius: $border-radius-lg;
+  padding: 2rem 1.5rem;
   text-align: center;
-  // transition: $transition-base; // Replaced by mixin
-  height: 100%; // Ensure consistent height
+  height: 100%; // 确保高度一致
   box-shadow: $box-shadow;
-  @include card-hover-effect('subtle'); // Apply subtle hover effect
+  position: relative;
+  background-color: white;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+              box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 
-  // &:hover { // Replaced by mixin
-  //   transform: translateY(-5px);
-  //   box-shadow: $box-shadow-lg;
-  // }
+  // 装饰性背景元素
+  &::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba($primary, 0.05);
+    z-index: 0;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba($primary, 0.03);
+    z-index: 0;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  // 图标容器
+  .icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba($primary, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    position: relative;
+    z-index: 1;
+    transition: all 0.4s ease;
+
+    // 图标光效
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba($primary, 0.2);
+      opacity: 0;
+      transform: scale(1.2);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+  }
+
+  &:hover .icon-wrapper {
+    transform: translateY(-5px);
+    background: rgba($primary, 0.15);
+
+    &::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
   i {
-    // Icon styling
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    opacity: 0.8;
+    // 图标样式
+    font-size: 2rem;
+    color: $primary;
+    opacity: 0.9;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  &:hover i {
+    transform: scale(1.1);
+  }
+
+  .stats-content {
+    position: relative;
+    z-index: 1;
   }
 
   h3 {
-    // Main statistic number
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
+    // 主要统计数字
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
     font-weight: $font-weight-bold;
+    color: $dark;
+    position: relative;
+    display: inline-block;
+    background: linear-gradient(135deg, $primary, darken($primary, 15%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: all 0.3s ease;
+
+    // 数字下划线
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 3px;
+      background: $primary;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+  }
+
+  &:hover h3::after {
+    width: 60px;
   }
 
   p {
-    // Label or description for the statistic
+    // 统计标签或描述
     margin-bottom: 0;
-    font-size: 1rem;
-    opacity: 0.9;
+    font-size: 1.1rem;
+    color: $text-muted;
+    font-weight: $font-weight-medium;
+    transition: color 0.3s ease;
+  }
+
+  &:hover p {
+    color: darken($text-muted, 15%);
+  }
+
+  // 添加对比指标
+  .trend-indicator {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: $border-radius-pill;
+    font-size: 0.85rem;
+    font-weight: $font-weight-medium;
+    transition: all 0.3s ease;
+
+    &.positive {
+      background-color: rgba($success, 0.1);
+      color: $success;
+
+      i {
+        color: $success;
+        font-size: 0.9rem;
+        margin-right: 0.25rem;
+      }
+    }
+
+    &.negative {
+      background-color: rgba($danger, 0.1);
+      color: $danger;
+
+      i {
+        color: $danger;
+        font-size: 0.9rem;
+        margin-right: 0.25rem;
+      }
+    }
+  }
+
+  &:hover .trend-indicator {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   }
 }
 
 // 媒体网格中的卡片 (通常用于图片库)
-.media-grid .card {
-  border: none; // Reset border if needed within grid context
-  border-radius: $border-radius-lg;
-  overflow: hidden;
-  // transition: $transition-slow; // Replaced by mixins
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 
-  @include card-hover-effect('moderate'); // Apply moderate hover effect
-  @include image-scale-hover(1.05, 0.6s); // Apply more subtle image scale hover
+  .card {
+    border: none; // 在网格中重置边框
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+                box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: $box-shadow;
 
-  // &:hover { // Replaced by mixin
-  //   transform: translateY(-10px);
-  //   box-shadow: $box-shadow-xl;
-  // }
+    // 使用增强版图片缩放悬停效果，带遮罩
+    @include image-scale-hover(1.08, 0.6s, true, rgba(0, 0, 0, 0.4));
 
-  .card-img-top {
-    height: 200px;
-    object-fit: cover;
-    // transition handled by mixin
+    // 卡片边框光效
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba($primary, 0.1);
+      border-radius: inherit;
+      z-index: 3;
+      pointer-events: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    &:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+
+      &::before {
+        border-color: rgba($primary, 0.3);
+        box-shadow: 0 0 0 3px rgba($primary, 0.05);
+      }
+    }
+
+    .card-img-top {
+      height: 220px;
+      object-fit: cover;
+      position: relative;
+    }
+
+    // 图片上的内容区
+    .card-img-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.25rem;
+      z-index: 2;
+      color: white;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+
+      h5 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+        font-weight: $font-weight-bold;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      p {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+        opacity: 0.9;
+      }
+    }
+
+    &:hover .card-img-content {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    // 卡片操作区
+    .card-actions {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 3;
+      display: flex;
+      gap: 0.5rem;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+
+      .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        color: $dark;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(4px);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: $primary;
+          color: white;
+          transform: translateY(-2px);
+        }
+      }
+    }
+
+    &:hover .card-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    // 卡片底部信息
+    .card-footer {
+      padding: 1rem;
+      background: transparent;
+      border-top: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .meta-info {
+        font-size: 0.85rem;
+        color: $text-muted;
+        display: flex;
+        align-items: center;
+
+        i {
+          margin-right: 0.5rem;
+          color: $primary;
+        }
+      }
+    }
   }
 
-  // &:hover .card-img-top { // Replaced by mixin
-  //   transform: scale(1.1);
-  // }
+  // 响应式调整
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+
+    .card .card-img-top {
+      height: 180px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+
+    .card .card-img-top {
+      height: 150px;
+    }
+
+    .card .card-img-content h5 {
+      font-size: 1rem;
+    }
+  }
 }
 
 // --- 响应式调整 ---

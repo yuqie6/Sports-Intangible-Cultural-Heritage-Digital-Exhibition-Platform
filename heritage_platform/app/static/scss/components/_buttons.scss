@@ -9,97 +9,222 @@
   border-radius: $border-radius;
   font-weight: $font-weight-medium;
   padding: $button-padding;
-  // transition: $transition-fast; // Transition handled by mixin or specific overrides
   cursor: pointer; // 明确指针样式
   text-align: center;
   vertical-align: middle;
   @include mix.user-select-none; // 禁止文本选择
   border: 1px solid transparent; // 基础边框，方便轮廓按钮覆盖
+  position: relative; // 为伪元素和效果做准备
+  overflow: hidden; // 隐藏溢出内容（如波纹效果）
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); // 统一过渡效果
+  transform: translateZ(0); // 启用GPU加速
+
+  // 聚焦状态
+  &:focus, &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+  }
+
+  // 按钮图标样式
+  i, .icon {
+    display: inline-block;
+    margin-right: 0.5rem;
+    transition: transform 0.3s ease;
+  }
+
+  // 悬停时图标效果
+  &:hover i, &:hover .icon {
+    transform: translateX(-3px);
+  }
 }
 
 // --- Standard Button Variations ---
 
-// 主要按钮 (Primary Action)
+// 主要按钮 (Primary Action) - 增强版
 .btn-primary {
   background: $primary-gradient;
   border: none; // 通常渐变按钮无边框
   color: white; // 确保文本颜色与背景对比度
-  box-shadow: 0 4px 6px rgba($primary, 0.2);
-  @include mix.button-hover-effect(-1px, 0 6px 8px rgba($primary, 0.3));
+  box-shadow: 0 4px 10px rgba($primary, 0.25);
+  @include mix.button-hover-effect(-2px, 0 8px 15px rgba($primary, 0.4));
+  letter-spacing: 0.3px; // 增加字间距，提高可读性
+
+  // 添加波纹效果
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+  }
 
   &:hover, &:focus {
     background: $primary-gradient-hover; // 特定背景变化
     color: white; // 保持文本颜色
   }
+
+  &:active::after {
+    animation: ripple 1s ease-out;
+  }
 }
 
-// 次要按钮 (Secondary Action)
+// 次要按钮 (Secondary Action) - 增强版
 .btn-secondary {
   background: $secondary-gradient;
   border: none;
   color: white;
-  box-shadow: 0 4px 6px rgba($secondary, 0.2);
-  @include mix.button-hover-effect(-1px, 0 6px 8px rgba($secondary, 0.3));
+  box-shadow: 0 4px 10px rgba($secondary, 0.25);
+  @include mix.button-hover-effect(-2px, 0 8px 15px rgba($secondary, 0.4));
+  letter-spacing: 0.3px; // 增加字间距，提高可读性
+
+  // 添加波纹效果
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+  }
 
   &:hover, &:focus {
     background: $secondary-gradient-hover;
     color: white;
   }
+
+  &:active::after {
+    animation: ripple 1s ease-out;
+  }
 }
 
-// 主要轮廓按钮
+// 主要轮廓按钮 - 增强版
 .btn-outline-primary {
   border-color: $primary;
+  border-width: 2px; // 增加边框宽度，增强视觉效果
   color: $primary;
   background-color: transparent; // 确保背景透明
-  @include mix.button-hover-effect(null, 0 4px 6px rgba($primary, 0.2)); // 只应用阴影和默认位移
+  @include mix.button-hover-effect(-2px, 0 6px 12px rgba($primary, 0.25)); // 增强悬停效果
+  letter-spacing: 0.3px; // 增加字间距，提高可读性
+
+  // 添加闪光效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
 
   &:hover, &:focus {
     background-color: $primary;
     color: white;
     border-color: $primary; // 确保边框颜色一致
+
+    &::before {
+      transform: translateX(100%);
+    }
   }
 }
 
-// 次要轮廓按钮
+// 次要轮廓按钮 - 增强版
 .btn-outline-secondary {
   border-color: $secondary;
+  border-width: 2px; // 增加边框宽度，增强视觉效果
   color: $secondary;
   background-color: transparent;
-  @include mix.button-hover-effect(null, 0 4px 6px rgba($secondary, 0.2));
+  @include mix.button-hover-effect(-2px, 0 6px 12px rgba($secondary, 0.25)); // 增强悬停效果
+  letter-spacing: 0.3px; // 增加字间距，提高可读性
+
+  // 添加闪光效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
 
   &:hover, &:focus {
     background-color: $secondary;
     color: white;
     border-color: $secondary;
+
+    &::before {
+      transform: translateX(100%);
+    }
   }
 }
 
-// 浅色按钮 (常用于需要较不显眼操作的场景)
+// 浅色按钮 (常用于需要较不显眼操作的场景) - 增强版
 .btn-light {
   background: white;
   border: 1px solid $border-color-light; // 使用浅色边框
   color: $text-muted; // 通常使用柔和的文本颜色
   font-weight: $font-weight-medium;
-  // transition: $transition-base; // Replaced by mixin
-  @include mix.button-hover-effect(-2px, 0 4px 10px rgba($primary, 0.1));
+  @include mix.button-hover-effect(-2px, 0 6px 12px rgba($primary, 0.15)); // 增强悬停效果
+
+  // 添加微妙的背景渐变
+  background: linear-gradient(to bottom, white, rgba($light, 0.5));
+
+  // 添加闪光效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
 
   &:hover, &:focus {
     background: $light; // 悬停时使用 $light 背景色
     border-color: $primary; // 悬停时边框变为主色
     color: $primary; // 悬停时文本变为主色
+
+    &::before {
+      transform: translateX(100%);
+    }
   }
 }
 
-// --- Button Sizes ---
+// --- Button Sizes --- 增强版
 .btn-sm {
-  padding: 0.25rem 0.5rem;
+  padding: 0.35rem 0.75rem; // 增加内边距，提高可用性
   font-size: $font-size-sm;
+  border-radius: $border-radius-sm; // 使用更小的圆角
+  // 小按钮特有的悬停效果
+  @include mix.button-hover-effect(-1px, 0 4px 8px rgba($primary, 0.2));
 }
 
 .btn-lg {
-  padding: 1rem 1.5rem;
+  padding: 1rem 2rem; // 增加内边距，增强视觉效果
   font-size: $font-size-lg;
+  border-radius: $border-radius-lg; // 使用更大的圆角
+  letter-spacing: 0.5px; // 增加字间距，提高可读性
+  // 大按钮特有的悬停效果
+  @include mix.button-hover-effect(-3px, 0 8px 20px rgba($primary, 0.3));
 }
 
 // --- Context-Specific Button Styles ---
@@ -413,5 +538,55 @@
     padding-top: 0.6rem; // 稍微增加垂直内边距
     padding-bottom: 0.6rem;
     min-height: 44px; // 设置最小高度以符合移动端可用性指南
+  }
+}
+
+// --- 按钮动画关键帧 ---
+
+// 波纹效果动画
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+// 按钮浮动动画
+@keyframes buttonFloat {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba($primary, 0.2);
+  }
+  50% {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba($primary, 0.3);
+  }
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba($primary, 0.2);
+  }
+}
+
+// 按钮脉动动画
+@keyframes buttonPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px rgba($primary, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba($primary, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px rgba($primary, 0.2);
   }
 }
