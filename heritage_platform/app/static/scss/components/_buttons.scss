@@ -590,3 +590,64 @@
     box-shadow: 0 4px 6px rgba($primary, 0.2);
   }
 }
+
+// --- 删除按钮特殊样式 ---
+// 这些样式专门用于内容列表页面的删除按钮
+
+// 危险轮廓按钮 (通常用于删除操作)
+.btn-outline-danger {
+  border-color: $danger;
+  border-width: 2px; // 增加边框宽度，增强视觉效果
+  color: $danger;
+  background-color: transparent;
+  @include mix.button-hover-effect(-2px, 0 6px 12px rgba($danger, 0.25)); // 增强悬停效果
+  letter-spacing: 0.3px; // 增加字间距，提高可读性
+  position: relative; // 用于伪元素定位
+  z-index: 10; // 确保按钮在最上层
+  cursor: pointer !important; // 确保鼠标指针样式
+  pointer-events: auto !important; // 确保可以接收鼠标事件
+
+  // 添加闪光效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+
+  &:hover, &:focus {
+    background-color: $danger;
+    color: white;
+    border-color: $danger;
+
+    &::before {
+      transform: translateX(100%);
+    }
+  }
+}
+
+// 删除按钮特殊样式
+.delete-btn {
+  min-width: 38px !important;
+  min-height: 31px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.25rem 0.5rem !important;
+  position: relative;
+  z-index: 10;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+// 删除表单样式
+.delete-form {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-block !important;
+}

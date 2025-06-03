@@ -947,3 +947,5 @@ WHERE chat_sessions.user_id = %(user_id_1)s ORDER BY chat_sessions.updated_at DE
 [parameters: {'user_id_1': 1}]
 (Background on this error at: https://sqlalche.me/e/20/f405)
 2025-03-31 23:21:45,189 [ERROR] [ai_assistant:60] - 创建会话失败: 'coroutine' object has no attribute 'id'
+2025-05-06 14:45:29,913 [WARNING] [security_config:68] - Redis连接失败，将使用内存存储: Error 10061 connecting to localhost:6379. 由于目标计算机积极拒绝，无法连接。.
+2025-05-06 14:46:38,496 [WARNING] [security_config:71] - 未配置Redis URL，将使用内存存储

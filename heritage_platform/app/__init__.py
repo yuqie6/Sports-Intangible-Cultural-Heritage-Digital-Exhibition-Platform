@@ -144,7 +144,15 @@ def create_app(config_name='default'):
     init_websocket_manager(app)
 
     # 确保日志目录存在，防止应用运行时因目录不存在而崩溃
-    os.makedirs('logs', exist_ok=True)
+    # 开发环境使用相对路径，生产环境使用绝对路径
+    if app.config['DEBUG']:
+        log_dir = os.path.join(os.path.dirname(app.root_path), 'logs')
+    else:
+        # 使用与logging_config.py相同的路径
+        log_dir = '/var/www/heritage_platform/Sports-Intangible-Cultural-Heritage-Digital-Exhibition-Platform/heritage_platform/logs'
+
+    os.makedirs(log_dir, exist_ok=True)
+    app.logger.info(f"日志目录已创建: {log_dir}")
 
     # 注册API蓝图（前后端分离的API接口）
     from app.api import api_bp

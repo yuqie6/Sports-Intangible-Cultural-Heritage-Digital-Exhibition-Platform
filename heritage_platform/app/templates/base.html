@@ -723,28 +723,37 @@
                 menu.style.transformOrigin = 'top center';
             });
 
-            // 添加按钮波纹效果
+            // 添加按钮波纹效果（不阻止默认行为）
             const enhancedButtons = document.querySelectorAll('.btn-primary, .btn-outline-primary');
             enhancedButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    // Create ripple element
-                    const ripple = document.createElement('span');
-                    ripple.classList.add('btn-ripple');
-                    this.appendChild(ripple);
+                // 检查按钮是否在表单中，如果是，不添加波纹效果
+                const isFormButton = button.closest('form') !== null &&
+                                    (button.type === 'submit' ||
+                                     button.getAttribute('type') === 'submit');
 
-                    // Position the ripple
-                    const rect = this.getBoundingClientRect();
-                    const size = Math.max(rect.width, rect.height);
-                    ripple.style.width = ripple.style.height = size + 'px';
-                    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
-                    ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+                if (!isFormButton) {
+                    button.addEventListener('click', function(e) {
+                        // 不阻止事件传播和默认行为
 
-                    // Remove ripple after animation
-                    ripple.classList.add('active');
-                    setTimeout(() => {
-                        ripple.remove();
-                    }, 600);
-                });
+                        // Create ripple element
+                        const ripple = document.createElement('span');
+                        ripple.classList.add('btn-ripple');
+                        this.appendChild(ripple);
+
+                        // Position the ripple
+                        const rect = this.getBoundingClientRect();
+                        const size = Math.max(rect.width, rect.height);
+                        ripple.style.width = ripple.style.height = size + 'px';
+                        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+                        ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+
+                        // Remove ripple after animation
+                        ripple.classList.add('active');
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 600);
+                    });
+                }
             });
 
             // 改进导航栏响应式行为

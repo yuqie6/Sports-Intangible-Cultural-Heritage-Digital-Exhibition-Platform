@@ -13,13 +13,13 @@
     .cke_panel {
         z-index: 8000 !important;
     }
-    
+
     .cke_dialog {
         z-index: 8001 !important;
     }
-    
+
     /* 调整任何计时器或时间显示元素的样式 */
-    .time-display, 
+    .time-display,
     .countdown-timer,
     .auto-save-timer {
         position: fixed;
@@ -44,7 +44,7 @@
             <li class="breadcrumb-item active" aria-current="page">发布内容</li>
         </ol>
     </nav>
-    
+
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <!-- 小提示卡片 -->
@@ -64,7 +64,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-primary text-white py-3">
                     <h4 class="mb-0 d-flex align-items-center">
@@ -75,7 +75,7 @@
                 <div class="card-body p-4">
                     <form method="POST" action="{{ url_for('content.create') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
                         {{ form.hidden_tag() }}
-                        
+
                         <div class="mb-4">
                             <div class="form-floating">
                                 {{ form.title(class="form-control", placeholder="标题", id="title") }}
@@ -89,7 +89,7 @@
                                 </div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="mb-4">
                             <div class="form-floating">
                                 {{ form.heritage_id(class="form-select", id="heritage_id") }}
@@ -135,7 +135,7 @@
                                 <img id="cover-image-preview" class="img-fluid rounded" style="max-height: 300px;" alt="封面预览">
                             </div>
                         </div>
-                        
+
                         <div class="mb-4">
                             <div class="form-floating">
                                 {{ form.content_type(class="form-select", id="content_type", onchange="toggleContentFields()") }}
@@ -149,7 +149,7 @@
                                 </div>
                             {% endif %}
                         </div>
-                        
+
                         <div id="text-content-field" class="mb-4 content-field">
                             <div class="mb-2 d-flex align-items-center">
                                 <i class="fas fa-paragraph text-primary me-2"></i>
@@ -167,7 +167,7 @@
                                 <i class="fas fa-info-circle me-1"></i>支持Markdown格式，可添加段落、标题、列表等
                             </small>
                         </div>
-                        
+
                         <div id="file-field" class="mb-4 content-field d-none">
                             <div class="mb-2 d-flex align-items-center">
                                 <i class="fas fa-file-upload text-primary me-2"></i>
@@ -202,7 +202,7 @@
                                 <div id="image-preview-container" class="row g-2 d-none"></div>
                             </div>
                         </div>
-                        
+
                         <div id="multimedia-content-field" class="mb-4 content-field d-none">
                             <div class="mb-2 d-flex align-items-center">
                                 <i class="fas fa-pen-fancy text-primary me-2"></i>
@@ -216,7 +216,7 @@
                                     {% endfor %}
                                 </div>
                             {% endif %}
-                            
+
                             <!-- 媒体文件上传区域 -->
                             <div class="mt-4 card border-light">
                                 <div class="card-header bg-light">
@@ -235,16 +235,19 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <hr class="my-4">
-                        
+
                         <div class="d-flex justify-content-between">
                             <a href="{{ url_for('content.list') }}" class="btn btn-outline-secondary" aria-label="取消创建">
                                 <i class="fas fa-times me-1"></i>取消
                             </a>
-                            <button type="submit" class="btn btn-primary" aria-label="发布内容">
-                                <i class="fas fa-paper-plane me-1"></i>{{ form.submit.label.text }}
-                            </button>
+                            <div>
+                                <!-- 提交按钮 -->
+                                <button type="submit" id="submit-button" class="btn btn-primary" aria-label="发布内容">
+                                    <i class="fas fa-paper-plane me-1"></i>{{ form.submit.label.text }}
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -260,15 +263,15 @@
 <script>
     function toggleContentFields() {
         const contentType = document.getElementById('content_type');
-        
+
         // 防御性检查：如果content_type元素不存在，直接返回
         if (!contentType) {
             console.log("找不到content_type元素，可能不在创建页面");
             return;
         }
-        
+
         const contentTypeValue = contentType.value;
-        
+
         // 查找所有内容字段
         const textContentField = document.getElementById('text-content-field');
         const fileField = document.getElementById('file-field');
@@ -276,17 +279,17 @@
         const imageHelp = document.getElementById('image-help');
         const videoHelp = document.getElementById('video-help');
         const fileInput = document.getElementById('file');
-        
+
         // 获取所有具有content-field类的元素
         const contentFields = document.querySelectorAll('.content-field');
-        
+
         // 隐藏所有字段（防御性检查）
         if (contentFields && contentFields.length > 0) {
             contentFields.forEach(field => {
                 if (field) field.classList.add('d-none');
             });
         }
-        
+
         // 根据内容类型显示相应字段（每个元素都添加防御性检查）
         if (contentTypeValue === 'article') {
             if (textContentField) textContentField.classList.remove('d-none');
@@ -294,7 +297,7 @@
             if (multimediaField) multimediaField.classList.remove('d-none');
         } else {
             if (fileField) fileField.classList.remove('d-none');
-            
+
             // 显示相应的帮助文本
             if (contentTypeValue === 'image') {
                 if (imageHelp) imageHelp.classList.remove('d-none');
@@ -314,16 +317,16 @@
                 }
             }
         }
-        
+
         // 清空预览区域
         const filePreview = document.getElementById('file-preview');
         if (filePreview) {
             filePreview.classList.add('d-none');
         }
-        
+
         console.log("内容类型更改为: " + contentTypeValue);
     }
-    
+
     // 初始化富文本编辑器
     document.addEventListener('DOMContentLoaded', function() {
         // 防御性调用toggleContentFields，添加try-catch防止错误中断整个脚本
@@ -332,7 +335,32 @@
         } catch (error) {
             console.error("切换内容字段时出错:", error);
         }
-        
+
+        // 添加表单提交前的处理
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                // 获取内容类型
+                const contentType = document.getElementById('content_type');
+
+                // 如果是富文本内容，确保富文本编辑器内容被同步到表单字段
+                if (contentType && contentType.value === 'multimedia' && CKEDITOR && CKEDITOR.instances['rich-editor']) {
+                    const richEditorField = document.getElementById('rich-editor');
+                    if (richEditorField) {
+                        richEditorField.value = CKEDITOR.instances['rich-editor'].getData();
+                        console.log('已将富文本内容同步到表单字段，长度:', richEditorField.value.length);
+                    }
+                }
+
+                // 显示提交中状态
+                const submitButton = document.getElementById('submit-button');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>提交中...';
+                }
+            });
+        }
+
         // 如果页面上有富文本编辑器，则初始化它
         if (document.getElementById('rich-editor')) {
             // 创建一个调试日志工具
@@ -344,9 +372,9 @@
                     console.error('[ERROR] ' + msg);
                 }
             };
-            
+
             logger.info('初始化CKEditor...');
-            
+
             try {
                 // 初始化编辑器
                 CKEDITOR.replace('rich-editor', {
@@ -359,51 +387,51 @@
                     // 指定自定义配置文件
                     customConfig: '{{ url_for("static", filename="vendor/ckeditor/config.js") }}'
                 });
-                
+
                 logger.info('CKEditor初始化成功');
-                
+
                 // 监听图片上传事件以显示更友好的反馈
                 CKEDITOR.on('dialogDefinition', function(ev) {
                     logger.info('对话框定义事件: ' + ev.data.name);
                     var dialogName = ev.data.name;
                     var dialogDefinition = ev.data.definition;
-                    
+
                     if (dialogName === 'image') {
                         // 获取上传标签页
                         var uploadTab = dialogDefinition.getContents('Upload');
-                        
+
                         if (uploadTab) {
                             // 添加更详细的上传说明
                             uploadTab.elements[0].children[0].label = '选择要上传的图片文件 (支持JPG, JPEG, PNG, GIF)';
                         }
                     }
                 });
-                
+
                 // 添加图片粘贴处理
                 CKEDITOR.instances['rich-editor'].on('paste', function(e) {
                     logger.info('检测到粘贴事件');
                     var data = e.data;
-                    
+
                     // 检查是否有图片数据
                     if (data && data.dataTransfer && data.dataTransfer.getFilesCount() > 0) {
                         var file = data.dataTransfer.getFile(0);
                         logger.info('粘贴包含文件: ' + file.name + ', 类型: ' + file.type);
-                        
+
                         // 检查是否是图片
                         if (file.type.indexOf('image') === 0) {
                             logger.info('开始处理粘贴的图片...');
-                            
+
                             // 准备FormData
                             var formData = new FormData();
                             formData.append('upload', file);
-                            
+
                             // 使用原生AJAX上传
                             var xhr = new XMLHttpRequest();
                             xhr.open('POST', '{{ url_for("content.upload_image") }}', true);
                             xhr.onload = function() {
                                 logger.info('XHR状态: ' + xhr.status);
                                 logger.info('XHR响应: ' + xhr.responseText);
-                                
+
                                 if (xhr.status === 200) {
                                     try {
                                         var response = JSON.parse(xhr.responseText);
@@ -433,7 +461,7 @@
                 logger.error('初始化CKEditor时出错: ' + error);
             }
         }
-        
+
         // 处理媒体文件插入
         const insertMediaBtn = document.getElementById('insert-media');
         if (insertMediaBtn) {
@@ -443,17 +471,17 @@
                 if (fileInput && fileInput.files && fileInput.files.length > 0) {
                     const file = fileInput.files[0];
                     console.log('选择了文件:', file.name, file.type, file.size + ' 字节');
-                    
+
                     // 创建FormData对象上传文件
                     const formData = new FormData();
                     formData.append('upload', file);
-                    
+
                     // 显示上传进度提示
                     insertMediaBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>上传中...';
                     insertMediaBtn.disabled = true;
-                    
+
                     console.log('开始上传文件...');
-                    
+
                     // 发送AJAX请求上传文件
                     fetch('{{ url_for("content.upload_image") }}', {
                         method: 'POST',
@@ -469,15 +497,15 @@
                     })
                     .then(data => {
                         console.log('上传响应数据:', data);
-                        
+
                         if (data.uploaded && data.url) {
                             // 获取编辑器实例
                             const editor = CKEDITOR.instances['rich-editor'];
-                            
+
                             // 判断文件类型
                             const isImage = /\.(jpe?g|png|gif)$/i.test(file.name);
                             const isVideo = /\.(mp4|webm|mov)$/i.test(file.name);
-                            
+
                             if (isImage) {
                                 // 插入图片
                                 const imgHtml = `<p><img src="${data.url}" alt="${data.fileName}" style="max-width: 100%; height: auto;"></p>`;
@@ -489,10 +517,10 @@
                                 editor.insertHtml(videoHtml);
                                 console.log('成功插入视频:', data.url);
                             }
-                            
+
                             // 重置文件输入
                             fileInput.value = '';
-                            
+
                             // 显示成功消息
                             alert('媒体文件已成功插入到编辑器中');
                         } else {
@@ -515,35 +543,35 @@
             });
         }
     });
-    
+
     function previewCoverImage(input) {
         const preview = document.getElementById('cover-preview');
         const imagePreview = document.getElementById('cover-image-preview');
         const fileNameSpan = document.getElementById('cover-image-name');
         const uploadBtn = document.getElementById('upload-cover-btn');
-        
+
         // 防御性检查
         if (!preview || !imagePreview || !fileNameSpan || !uploadBtn) {
             console.error("找不到封面预览相关元素");
             return;
         }
-        
+
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            
+
             reader.onload = function(e) {
                 preview.classList.remove('d-none');
                 imagePreview.src = e.target.result;
                 fileNameSpan.textContent = input.files[0].name;
                 uploadBtn.disabled = false;
             };
-            
+
             reader.onerror = function(e) {
                 console.error("封面图片读取错误: ", e);
                 fileNameSpan.textContent = "读取失败";
                 uploadBtn.disabled = true;
             };
-            
+
             reader.readAsDataURL(input.files[0]);
         } else {
             preview.classList.add('d-none');
@@ -584,7 +612,7 @@
                         alert('封面图片上传成功');
                         const nameSpan = document.getElementById('cover-image-name');
                         if (nameSpan) nameSpan.textContent = file.name + ' (已上传)';
-                        
+
                         // 更新预览图片为服务器返回的URL
                         const imgPreview = document.getElementById('cover-image-preview');
                         if (imgPreview) imgPreview.src = data.url;
@@ -612,75 +640,75 @@
             console.error("文件输入元素无效");
             return;
         }
-        
+
         const contentTypeElem = document.getElementById('content_type');
         if (!contentTypeElem) {
             console.error("找不到content_type元素");
             return;
         }
-        
+
         const contentType = contentTypeElem.value;
         const preview = document.getElementById('file-preview');
         const videoPreview = document.getElementById('video-preview');
         const imagePreviewContainer = document.getElementById('image-preview-container');
         const imageCount = document.getElementById('image-count');
-        
+
         // 再次检查所需的DOM元素是否存在
         if (!preview || !videoPreview || !imagePreviewContainer || !imageCount) {
             console.error("找不到预览相关元素");
             return;
         }
-        
+
         console.log("预览文件, 类型: " + contentType);
-        
+
         if (input.files && input.files.length > 0) {
             preview.classList.remove('d-none');
-            
+
             if (contentType === 'image') {
                 // 清空之前的预览
                 imagePreviewContainer.innerHTML = '';
                 imagePreviewContainer.classList.remove('d-none');
                 videoPreview.classList.add('d-none');
-                
+
                 // 更新图片计数
                 imageCount.textContent = input.files.length + ' 张图片';
                 imageCount.classList.remove('d-none');
-                
+
                 console.log("预览 " + input.files.length + " 张图片");
-                
+
                 // 为每个文件创建预览
                 Array.from(input.files).forEach((file, index) => {
                     console.log("处理图片 #" + (index + 1) + ": " + file.name + ", 大小: " + file.size + " 字节");
-                    
+
                     const reader = new FileReader();
                     const colDiv = document.createElement('div');
                     colDiv.className = 'col-md-4 col-sm-6 mb-3';
                     colDiv.dataset.index = index;
-                    
+
                     const cardDiv = document.createElement('div');
                     cardDiv.className = 'card h-100';
-                    
+
                     const img = document.createElement('img');
                     img.className = 'card-img-top';
                     img.alt = '图片 #' + (index + 1);
                     img.style.height = '160px';
                     img.style.objectFit = 'cover';
-                    
+
                     const cardBody = document.createElement('div');
                     cardBody.className = 'card-body p-2';
-                    
+
                     const cardText = document.createElement('p');
                     cardText.className = 'card-text small text-truncate mb-1';
                     cardText.title = file.name;
                     cardText.textContent = file.name;
-                    
+
                     const cardFooter = document.createElement('div');
                     cardFooter.className = 'card-footer p-2 d-flex justify-content-between align-items-center';
-                    
+
                     const fileSize = document.createElement('small');
                     fileSize.className = 'text-muted';
                     fileSize.textContent = formatFileSize(file.size);
-                    
+
                     const removeBtn = document.createElement('button');
                     removeBtn.type = 'button';
                     removeBtn.className = 'btn btn-sm btn-outline-danger';
@@ -689,11 +717,11 @@
                     removeBtn.onclick = function() {
                         // 移除预览
                         colDiv.remove();
-                        
+
                         // 更新计数
                         const remainingImages = imagePreviewContainer.querySelectorAll('.col-md-4').length;
                         imageCount.textContent = remainingImages + ' 张图片';
-                        
+
                         if (remainingImages === 0) {
                             // 如果没有图片了，隐藏预览区域
                             preview.classList.add('d-none');
@@ -701,19 +729,19 @@
                             // 清空文件输入
                             input.value = '';
                         }
-                        
+
                         console.log("移除图片 #" + (index + 1) + ", 剩余 " + remainingImages + " 张图片");
                     };
-                    
+
                     reader.onload = function(e) {
                         img.src = e.target.result;
                     };
-                    
+
                     reader.onerror = function(e) {
                         console.error("图片 #" + (index + 1) + " 读取错误: ", e);
                         img.src = '{{ url_for("static", filename="images/error-image.png") }}';
                     };
-                    
+
                     cardFooter.appendChild(fileSize);
                     cardFooter.appendChild(removeBtn);
                     cardBody.appendChild(cardText);
@@ -722,7 +750,7 @@
                     cardDiv.appendChild(cardFooter);
                     colDiv.appendChild(cardDiv);
                     imagePreviewContainer.appendChild(colDiv);
-                    
+
                     reader.readAsDataURL(file);
                 });
             } else if (contentType === 'video') {
@@ -730,20 +758,20 @@
                 imagePreviewContainer.classList.add('d-none');
                 imageCount.classList.add('d-none');
                 videoPreview.classList.remove('d-none');
-                
+
                 const file = input.files[0];
                 console.log("预览视频: " + file.name + ", 大小: " + file.size + " 字节");
-                
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     videoPreview.src = e.target.result;
                     console.log("视频预览已设置");
                 };
-                
+
                 reader.onerror = function(e) {
                     console.error("视频读取错误: ", e);
                 };
-                
+
                 reader.readAsDataURL(file);
             }
         } else {
@@ -751,7 +779,7 @@
             imageCount.classList.add('d-none');
         }
     }
-    
+
     // 格式化文件大小
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
@@ -760,20 +788,47 @@
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
-    
+
     // 表单验证
     (function() {
         'use strict'
-        
+
         const forms = document.querySelectorAll('.needs-validation');
-        
+
         Array.prototype.slice.call(forms).forEach(function(form) {
             form.addEventListener('submit', function(event) {
-                if (!form.checkValidity()) {
+                console.log('表单提交事件触发');
+
+                // 检查表单有效性
+                const isValid = form.checkValidity();
+                console.log('表单验证结果:', isValid);
+
+                if (!isValid) {
                     event.preventDefault();
                     event.stopPropagation();
+                    console.log('表单验证失败，阻止提交');
+
+                    // 查找所有无效字段并记录
+                    const invalidFields = form.querySelectorAll(':invalid');
+                    console.log('无效字段数量:', invalidFields.length);
+                    invalidFields.forEach(function(field) {
+                        console.log('无效字段:', field.name || field.id, '验证信息:', field.validationMessage);
+                    });
+                } else {
+                    console.log('表单验证成功，准备提交');
+
+                    // 检查内容类型和必填字段
+                    const contentType = document.getElementById('content_type').value;
+                    console.log('内容类型:', contentType);
+
+                    // 检查富文本编辑器内容
+                    if (contentType === 'multimedia' && CKEDITOR && CKEDITOR.instances['rich-editor']) {
+                        const editorContent = CKEDITOR.instances['rich-editor'].getData();
+                        console.log('富文本编辑器内容长度:', editorContent.length);
+                        document.getElementById('rich-editor').value = editorContent;
+                    }
                 }
-                
+
                 form.classList.add('was-validated');
             }, false);
         });

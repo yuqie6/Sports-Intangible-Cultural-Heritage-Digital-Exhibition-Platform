@@ -39,11 +39,19 @@ def setup_logging(app):
     Args:
         app: Flask应用实例
     """
-    # 使用绝对路径指定日志目录
-    log_dir = '/var/www/heritage_platform/Sports-Intangible-Cultural-Heritage-Digital-Exhibition-Platform/heritage_platform/logs'
+    # 根据环境选择日志目录路径
+    if app.config['DEBUG']:
+        # 开发环境使用相对路径
+        log_dir = os.path.join(os.path.dirname(app.root_path), 'logs')
+    else:
+        # 生产环境使用绝对路径
+        log_dir = '/var/www/heritage_platform/Sports-Intangible-Cultural-Heritage-Digital-Exhibition-Platform/heritage_platform/logs'
+
     # 确保日志目录存在，不存在则创建
     if not os.path.exists(log_dir):
         os.makedirs(log_dir, exist_ok=True)
+
+    app.logger.info(f"日志系统初始化，使用目录: {log_dir}")
 
     # 配置基本日志格式
     log_format = logging.Formatter(

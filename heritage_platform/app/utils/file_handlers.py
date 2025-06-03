@@ -145,7 +145,7 @@ def add_watermark(image: Image, text: str) -> Image:
 
     return image
 
-def save_file(file, file_type: str, watermark: Optional[str] = None) -> Optional[str]:
+def save_file(file, file_type: str, watermark: Optional[str] = "体育非遗平台") -> Optional[str]:
     """保存上传的文件
 
     安全地处理和保存上传的文件，包括验证文件类型、处理文件名、
@@ -161,7 +161,7 @@ def save_file(file, file_type: str, watermark: Optional[str] = None) -> Optional
     Args:
         file: 文件对象，通常是request.files中的FileStorage对象
         file_type: 文件类型，可选值为'image'或'video'
-        watermark: 可选的水印文字，仅适用于图片
+        watermark: 水印文字，仅适用于图片，默认为"体育非遗平台"
 
     Returns:
         str or None: 保存成功返回相对于static目录的文件路径（如'uploads/images/xxx.jpg'），失败返回None
@@ -174,7 +174,7 @@ def save_file(file, file_type: str, watermark: Optional[str] = None) -> Optional
     - 失败时清理部分写入的文件
 
     示例:
-        >>> file_path = save_file(request.files['image'], 'image', '非遗平台')
+        >>> file_path = save_file(request.files['image'], 'image', '体育非遗平台')
         >>> if file_path:
         >>>     content.image_path = file_path
     """

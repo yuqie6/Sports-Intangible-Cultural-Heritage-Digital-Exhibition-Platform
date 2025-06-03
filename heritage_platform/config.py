@@ -54,10 +54,7 @@ class Config:
     # 文件上传配置
     UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads')  # 上传文件存储目录
 
-    # Redis服务配置，用于缓存、会话存储和任务队列
-    REDIS_HOST = os.environ.get('REDIS_HOST') or 'localhost'  # Redis服务器地址
-    REDIS_PORT = int(os.environ.get('REDIS_PORT') or 6379)  # Redis服务端口
-    REDIS_DB = int(os.environ.get('REDIS_DB') or 0)  # Redis数据库索引
+    # 注意：Redis服务配置已移除，应用将使用内存存储代替
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 上传文件大小限制（16MB）
 
     # 日志配置

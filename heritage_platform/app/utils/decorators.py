@@ -16,15 +16,12 @@ from flask import abort, flash, redirect, url_for, current_app, request
 from flask_login import current_user
 from typing import Callable, Union, Optional
 import time
-from collections import defaultdict
-from threading import Lock
 from app.utils.response import api_error
+from app.utils.security_config import rate_limit as security_rate_limit
 
-# 简单的内存缓存，用于存储访问记录
-# 使用defaultdict避免键不存在的问题，使用列表存储时间戳
-_rate_limit_cache = defaultdict(list)
-# 使用锁确保线程安全，防止并发访问导致的竞态条件
-_cache_lock = Lock()
+# 导入Flask-Limiter提供的速率限制装饰器
+# 注意：应用中使用Flask-Limiter进行速率限制，而非自定义实现
+# 请参考app.utils.security_config中的rate_limit装饰器
 
 def role_required(role: Union[str, list]):
     """角色要求装饰器
@@ -75,65 +72,44 @@ def teacher_required(f: Callable):
     return role_required(['teacher', 'admin'])(f)
 
 def ratelimit(calls: int = 100, period: int = 60, by: Optional[str] = None):
-    """访问频率限制装饰器
+    """访问频率限制装饰器 (已弃用)
 
-    限制API的访问频率，防止滥用和DoS攻击。
-    使用滑动窗口算法实现，在指定时间窗口内限制请求次数。
-    可以基于IP地址或用户ID进行限制。
-    超过限制时返回429错误(Too Many Requests)。
+    此装饰器已弃用，请使用 Flask-Limiter 提供的速率限制功能。
 
-    实现原理:
-    - 使用内存缓存存储每个限制键的访问时间戳列表
-    - 每次请求时清理过期的时间戳并检查是否超过限制
-    - 使用锁确保线程安全
-
-    Args:
-        calls: 允许的最大请求次数，默认为100次
-        period: 时间窗口（秒），默认为60秒
-        by: 限制依据，可选值为'ip'(基于IP地址)或'user'(基于用户ID)，默认为None(基于函数名)
-
-    Returns:
-        装饰器函数
+    推荐使用 app.utils.security_config 中的 rate_limit 装饰器，或直接使用
+    app 中初始化的 limiter 实例的 limit 方法。
 
     示例:
+        # 使用 security_config 中的 rate_limit 装饰器
+        from app.utils.security_config import rate_limit
+
         @app.route('/api/sensitive')
-        @ratelimit(calls=5, period=60, by='ip')
+        @rate_limit(["5 per minute", "100 per day"])
         def sensitive_api():
-            return "此API每分钟最多调用5次"
+            return "此API有速率限制"
+
+        # 或直接使用 limiter 实例
+        from app import limiter
+
+        @app.route('/api/sensitive')
+        @limiter.limit("5 per minute")
+        def sensitive_api():
+            return "此API有速率限制"
     """
-    def decorator(f: Callable):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            # 获取限制键
-            if by == 'ip':
-                key = f"ratelimit:{request.remote_addr}:{f.__name__}"
-            elif by == 'user' and current_user.is_authenticated:
-                key = f"ratelimit:{current_user.id}:{f.__name__}"
-            else:
-                key = f"ratelimit:default:{f.__name__}"
-
-            # 获取当前时间
-            now = time.time()
-
-            with _cache_lock:
-                # 清理过期的访问记录
-                _rate_limit_cache[key] = [ts for ts in _rate_limit_cache[key] if now - ts < period]
-
-                # 检查是否超过限制
-                if len(_rate_limit_cache[key]) >= calls:
-                    current_app.logger.warning(f"访问频率限制: {key}")
-                    return api_error(
-                        message="请求过于频繁，请稍后再试",
-                        status_code=429,
-                        error_code="RATE_LIMIT_EXCEEDED"
-                    )
-
-                # 记录本次访问
-                _rate_limit_cache[key].append(now)
-
-            return f(*args, **kwargs)
-        return decorated_function
-    return decorator
+    # 返回 security_config 中的 rate_limit 装饰器
+    # 将调用转发到标准实现
+    if by == 'ip':
+        # 基于IP地址限制
+        limit_string = f"{calls} per {period} second"
+        return security_rate_limit([limit_string])
+    elif by == 'user':
+        # 基于用户ID限制 (注意：Flask-Limiter 默认基于IP)
+        limit_string = f"{calls} per {period} second"
+        return security_rate_limit([limit_string])
+    else:
+        # 默认限制
+        limit_string = f"{calls} per {period} second"
+        return security_rate_limit([limit_string])
 
 def log_access(f: Callable):
     """访问日志装饰器

@@ -52,9 +52,9 @@ def setup_security(app):
     # 抑制内存存储的警告
     warnings.filterwarnings("ignore", message="Using the in-memory storage for tracking rate limits")
 
-    # 配置Limiter使用Redis存储（如果可用），否则回退到内存存储
-    redis_uri = app.config.get('REDIS_URL', None)
-    storage_uri = redis_uri if redis_uri else "memory://"
+    # 直接使用内存存储，不尝试连接Redis
+    storage_uri = "memory://"
+    app.logger.info("使用内存存储进行速率限制")
 
     limiter = Limiter(
         app=app,

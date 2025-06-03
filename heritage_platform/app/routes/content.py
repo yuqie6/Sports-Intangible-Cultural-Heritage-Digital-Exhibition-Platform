@@ -398,32 +398,74 @@ def create():
         - 视频类型支持上传视频文件
         - 使用save_file函数处理文件上传，确保安全存储
     """
+    current_app.logger.info("访问内容创建页面")
+
+    # 检查请求方法
+    if request.method == 'POST':
+        current_app.logger.info("收到POST请求，开始处理内容创建")
+        current_app.logger.info(f"表单数据: {request.form}")
+        current_app.logger.info(f"文件数据: {request.files}")
+    else:
+        current_app.logger.info("GET请求，显示创建表单")
+
     form = ContentForm()
 
     # 动态加载非遗项目选项
-    form.heritage_id.choices = [(h.id, h.name) for h in HeritageItem.query.all()]
+    try:
+        heritage_items = HeritageItem.query.all()
+        form.heritage_id.choices = [(h.id, h.name) for h in heritage_items]
+        current_app.logger.info(f"加载了 {len(heritage_items)} 个非遗项目选项")
+    except Exception as e:
+        current_app.logger.error(f"加载非遗项目选项失败: {str(e)}")
+        form.heritage_id.choices = []
+        flash('加载非遗项目列表失败，请稍后重试', 'danger')
+
+    # 检查表单验证状态
+    is_submitted = form.is_submitted()
+    is_validated = form.validate() if is_submitted else False
+
+    current_app.logger.info(f"表单提交状态: {is_submitted}, 验证状态: {is_validated}")
+
+    if is_submitted and not is_validated:
+        current_app.logger.warning("表单验证失败")
+        for field_name, errors in form.errors.items():
+            current_app.logger.warning(f"字段 '{field_name}' 验证错误: {errors}")
 
     if form.validate_on_submit():
+        current_app.logger.info("表单验证通过，开始创建内容")
         try:
+            # 记录表单数据
+            current_app.logger.info(f"标题: {form.title.data}")
+            current_app.logger.info(f"非遗项目ID: {form.heritage_id.data}")
+            current_app.logger.info(f"内容类型: {form.content_type.data}")
+            current_app.logger.info(f"当前用户ID: {current_user.id}")
+
+            # 创建内容对象
             content = Content(
                 title=form.title.data,
                 heritage_id=form.heritage_id.data,
                 user_id=current_user.id,
                 content_type=form.content_type.data
             )
+            current_app.logger.info("内容对象创建成功")
 
             # 处理封面图片（适用于所有内容类型）
-            if form.cover_image.data and form.cover_image.data.filename:
-                current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
-                cover_path = save_file(form.cover_image.data, 'image')
-                if cover_path:
-                    current_app.logger.info(f"封面图片上传成功，路径: {cover_path}")
-                    content.cover_image = cover_path
+            if form.cover_image.data:
+                if hasattr(form.cover_image.data, 'filename') and form.cover_image.data.filename:
+                    current_app.logger.info(f"处理封面图片上传: {form.cover_image.data.filename}")
+                    cover_path = save_file(form.cover_image.data, 'image')
+                    if cover_path:
+                        current_app.logger.info(f"封面图片上传成功，路径: {cover_path}")
+                        content.cover_image = cover_path
+                    else:
+                        current_app.logger.error("封面图片上传失败")
+                        flash('封面图片上传失败', 'danger')
+                        # 保留原有封面图片
+                        # 不要在这里返回，让用户可以继续保存其他内容
                 else:
-                    current_app.logger.error("封面图片上传失败")
-                    flash('封面图片上传失败', 'danger')
-                    # 保留原有封面图片
-                    # 不要在这里返回，让用户可以继续保存其他内容
+                    current_app.logger.info("封面图片数据存在但没有文件名，可能是空文件或无效文件")
+            else:
+                current_app.logger.info("未提供封面图片")
 
             # 根据内容类型处理不同字段
             if form.content_type.data == 'article':
@@ -498,18 +540,32 @@ def create():
                 else:
                     current_app.logger.warning(f"未检测到视频上传")
 
-            db.session.add(content)
-            db.session.commit()
-            current_app.logger.info(f"内容创建成功：ID={content.id}, 标题={content.title}")
+            # 添加内容到数据库
+            current_app.logger.info("准备将内容添加到数据库")
+            try:
+                db.session.add(content)
+                current_app.logger.info("内容已添加到会话，准备提交")
+                db.session.commit()
+                current_app.logger.info(f"内容创建成功：ID={content.id}, 标题={content.title}")
 
-            flash('内容创建成功', 'success')
-            return redirect(url_for('content.detail', id=content.id))
+                flash('内容创建成功', 'success')
+                redirect_url = url_for('content.detail', id=content.id)
+                current_app.logger.info(f"重定向到: {redirect_url}")
+                return redirect(redirect_url)
+            except SQLAlchemyError as db_error:
+                db.session.rollback()
+                current_app.logger.error(f"数据库错误: {str(db_error)}")
+                current_app.logger.error(traceback.format_exc())
+                flash('数据库操作失败，请稍后重试', 'danger')
+                return render_template('content/create.html', form=form)
 
         except Exception as e:
-            db.session.rollback()
+            if 'db' in locals() and db.session.is_active:
+                db.session.rollback()
             current_app.logger.error(f"创建内容失败: {str(e)}")
             current_app.logger.error(traceback.format_exc())
             flash('创建内容失败，请稍后重试', 'danger')
+            current_app.logger.info("返回创建表单页面")
 
     return render_template('content/create.html', form=form)
 
@@ -678,25 +734,24 @@ def upload_image():
         file.seek(0)
 
         try:
-            # 创建上传目录
-            upload_path = os.path.join(
-                current_app.root_path,
-                'static', 'uploads', 'images'
-            )
-            current_app.logger.info(f"上传路径: {upload_path}")
-            os.makedirs(upload_path, exist_ok=True)
+            # 使用统一的文件处理函数保存图片（包括压缩和添加水印）
+            current_app.logger.info("使用save_file函数处理图片上传")
+            file_path = save_file(file, 'image')
 
-            # 创建安全的文件名
+            if not file_path:
+                current_app.logger.error("文件保存失败")
+                return jsonify({
+                    'uploaded': 0,
+                    'error': {'message': '文件保存失败，请稍后重试'}
+                })
+
+            current_app.logger.info(f"文件保存成功，路径: {file_path}")
+
+            # 获取原始文件名
             filename = secure_filename(file.filename)
-            unique_filename = f"{uuid.uuid4().hex}_{filename}"
-            file_path = os.path.join(upload_path, unique_filename)
-
-            # 直接保存文件
-            file.save(file_path)
-            current_app.logger.info(f"文件保存到: {file_path}")
 
             # 构建绝对URL路径（确保以/static/开头）
-            url = url_for('static', filename=f"uploads/images/{unique_filename}")
+            url = url_for('static', filename=file_path)
 
             # 记录生成的URL
             current_app.logger.info(f"生成的图片URL: {url}")
